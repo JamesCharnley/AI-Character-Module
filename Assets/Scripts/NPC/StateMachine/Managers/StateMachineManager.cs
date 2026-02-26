@@ -26,10 +26,6 @@ namespace AICharacterModule.NPC.StateMachine.Managers
 
         private readonly Dictionary<string, ISubStateMachine<TGlobalData>> _subMachines = new();
         private readonly List<Transition> _transitions = new();
-    /// </summary>
-    public class StateMachineManager<TGlobalData>
-    {
-        private readonly Dictionary<string, ISubStateMachine<TGlobalData>> _subMachines = new();
         private ISubStateMachine<TGlobalData> _current;
 
         public StateMachineManager(TGlobalData globalData)
@@ -40,7 +36,6 @@ namespace AICharacterModule.NPC.StateMachine.Managers
         public TGlobalData GlobalData { get; }
 
         public string CurrentSubMachineName { get; private set; }
-        public string CurrentSubMachineName => _current?.Name;
 
         public void RegisterSubMachine(ISubStateMachine<TGlobalData> subMachine)
         {
@@ -95,8 +90,6 @@ namespace AICharacterModule.NPC.StateMachine.Managers
                 SwitchTo(transition.ToSubMachine);
                 return;
             }
-        }
-            _current?.Tick(deltaTime);
         }
     }
 }

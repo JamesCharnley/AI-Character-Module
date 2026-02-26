@@ -26,10 +26,6 @@ namespace AICharacterModule.NPC.StateMachine.Managers
 
         private readonly Dictionary<string, IState<TLocalData, TGlobalData>> _states = new();
         private readonly List<Transition> _transitions = new();
-    /// </summary>
-    public class StateManager<TLocalData, TGlobalData>
-    {
-        private readonly Dictionary<string, IState<TLocalData, TGlobalData>> _states = new();
         private IState<TLocalData, TGlobalData> _current;
 
         public StateManager(TLocalData localData, StateMachineManager<TGlobalData> machineManager)
