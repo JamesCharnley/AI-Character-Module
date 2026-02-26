@@ -35,6 +35,36 @@ namespace AICharacterModule.NPC
 
             _masterStateMachine = new StateMachineManager<NPCGlobalData>(globalData);
 
+            var navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(), _masterStateMachine);
+            navigationStateManager.RegisterState("Patrol", new PatrolState());
+            navigationStateManager.RegisterState("Chase", new ChaseState());
+            navigationStateManager.RegisterTransition(
+                "Patrol",
+                "Chase",
+                (_, data) => HasTargetWithinRange(data, data.DetectionRange));
+            navigationStateManager.RegisterTransition(
+                "Chase",
+                "Patrol",
+                (_, data) => !HasTargetWithinRange(data, data.DetectionRange));
+
+            var combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
+            combatStateManager.RegisterState("Attack", new AttackState());
+
+            var navigationSubMachine = new SubStateMachine<NavigationData, NPCGlobalData>("Navigation", "Patrol", navigationStateManager);
+            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "Attack", combatStateManager);
+
+            _masterStateMachine.RegisterSubMachine(navigationSubMachine);
+            _masterStateMachine.RegisterSubMachine(combatSubMachine);
+
+            _masterStateMachine.RegisterTransition(
+                "Navigation",
+                "Combat",
+                data => HasTargetWithinRange(data, data.AttackRange));
+            _masterStateMachine.RegisterTransition(
+                "Combat",
+                "Navigation",
+                data => !HasTargetWithinRange(data, data.AttackRange));
+
             _navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(), _masterStateMachine);
             _navigationStateManager.RegisterState("Patrol", new PatrolState());
             _navigationStateManager.RegisterState("Chase", new ChaseState());
@@ -52,6 +82,18 @@ namespace AICharacterModule.NPC
 
         private void Update()
         {
+            _masterStateMachine.GlobalData.CurrentTarget = target;
+            _masterStateMachine.Tick(Time.deltaTime);
+        }
+
+        private static bool HasTargetWithinRange(NPCGlobalData data, float range)
+        {
+            if (data.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
             var globalData = _masterStateMachine.GlobalData;
             globalData.CurrentTarget = target;
 
