@@ -30,7 +30,9 @@ namespace AICharacterModule.NPC.StateMachine.States
             }
 
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
-            localData.UpdateRemainingDistanceHistory(globalData.NavAgent.remainingDistance, deltaTime);
+
+            float npcToTargetDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            localData.UpdateAttackGapHistory(npcToTargetDistance, globalData.AttackRange, deltaTime);
         }
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
@@ -69,13 +71,13 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
 
-            float estimatedSecondsToDestination = _localData.GetEstimatedSecondsToDestination();
-            if (float.IsInfinity(estimatedSecondsToDestination) || float.IsNaN(estimatedSecondsToDestination))
+            float estimatedSecondsToAttack = _localData.GetEstimatedSecondsToAttack();
+            if (float.IsInfinity(estimatedSecondsToAttack) || float.IsNaN(estimatedSecondsToAttack))
             {
                 return;
             }
 
-            if (estimatedSecondsToDestination >= AttackEstimateMinSeconds && estimatedSecondsToDestination <= AttackEstimateMaxSeconds)
+            if (estimatedSecondsToAttack >= AttackEstimateMinSeconds && estimatedSecondsToAttack <= AttackEstimateMaxSeconds)
             {
                 _globalData.Anim.SetTrigger("Attack");
                 _globalData.IsAttacking = true;
