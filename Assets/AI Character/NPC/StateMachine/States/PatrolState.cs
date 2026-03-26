@@ -23,8 +23,6 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
         {
-            localData.UpdateRemainingDistanceHistory(globalData.NavAgent.remainingDistance, deltaTime);
-
             if (!isIdle && !globalData.NavAgent.pathPending && globalData.NavAgent.remainingDistance <= localData.ReachedThreshold)
             {
                 globalData.NpcTransform.GetComponent<MonoBehaviour>().StartCoroutine(WaitForSeconds(5, localData, globalData));
