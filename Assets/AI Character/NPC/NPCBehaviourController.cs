@@ -79,6 +79,7 @@ namespace AICharacterModule.NPC
 
         private void Update()
         {
+            _masterStateMachine.GlobalData.NavAgent.speed = _masterStateMachine.GlobalData.Anim.GetFloat("Speed");
             _masterStateMachine.GlobalData.CurrentTarget = target;
             _masterStateMachine.Tick(Time.deltaTime);
         }
@@ -107,6 +108,11 @@ namespace AICharacterModule.NPC
             }
 
             return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
+        }
+        private void OnAnimatorMove()
+        {
+            Vector3 localVelocity = transform.InverseTransformDirection(_masterStateMachine.GlobalData.Anim.velocity);
+            _masterStateMachine.GlobalData.Anim.SetFloat("Speed", localVelocity.z);
         }
     }
 }
