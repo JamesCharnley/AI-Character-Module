@@ -2,6 +2,7 @@ using AICharacterModule.NPC.StateMachine.Data;
 using AICharacterModule.NPC.StateMachine.Managers;
 using AICharacterModule.NPC.StateMachine.States;
 using AICharacterModule.NPC.StateMachine.SubMachines;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +17,8 @@ namespace AICharacterModule.NPC
     {
         [SerializeField] private Transform target;
 
+        public event Action chaseAnimationCycleEndingEvent;
+
         private StateMachineManager<NPCGlobalData> _masterStateMachine;
 
         private void Awake()
@@ -24,6 +27,7 @@ namespace AICharacterModule.NPC
 
             var globalData = new NPCGlobalData
             {
+                BehaviourController = this,
                 NpcTransform = transform,
                 NavAgent = navAgent,
                 CurrentTarget = target,
@@ -88,6 +92,11 @@ namespace AICharacterModule.NPC
             }
 
             _masterStateMachine.GlobalData.IsAttacking = false;
+        }
+
+        public void ChaseAnimationCycleEnding()
+        {
+            chaseAnimationCycleEndingEvent?.Invoke();
         }
 
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)
