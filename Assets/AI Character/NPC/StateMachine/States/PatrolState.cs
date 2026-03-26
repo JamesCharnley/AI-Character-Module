@@ -17,11 +17,14 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             globalData.NavAgent.isStopped = false;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
+            localData.ResetArrivalEstimateTracking();
             globalData.Anim.SetTrigger("Walk");
         }
 
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
         {
+            localData.UpdateRemainingDistanceHistory(globalData.NavAgent.remainingDistance, deltaTime);
+
             if (!isIdle && !globalData.NavAgent.pathPending && globalData.NavAgent.remainingDistance <= localData.ReachedThreshold)
             {
                 globalData.NpcTransform.GetComponent<MonoBehaviour>().StartCoroutine(WaitForSeconds(5, localData, globalData));
@@ -41,6 +44,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             localData.PatrolPoint = globalData.NpcTransform.position + Random.insideUnitSphere * 20f;
             localData.PatrolPoint.y = globalData.NpcTransform.position.y;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
+            localData.ResetArrivalEstimateTracking();
             isIdle = false;
             globalData.Anim.SetTrigger("Walk");
         }

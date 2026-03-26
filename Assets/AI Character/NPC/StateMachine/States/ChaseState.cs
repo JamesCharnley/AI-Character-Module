@@ -8,6 +8,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
             globalData.NavAgent.isStopped = false;
+            localData.ResetArrivalEstimateTracking();
         }
 
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
@@ -18,6 +19,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             }
 
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
+            localData.UpdateRemainingDistanceHistory(globalData.NavAgent.remainingDistance, deltaTime);
         }
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
