@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using AICharacterModule.NPC;
 
 namespace AICharacterModule.NPC.StateMachine.Data
 {
@@ -9,6 +10,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
     /// </summary>
     public class NPCGlobalData
     {
+        public NPCBehaviourController BehaviourController;
         public Transform NpcTransform;
         public NavMeshAgent NavAgent;
         public Transform CurrentTarget;
