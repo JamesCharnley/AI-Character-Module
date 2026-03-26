@@ -6,8 +6,8 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public class ChaseState : IState<NavigationData, NPCGlobalData>
     {
-        private const float AttackEstimateMinSeconds = 2.5f;
-        private const float AttackEstimateMaxSeconds = 3.5f;
+        private const float AttackEstimateMinSeconds = 1f;
+        private const float AttackEstimateMaxSeconds = 2.5f;
         private NavigationData _localData;
         private NPCGlobalData _globalData;
 
@@ -49,8 +49,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 return;
             }
-
-            globalData.BehaviourController.chaseAnimationCycleEndingEvent -= OnChaseAnimationCycleEnding;
+            
             globalData.BehaviourController.chaseAnimationCycleEndingEvent += OnChaseAnimationCycleEnding;
         }
 

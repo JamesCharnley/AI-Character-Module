@@ -17,7 +17,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public Animator Anim;
         public bool IsAttacking;
         public float Health = 100f;
-        public float DetectionRange = 10f;
+        public float DetectionRange = 40f;
         public float AttackRange = 2f;
     }
 }
