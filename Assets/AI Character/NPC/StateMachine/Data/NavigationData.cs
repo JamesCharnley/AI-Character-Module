@@ -8,6 +8,6 @@ namespace AICharacterModule.NPC.StateMachine.Data
     public class NavigationData
     {
         public Vector3 PatrolPoint;
-        public float ReachedThreshold = 0.25f;
+        public float ReachedThreshold = 3.0f;
     }
 }

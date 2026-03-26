@@ -38,7 +38,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         IEnumerator WaitForSeconds(float _seconds, NavigationData localData, NPCGlobalData globalData)
         {
             yield return new WaitForSeconds(_seconds);
-            localData.PatrolPoint = globalData.NpcTransform.position + Random.insideUnitSphere * 4f;
+            localData.PatrolPoint = globalData.NpcTransform.position + Random.insideUnitSphere * 20f;
             localData.PatrolPoint.y = globalData.NpcTransform.position.y;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
             isIdle = false;
