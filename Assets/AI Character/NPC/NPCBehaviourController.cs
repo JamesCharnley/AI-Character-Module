@@ -32,7 +32,7 @@ namespace AICharacterModule.NPC
                 NavAgent = navAgent,
                 CurrentTarget = target,
                 Anim = GetComponent<Animator>(),
-                DetectionRange = navAgent.stoppingDistance + 12f,
+                DetectionRange = navAgent.stoppingDistance + 60f,
                 AttackRange = navAgent.stoppingDistance
             };
 
@@ -65,10 +65,10 @@ namespace AICharacterModule.NPC
             _masterStateMachine.RegisterSubMachine(navigationSubMachine);
             _masterStateMachine.RegisterSubMachine(combatSubMachine);
 
-            _masterStateMachine.RegisterTransition(
-                "Navigation",
-                "Combat",
-                data => HasTargetWithinRange(data, data.AttackRange));
+            //_masterStateMachine.RegisterTransition(
+            //    "Navigation",
+            //    "Combat",
+            //    data => HasTargetWithinRange(data, data.AttackRange));
             _masterStateMachine.RegisterTransition(
                 "Combat",
                 "Navigation",

@@ -6,8 +6,10 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public class ChaseState : IState<NavigationData, NPCGlobalData>
     {
-        private const float AttackEstimateMinSeconds = 1f;
-        private const float AttackEstimateMaxSeconds = 2.5f;
+        private const float ChaseAttackEstimateMinSeconds = 3.1f;
+        private const float ChaseAttackEstimateMaxSeconds = 5f;
+        private const float PushStopAttackEstimateMinSeconds = 0;
+        private const float PushStopAttackEstimateMaxSeconds = 3f;
         private NavigationData _localData;
         private NPCGlobalData _globalData;
 
@@ -27,6 +29,12 @@ namespace AICharacterModule.NPC.StateMachine.States
             if (globalData.CurrentTarget == null)
             {
                 return;
+            }
+            
+            if (_globalData.NavAgent.remainingDistance < 0.7f)
+            {
+                _globalData.Anim.SetTrigger("PushStop");
+                _globalData.IsAttacking = true;
             }
 
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
@@ -70,13 +78,27 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
 
+            
+            if (_globalData.NavAgent.remainingDistance < 3 && _globalData.NavAgent.remainingDistance > 2)
+            {
+                _globalData.Anim.SetTrigger("Attack");
+                _globalData.IsAttacking = true;
+            }
+
+            return;
             float estimatedSecondsToAttack = _localData.GetEstimatedSecondsToAttack();
             if (float.IsInfinity(estimatedSecondsToAttack) || float.IsNaN(estimatedSecondsToAttack))
             {
                 return;
             }
+            
+            if (estimatedSecondsToAttack >= PushStopAttackEstimateMinSeconds && estimatedSecondsToAttack <= PushStopAttackEstimateMaxSeconds)
+            {
+                _globalData.Anim.SetTrigger("PushStop");
+                _globalData.IsAttacking = true;
+            }
 
-            if (estimatedSecondsToAttack >= AttackEstimateMinSeconds && estimatedSecondsToAttack <= AttackEstimateMaxSeconds)
+            if (estimatedSecondsToAttack >= ChaseAttackEstimateMinSeconds && estimatedSecondsToAttack <= ChaseAttackEstimateMaxSeconds)
             {
                 _globalData.Anim.SetTrigger("Attack");
                 _globalData.IsAttacking = true;

@@ -19,7 +19,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
 
         public Vector3 PatrolPoint;
         public float ReachedThreshold = 3.0f;
-        public float RemainingDistanceAverageWindowSeconds = 3.0f;
+        public float RemainingDistanceAverageWindowSeconds = 1.0f;
         public float AttackAnimationTravelDistance = 1.0f;
 
         /// <summary>
