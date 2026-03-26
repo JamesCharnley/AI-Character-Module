@@ -9,6 +9,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
             localData.CooldownTimer = 0f;
+            globalData.IsAttacking = true;
             globalData.NavAgent.isStopped = true;
             globalData.NavAgent.ResetPath();
         }

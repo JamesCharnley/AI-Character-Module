@@ -79,6 +79,17 @@ namespace AICharacterModule.NPC
             _masterStateMachine.Tick(Time.deltaTime);
         }
 
+
+        public void AttackAnimationCompleted()
+        {
+            if (_masterStateMachine == null)
+            {
+                return;
+            }
+
+            _masterStateMachine.GlobalData.IsAttacking = false;
+        }
+
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)
         {
             if (data.CurrentTarget == null)
