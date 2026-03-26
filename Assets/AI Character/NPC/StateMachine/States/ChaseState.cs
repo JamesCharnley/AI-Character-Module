@@ -13,6 +13,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             globalData.NavAgent.isStopped = false;
             localData.ResetArrivalEstimateTracking();
+            globalData.Anim.SetTrigger("Chase");
         }
 
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
