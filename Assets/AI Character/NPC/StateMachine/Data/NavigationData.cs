@@ -8,23 +8,26 @@ namespace AICharacterModule.NPC.StateMachine.Data
     /// </summary>
     public class NavigationData
     {
-        private readonly Queue<DistanceSample> distanceSamples = new Queue<DistanceSample>();
+        private readonly Queue<GapSample> gapSamples = new Queue<GapSample>();
         private float elapsedTrackingTime;
 
-        private struct DistanceSample
+        private struct GapSample
         {
             public float Time;
-            public float RemainingDistance;
+            public float RemainingGapToAttack;
         }
 
         public Vector3 PatrolPoint;
         public float ReachedThreshold = 3.0f;
         public float RemainingDistanceAverageWindowSeconds = 3.0f;
+        public float AttackAnimationTravelDistance = 1.0f;
 
         /// <summary>
-        /// Track remaining path distance over time so an arrival estimate can be calculated.
+        /// Track remaining gap to attack over time so an arrival estimate can be calculated.
+        /// This uses the real NPC-target distance and subtracts distance that will be covered
+        /// by the attack animation itself.
         /// </summary>
-        public void UpdateRemainingDistanceHistory(float remainingDistance, float deltaTime)
+        public void UpdateAttackGapHistory(float npcToTargetDistance, float attackRange, float deltaTime)
         {
             if (deltaTime <= 0f)
             {
@@ -33,29 +36,31 @@ namespace AICharacterModule.NPC.StateMachine.Data
 
             elapsedTrackingTime += deltaTime;
 
-            distanceSamples.Enqueue(new DistanceSample
+            float remainingGapToAttack = Mathf.Max(npcToTargetDistance - attackRange - AttackAnimationTravelDistance, 0f);
+
+            gapSamples.Enqueue(new GapSample
             {
                 Time = elapsedTrackingTime,
-                RemainingDistance = Mathf.Max(remainingDistance, 0f)
+                RemainingGapToAttack = remainingGapToAttack
             });
 
-            TrimDistanceHistory();
+            TrimGapHistory();
         }
 
         /// <summary>
-        /// Estimate seconds to destination using average progress from recent distance samples.
-        /// Returns Mathf.Infinity when there is not enough progress data.
+        /// Estimate seconds to attack using average gap-closing speed from recent samples.
+        /// Returns Mathf.Infinity when there is not enough data or if the NPC is not closing in.
         /// </summary>
-        public float GetEstimatedSecondsToDestination()
+        public float GetEstimatedSecondsToAttack()
         {
-            if (distanceSamples.Count < 2)
+            if (gapSamples.Count < 2)
             {
                 return Mathf.Infinity;
             }
 
-            DistanceSample[] samples = distanceSamples.ToArray();
-            DistanceSample oldest = samples[0];
-            DistanceSample latest = samples[samples.Length - 1];
+            GapSample[] samples = gapSamples.ToArray();
+            GapSample oldest = samples[0];
+            GapSample latest = samples[samples.Length - 1];
 
             float deltaTime = latest.Time - oldest.Time;
             if (deltaTime <= 0f)
@@ -63,14 +68,14 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 return Mathf.Infinity;
             }
 
-            float distanceReduction = oldest.RemainingDistance - latest.RemainingDistance;
-            float averageDistanceReductionPerSecond = distanceReduction / deltaTime;
-            if (averageDistanceReductionPerSecond <= 0f)
+            float gapReduction = oldest.RemainingGapToAttack - latest.RemainingGapToAttack;
+            float averageGapReductionPerSecond = gapReduction / deltaTime;
+            if (averageGapReductionPerSecond <= 0f)
             {
                 return Mathf.Infinity;
             }
 
-            return latest.RemainingDistance / averageDistanceReductionPerSecond;
+            return latest.RemainingGapToAttack / averageGapReductionPerSecond;
         }
 
         /// <summary>
@@ -78,16 +83,16 @@ namespace AICharacterModule.NPC.StateMachine.Data
         /// </summary>
         public void ResetArrivalEstimateTracking()
         {
-            distanceSamples.Clear();
+            gapSamples.Clear();
             elapsedTrackingTime = 0f;
         }
 
-        private void TrimDistanceHistory()
+        private void TrimGapHistory()
         {
             float historyWindow = Mathf.Max(RemainingDistanceAverageWindowSeconds, 0.1f);
-            while (distanceSamples.Count > 0 && elapsedTrackingTime - distanceSamples.Peek().Time > historyWindow)
+            while (gapSamples.Count > 0 && elapsedTrackingTime - gapSamples.Peek().Time > historyWindow)
             {
-                distanceSamples.Dequeue();
+                gapSamples.Dequeue();
             }
         }
     }
