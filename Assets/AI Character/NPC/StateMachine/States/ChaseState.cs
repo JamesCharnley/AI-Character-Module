@@ -4,23 +4,59 @@ using UnityEngine;
 
 namespace AICharacterModule.NPC.StateMachine.States
 {
-    public class ChaseState : IState<NavigationData, NPCGlobalData>
+    public sealed class ChaseState : IState<NavigationData, NPCGlobalData>
     {
-        private const float ChaseAttackEstimateMinSeconds = 3.1f;
-        private const float ChaseAttackEstimateMaxSeconds = 5f;
-        private const float PushStopAttackEstimateMinSeconds = 0;
-        private const float PushStopAttackEstimateMaxSeconds = 3f;
+        private AttackAnimationData[] attackAnimations;
         private NavigationData _localData;
         private NPCGlobalData _globalData;
 
+        public ChaseState()
+        {
+            Debug.Log("Chase state construct");
+            attackAnimations = new[]
+            {
+                new AttackAnimationData()
+                {
+                    StateName = "LongRightSwipe01",
+                    TargetDistanceOnAction = 1.35f,
+                    SecondsUntilAction = 0.5f,
+                    DistanceToAction = 3.5f
+                    
+                },
+                new AttackAnimationData()
+                {
+                    StateName = "ChasePush01",
+                    TargetDistanceOnAction = 1.2f,
+                    SecondsUntilAction = 0.7F,
+                    DistanceToAction = 1.91f
+                },
+                new AttackAnimationData()
+                {
+                    StateName = "ChasePush02",
+                    TargetDistanceOnAction = 1.1f,
+                    SecondsUntilAction = 0.44f,
+                    DistanceToAction = 2.41f
+                    
+                },
+                new AttackAnimationData()
+                {
+                    StateName = "SlideRightSwipe01",
+                    TargetDistanceOnAction = 1.15f,
+                    SecondsUntilAction = 0.8f,
+                    DistanceToAction = 2.7f
+                    
+                }
+            };
+        }
+
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
+            Debug.Log("Enter Chase");
             _localData = localData;
             _globalData = globalData;
 
             globalData.NavAgent.isStopped = false;
-            localData.ResetArrivalEstimateTracking();
-            globalData.Anim.SetTrigger("Chase");
+            globalData.Anim.SetBool("IsChasing01", true);
             SubscribeToChaseAnimationCycleEndingEvent(globalData);
         }
 
@@ -31,20 +67,12 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
             
-            if (_globalData.NavAgent.remainingDistance < 0.7f)
-            {
-                _globalData.Anim.SetTrigger("PushStop");
-                _globalData.IsAttacking = true;
-            }
-
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
-
-            float npcToTargetDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
-            localData.UpdateAttackGapHistory(npcToTargetDistance, globalData.AttackRange, deltaTime);
         }
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
         {
+            Debug.Log("Exit Chase");
             UnsubscribeFromChaseAnimationCycleEndingEvent(globalData);
             globalData.NavAgent.ResetPath();
             _localData = null;
@@ -55,9 +83,10 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             if (globalData.BehaviourController == null)
             {
+                Debug.Log("Subscribe cycle Failed");
                 return;
             }
-            
+            Debug.Log("Subscribe cycle");
             globalData.BehaviourController.chaseAnimationCycleEndingEvent += OnChaseAnimationCycleEnding;
         }
 
@@ -65,9 +94,10 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             if (globalData.BehaviourController == null)
             {
+                Debug.Log("UnSubscribe cycle Failed");
                 return;
             }
-
+            Debug.Log("UnSubscribe cycle");
             globalData.BehaviourController.chaseAnimationCycleEndingEvent -= OnChaseAnimationCycleEnding;
         }
 
@@ -75,34 +105,20 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             if (_localData == null || _globalData == null || _globalData.IsAttacking || _globalData.Anim == null)
             {
+                Debug.Log("OnChaseAnimationCycleEnding Failed");
                 return;
             }
 
-            
-            if (_globalData.NavAgent.remainingDistance < 3 && _globalData.NavAgent.remainingDistance > 2)
+            foreach (AttackAnimationData animationData in attackAnimations)
             {
-                _globalData.Anim.SetTrigger("Attack");
-                _globalData.IsAttacking = true;
-            }
-
-            return;
-            float estimatedSecondsToAttack = _localData.GetEstimatedSecondsToAttack();
-            if (float.IsInfinity(estimatedSecondsToAttack) || float.IsNaN(estimatedSecondsToAttack))
-            {
-                return;
+                float predictedDistanceFromTargetOnAction = _globalData.PredictTargetDistanceInTime(animationData.SecondsUntilAction);
+                if (Mathf.Abs(predictedDistanceFromTargetOnAction - animationData.DistanceToAction) < 0.3f)
+                {
+                    _globalData.Anim.SetTrigger(animationData.StateName);
+                    _globalData.IsAttacking = true;
+                }
             }
             
-            if (estimatedSecondsToAttack >= PushStopAttackEstimateMinSeconds && estimatedSecondsToAttack <= PushStopAttackEstimateMaxSeconds)
-            {
-                _globalData.Anim.SetTrigger("PushStop");
-                _globalData.IsAttacking = true;
-            }
-
-            if (estimatedSecondsToAttack >= ChaseAttackEstimateMinSeconds && estimatedSecondsToAttack <= ChaseAttackEstimateMaxSeconds)
-            {
-                _globalData.Anim.SetTrigger("Attack");
-                _globalData.IsAttacking = true;
-            }
         }
     }
 }

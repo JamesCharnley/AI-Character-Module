@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2e5b03d21a6a4834aac47b91d9179431
+guid: 41005519c2c567143a1825343d80c3c6
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -19,13 +19,13 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
       copied configuration does not match position in animation file:\n\t'clavicle_r'
-      : position error = 1.174124 mm\n\t'clavicle_l' : position error = 1.106409
+      : position error = 1.174326 mm\n\t'clavicle_l' : position error = 1.106522
       mm\nCopied Avatar Rig Configuration mis-match. Inbetween bone rotation in copied
       configuration does not match rotation in animation file:\n\t'spine_04' : rotation
-      error = 3.674215 deg\n\t'spine_05' : rotation error = 1.554434 deg\n"
+      error = 3.674219 deg\n\t'spine_05' : rotation error = 1.554434 deg\n"
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'ZombieThug_Chase01_RightLeftSwing_02' has import
-      animation warnings that might lower retargeting quality:\nNote: Activate translation
+    animationImportWarnings: "\nClip 'ZombieThug_Chase01_RightSwing' has import animation
+      warnings that might lower retargeting quality:\nNote: Activate translation
       DOF on avatar to improve retargeting quality.\n\t'thigh_l' has translation
       animation that will be discarded.\n\t'thigh_r' has translation animation that
       will be discarded.\n\t'spine_01' has translation animation that will be discarded.\n\t'spine_02'
@@ -50,11 +50,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: ZombieThug_Chase01_RightLeftSwing_02
-      takeName: ZombieThug_Chase01_RightLeftSwing_02
-      internalID: 2917658631325717179
+      name: ZombieThug_Chase01_RightSwing
+      takeName: ZombieThug_Chase01_RightSwing
+      internalID: -6726165817379136251
       firstFrame: 0
-      lastFrame: 50
+      lastFrame: 34
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -73,7 +73,14 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.9225092
+        functionName: AttackAnimationCompleted
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

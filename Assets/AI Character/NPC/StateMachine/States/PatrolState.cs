@@ -17,7 +17,6 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             globalData.NavAgent.isStopped = false;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
-            localData.ResetArrivalEstimateTracking();
             globalData.Anim.SetTrigger("Walk");
         }
 
@@ -42,7 +41,6 @@ namespace AICharacterModule.NPC.StateMachine.States
             localData.PatrolPoint = globalData.NpcTransform.position + Random.insideUnitSphere * 20f;
             localData.PatrolPoint.y = globalData.NpcTransform.position.y;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
-            localData.ResetArrivalEstimateTracking();
             isIdle = false;
             globalData.Anim.SetTrigger("Walk");
         }

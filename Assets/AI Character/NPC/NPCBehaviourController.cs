@@ -39,7 +39,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine = new StateMachineManager<NPCGlobalData>(globalData);
 
             // Navigation State machine
-            var navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(), _masterStateMachine);
+            var navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
             navigationStateManager.RegisterState("Patrol", new PatrolState());
             navigationStateManager.RegisterState("Chase", new ChaseState());
             navigationStateManager.RegisterTransition(
@@ -89,9 +89,10 @@ namespace AICharacterModule.NPC
         {
             if (_masterStateMachine == null)
             {
+                Debug.Log("AttackAnimationCompleted failed");
                 return;
             }
-
+            Debug.Log("AttackAnimationCompleted");
             _masterStateMachine.GlobalData.IsAttacking = false;
         }
 
@@ -113,6 +114,7 @@ namespace AICharacterModule.NPC
         {
             Vector3 localVelocity = transform.InverseTransformDirection(_masterStateMachine.GlobalData.Anim.velocity);
             _masterStateMachine.GlobalData.Anim.SetFloat("Speed", localVelocity.z);
+            _masterStateMachine.GlobalData.NpcLastVelocity = _masterStateMachine.GlobalData.Anim.velocity;
         }
     }
 }

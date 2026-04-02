@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e2aa9fb6bdc906449b89f6ba77365b3b
+guid: d1c586c46beabc04197bdc3d2f99d91f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -24,8 +24,8 @@ ModelImporter:
       configuration does not match rotation in animation file:\n\t'spine_04' : rotation
       error = 3.667913 deg\n\t'spine_05' : rotation error = 1.555954 deg\n"
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'ZombieThug_Chase01_PushStop' has import animation
-      warnings that might lower retargeting quality:\nNote: Activate translation
+    animationImportWarnings: "\nClip 'ZombieThug_Chase01_ChasePush02' has import
+      animation warnings that might lower retargeting quality:\nNote: Activate translation
       DOF on avatar to improve retargeting quality.\n\t'thigh_l' has translation
       animation that will be discarded.\n\t'thigh_r' has translation animation that
       will be discarded.\n\t'spine_01' has translation animation that will be discarded.\n\t'spine_02'
@@ -50,11 +50,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: ZombieThug_Chase01_PushStop
-      takeName: ZombieThug_Chase01_PushStop
-      internalID: -7440481180808799716
+      name: ZombieThug_Chase01_ChasePush02
+      takeName: ZombieThug_Chase01_ChasePush02
+      internalID: 2563663639544171221
       firstFrame: 0
-      lastFrame: 75
+      lastFrame: 49
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -74,7 +74,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.9298893
+      - time: 0.9594096
         functionName: AttackAnimationCompleted
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
