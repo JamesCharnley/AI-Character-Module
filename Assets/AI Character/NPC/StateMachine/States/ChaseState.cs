@@ -1,5 +1,6 @@
 using AICharacterModule.NPC.StateMachine.Core;
 using AICharacterModule.NPC.StateMachine.Data;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AICharacterModule.NPC.StateMachine.States
@@ -20,22 +21,30 @@ namespace AICharacterModule.NPC.StateMachine.States
                     StateName = "LongRightSwipe01",
                     TargetDistanceOnAction = 1.35f,
                     SecondsUntilAction = 0.5f,
-                    DistanceToAction = 3.5f
+                    DistanceToAction = 5.75f
                     
                 },
                 new AttackAnimationData()
                 {
                     StateName = "ChasePush01",
                     TargetDistanceOnAction = 1.2f,
-                    SecondsUntilAction = 0.7F,
-                    DistanceToAction = 1.91f
+                    SecondsUntilAction = 1,
+                    DistanceToAction = 5f
                 },
-                new AttackAnimationData()
+                new AttackAnimationData() // cross
                 {
                     StateName = "ChasePush02",
                     TargetDistanceOnAction = 1.1f,
                     SecondsUntilAction = 0.44f,
-                    DistanceToAction = 2.41f
+                    DistanceToAction = 3.65f
+                    
+                },
+                new AttackAnimationData()
+                {
+                    StateName = "ChasePush03",
+                    TargetDistanceOnAction = 1.15f,
+                    SecondsUntilAction = 0.26f,
+                    DistanceToAction = 3f
                     
                 },
                 new AttackAnimationData()
@@ -43,7 +52,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                     StateName = "SlideRightSwipe01",
                     TargetDistanceOnAction = 1.15f,
                     SecondsUntilAction = 0.8f,
-                    DistanceToAction = 2.7f
+                    DistanceToAction = 5f
                     
                 }
             };
@@ -60,14 +69,57 @@ namespace AICharacterModule.NPC.StateMachine.States
             SubscribeToChaseAnimationCycleEndingEvent(globalData);
         }
 
+        private bool hasAttacked = false;
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
         {
             if (globalData.CurrentTarget == null)
             {
                 return;
             }
-            
+            if (hasAttacked && !globalData.IsAttacking)
+            {
+                hasAttacked = false;
+                globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
+            }
+            if(globalData.NavAgent.remainingDistance < 0.5f)
+            {
+                globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
+            }
+            //OnChaseAnimationCycleEnding();
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
+
+            float distanceToTarget = Vector3.Distance(globalData.CurrentTarget.transform.position + Vector3.down,
+                _globalData.NavAgent.transform.position);
+            if (distanceToTarget < 3 && !globalData.IsAttacking)
+            {
+                if (globalData.GetTargetVelocity().magnitude < 0.1f)
+                {
+                    globalData.IsAttacking = true;
+                    globalData.Anim.SetTrigger("ChasePush03");
+                }
+                else
+                {
+                    Vector3 towards = (globalData.NavAgent.transform.position - globalData.CurrentTarget.position)
+                        .normalized;
+                    float dot = Vector3.Dot(globalData.GetTargetVelocity().normalized, towards);
+                    if (dot >= 0)
+                    {
+                        globalData.IsAttacking = true;
+                        globalData.Anim.SetTrigger("ChasePush03");
+                    }
+                }
+                
+            }
+            if (distanceToTarget < 1f)
+            {
+                if (globalData.CurrentTarget.TryGetComponent(out PlayerController player))
+                {
+                    player.AddImpulse(globalData.NavAgent.transform.forward * 40);
+                    hasAttacked = true;
+                }
+            }
+
+            
         }
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
@@ -103,6 +155,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         private void OnChaseAnimationCycleEnding()
         {
+            
             if (_localData == null || _globalData == null || _globalData.IsAttacking || _globalData.Anim == null)
             {
                 Debug.Log("OnChaseAnimationCycleEnding Failed");
@@ -112,10 +165,11 @@ namespace AICharacterModule.NPC.StateMachine.States
             foreach (AttackAnimationData animationData in attackAnimations)
             {
                 float predictedDistanceFromTargetOnAction = _globalData.PredictTargetDistanceInTime(animationData.SecondsUntilAction);
-                if (Mathf.Abs(predictedDistanceFromTargetOnAction - animationData.DistanceToAction) < 0.3f)
+                if (Mathf.Abs(predictedDistanceFromTargetOnAction - animationData.DistanceToAction) < 0.1f)
                 {
                     _globalData.Anim.SetTrigger(animationData.StateName);
                     _globalData.IsAttacking = true;
+                    break;
                 }
             }
             

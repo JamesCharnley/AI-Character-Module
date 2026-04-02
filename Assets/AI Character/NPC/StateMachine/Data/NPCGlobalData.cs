@@ -45,11 +45,22 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public Vector3 NpcLastVelocity;
         public float PredictTargetDistanceInTime(float _time)
         {
-            Vector3 predictedPlayerPosition = PlayerCharacterController.transform.position + Vector3.down +
-                                              PlayerCharacterController.velocity * _time;
-            Debug.Log(PlayerCharacterController.velocity);
+            Vector3 predictedPlayerPosition = (PlayerCharacterController.transform.position + Vector3.down) +
+                                               TargetVelocity * _time;
+            Debug.Log(TargetVelocity);
             Debug.Log(Vector3.Distance(NavAgent.transform.position, predictedPlayerPosition));
             return Vector3.Distance(NavAgent.transform.position, predictedPlayerPosition);
+        }
+
+        public Vector3 GetTargetVelocity()
+        {
+            return TargetVelocity;
+        }
+
+        public void Tick(float _deltaTime)
+        {
+            TargetVelocity = (PlayerCharacterController.transform.position - TargetPrevPosition) / Time.deltaTime;
+            TargetPrevPosition = PlayerCharacterController.transform.position;
         }
     }
 }

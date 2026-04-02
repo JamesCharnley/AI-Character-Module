@@ -17,6 +17,10 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
+    // external velocity (impulses, knockbacks, etc.)
+    private Vector3 externalVelocity;
+
+    public float drag = 5f;        // how fast impulse dies off
     
     void Start()
     {
@@ -29,6 +33,25 @@ public class PlayerController : MonoBehaviour
     {
         isSprinting = Input.GetKey(KeyCode.LeftShift);
         HandleMovement();
+        float dt = Time.deltaTime;
+
+        // Apply gravity
+        externalVelocity.y += gravity * dt;
+
+        // Move character using external velocity
+        controller.Move(externalVelocity * dt);
+
+        // Apply drag (decay impulse)
+        externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, drag * dt);
+
+        // Optional: stop tiny values to prevent micro sliding
+        if (externalVelocity.magnitude < 0.01f)
+            externalVelocity = Vector3.zero;
+    }
+    
+    public void AddImpulse(Vector3 impulse)
+    {
+        externalVelocity += impulse;
     }
 
     void HandleMovement()
@@ -55,8 +78,7 @@ public class PlayerController : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
         }
 
-        // Gravity
-        velocity.y += gravity * Time.deltaTime;
+        
         controller.Move(velocity * Time.deltaTime);
     }
 }

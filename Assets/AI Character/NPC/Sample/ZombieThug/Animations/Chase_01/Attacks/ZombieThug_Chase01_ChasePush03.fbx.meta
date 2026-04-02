@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 90f39e1d649678f4abe41e8a6645d8f5
+guid: 02af39439f0b91949b2c18755f71c779
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -19,13 +19,13 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
       copied configuration does not match position in animation file:\n\t'clavicle_r'
-      : position error = 1.174191 mm\n\t'clavicle_l' : position error = 1.106522
+      : position error = 1.185082 mm\n\t'clavicle_l' : position error = 1.114757
       mm\nCopied Avatar Rig Configuration mis-match. Inbetween bone rotation in copied
       configuration does not match rotation in animation file:\n\t'spine_04' : rotation
-      error = 3.674218 deg\n\t'spine_05' : rotation error = 1.554558 deg\n"
+      error = 3.667913 deg\n\t'spine_05' : rotation error = 1.555954 deg\n"
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'ZombieThug_Chase01_Chase' has import animation
-      warnings that might lower retargeting quality:\nNote: Activate translation
+    animationImportWarnings: "\nClip 'ZombieThug_Chase01_ChasePush03' has import
+      animation warnings that might lower retargeting quality:\nNote: Activate translation
       DOF on avatar to improve retargeting quality.\n\t'thigh_l' has translation
       animation that will be discarded.\n\t'thigh_r' has translation animation that
       will be discarded.\n\t'spine_01' has translation animation that will be discarded.\n\t'spine_02'
@@ -42,26 +42,26 @@ ModelImporter:
     importAnimatedCustomProperties: 0
     importConstraints: 1
     animationCompression: 3
-    animationRotationError: 0.5
-    animationPositionError: 0.5
-    animationScaleError: 0.5
+    animationRotationError: 0.2
+    animationPositionError: 0.2
+    animationScaleError: 0.2
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: ZombieThug_Chase01_Chase
-      takeName: ZombieThug_Chase01_Chase
-      internalID: 1280744124046392813
+      name: ZombieThug_Chase01_ChasePush03
+      takeName: ZombieThug_Chase01_ChasePush03
+      internalID: 3360098878091748830
       firstFrame: 0
-      lastFrame: 17
+      lastFrame: 49
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
@@ -74,15 +74,8 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.5352774
-        functionName: ChaseAnimationCycleEnding
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.98331755
-        functionName: ChaseAnimationCycleEnding
+      - time: 0.97416973
+        functionName: AttackAnimationCompleted
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0

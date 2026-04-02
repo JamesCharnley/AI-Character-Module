@@ -82,6 +82,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.NavAgent.speed = _masterStateMachine.GlobalData.Anim.GetFloat("Speed");
             _masterStateMachine.GlobalData.CurrentTarget = target;
             _masterStateMachine.Tick(Time.deltaTime);
+            _masterStateMachine.GlobalData.Tick(Time.deltaTime);
         }
 
 
