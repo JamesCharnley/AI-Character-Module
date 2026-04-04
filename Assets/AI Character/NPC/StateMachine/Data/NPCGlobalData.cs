@@ -47,8 +47,8 @@ namespace AICharacterModule.NPC.StateMachine.Data
         {
             Vector3 predictedPlayerPosition = (PlayerCharacterController.transform.position + Vector3.down) +
                                                TargetVelocity * _time;
-            Debug.Log(TargetVelocity);
-            Debug.Log(Vector3.Distance(NavAgent.transform.position, predictedPlayerPosition));
+            //Debug.Log(TargetVelocity);
+            //Debug.Log(Vector3.Distance(NavAgent.transform.position, predictedPlayerPosition));
             return Vector3.Distance(NavAgent.transform.position, predictedPlayerPosition);
         }
 
