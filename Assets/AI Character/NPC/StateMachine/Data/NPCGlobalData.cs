@@ -57,6 +57,66 @@ namespace AICharacterModule.NPC.StateMachine.Data
             return TargetVelocity;
         }
 
+
+
+        public NavMeshPath FindPathOnTargetRadius(float targetRadius, Vector3 targetPosition, float minDistanceFromNpc,
+            float maxDistanceFromNpc, float radiusErrorMargin = 0.5f, int sampleCount = 32)
+        {
+            NavMeshPath bestPath = new NavMeshPath();
+
+            if (NavAgent == null || targetRadius <= 0f || maxDistanceFromNpc < 0f || minDistanceFromNpc > maxDistanceFromNpc)
+            {
+                return bestPath;
+            }
+
+            Vector3 npcPosition = NpcTransform != null ? NpcTransform.position : NavAgent.transform.position;
+            float targetNpcDistance = (minDistanceFromNpc + maxDistanceFromNpc) * 0.5f;
+            float bestScore = float.MaxValue;
+            float angleStep = Mathf.PI * 2f / Mathf.Max(1, sampleCount);
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                float angle = i * angleStep;
+                Vector3 radialOffset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * targetRadius;
+                Vector3 candidate = targetPosition + radialOffset;
+
+                float distanceFromNpc = Vector3.Distance(npcPosition, candidate);
+                if (distanceFromNpc < minDistanceFromNpc || distanceFromNpc > maxDistanceFromNpc)
+                {
+                    continue;
+                }
+
+                if (!NavMesh.SamplePosition(candidate, out NavMeshHit navHit, radiusErrorMargin, NavMesh.AllAreas))
+                {
+                    continue;
+                }
+
+                float radiusError = Mathf.Abs(Vector3.Distance(navHit.position, targetPosition) - targetRadius);
+                if (radiusError > radiusErrorMargin)
+                {
+                    continue;
+                }
+
+                NavMeshPath candidatePath = new NavMeshPath();
+                if (!NavMesh.CalculatePath(npcPosition, navHit.position, NavMesh.AllAreas, candidatePath) ||
+                    candidatePath.status != NavMeshPathStatus.PathComplete)
+                {
+                    continue;
+                }
+
+                float score = Mathf.Abs(distanceFromNpc - targetNpcDistance) + radiusError;
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                bestScore = score;
+                bestPath = candidatePath;
+            }
+
+            return bestPath;
+        }
+
         public void Tick(float _deltaTime)
         {
             TargetVelocity = (PlayerCharacterController.transform.position - TargetPrevPosition) / Time.deltaTime;
