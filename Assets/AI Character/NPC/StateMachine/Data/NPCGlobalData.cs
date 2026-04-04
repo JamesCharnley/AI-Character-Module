@@ -59,14 +59,21 @@ namespace AICharacterModule.NPC.StateMachine.Data
 
 
 
-        public NavMeshPath FindPathOnTargetRadius(float targetRadius, Vector3 targetPosition, float minDistanceFromNpc,
-            float maxDistanceFromNpc, bool? orbitClockwise = null, float radiusErrorMargin = 0.5f, int sampleCount = 32)
+        public bool TryFindPositionOnTargetRadius(
+            float targetRadius,
+            Vector3 targetPosition,
+            float minDistanceFromNpc,
+            float maxDistanceFromNpc,
+            out Vector3 bestPosition,
+            bool? orbitClockwise = null,
+            float radiusErrorMargin = 0.5f,
+            int sampleCount = 32)
         {
-            NavMeshPath bestPath = new NavMeshPath();
+            bestPosition = Vector3.zero;
 
             if (NavAgent == null || targetRadius <= 0f || maxDistanceFromNpc < 0f || minDistanceFromNpc > maxDistanceFromNpc)
             {
-                return bestPath;
+                return false;
             }
 
             Vector3 npcPosition = NpcTransform != null ? NpcTransform.position : NavAgent.transform.position;
@@ -75,6 +82,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
             toNpcFromTarget.y = 0f;
             toNpcFromTarget = toNpcFromTarget.sqrMagnitude > 0.0001f ? toNpcFromTarget.normalized : Vector3.forward;
             float bestScore = float.MaxValue;
+            bool foundValidPoint = false;
             float angleStep = Mathf.PI * 2f / Mathf.Max(1, sampleCount);
 
             for (int i = 0; i < sampleCount; i++)
@@ -130,10 +138,11 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 }
 
                 bestScore = score;
-                bestPath = candidatePath;
+                bestPosition = navHit.position;
+                foundValidPoint = true;
             }
 
-            return bestPath;
+            return foundValidPoint;
         }
 
         public void Tick(float _deltaTime)

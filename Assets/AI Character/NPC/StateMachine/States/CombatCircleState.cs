@@ -1,7 +1,6 @@
 using AICharacterModule.NPC.StateMachine.Core;
 using AICharacterModule.NPC.StateMachine.Data;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace AICharacterModule.NPC.StateMachine.States
 {
@@ -76,13 +75,14 @@ namespace AICharacterModule.NPC.StateMachine.States
             bool orbitClockwise = Random.value < 0.5f;
             localData.CircleClockwise = orbitClockwise;
             globalData.Anim.SetTrigger(orbitClockwise ? "OrbitClockwise" : "OrbitAntiClockwise");
-            NavMeshPath orbitPath = globalData.FindPathOnTargetRadius(
+            bool foundOrbitPosition = globalData.TryFindPositionOnTargetRadius(
                 OrbitTargetRadius,
                 globalData.CurrentTarget.position,
                 OrbitMinDistanceFromNpc,
                 OrbitMaxDistanceFromNpc,
+                out Vector3 orbitDestination,
                 orbitClockwise);
-            if (orbitPath.corners == null || orbitPath.corners.Length == 0)
+            if (!foundOrbitPosition)
             {
                 _idleTimer = IdleDurationSeconds;
                 IsIdle = true;
@@ -90,7 +90,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
 
-            globalData.NavAgent.SetPath(orbitPath);
+            globalData.NavAgent.SetDestination(orbitDestination);
 
             _idleTimer = IdleDurationSeconds;
             IsIdle = false;
