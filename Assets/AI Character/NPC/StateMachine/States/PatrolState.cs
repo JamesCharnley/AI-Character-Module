@@ -10,6 +10,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         private bool isIdle = false;
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
+            Debug.Log($"{GetType().Name} Enter");
             if (localData.PatrolPoint == Vector3.zero)
             {
                 localData.PatrolPoint = globalData.NpcTransform.position + Vector3.right * 4f;

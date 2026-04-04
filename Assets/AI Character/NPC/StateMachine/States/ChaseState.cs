@@ -60,7 +60,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
-            Debug.Log("Enter Chase");
+            Debug.Log($"{GetType().Name} Enter");
             _localData = localData;
             _globalData = globalData;
 
