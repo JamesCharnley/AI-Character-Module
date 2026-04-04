@@ -19,6 +19,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
+            Debug.Log($"{GetType().Name} Enter");
             globalData.NavAgent.isStopped = false;
             _idleTimer = IdleDurationSeconds;
             IsIdle = true;
