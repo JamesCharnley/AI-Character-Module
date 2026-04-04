@@ -7,9 +7,9 @@ namespace AICharacterModule.NPC.StateMachine.States
     public class CombatCircleState : IState<CombatData, NPCGlobalData>
     {
         private const float IdleDurationSeconds = 4f;
-        private const float OrbitTargetRadius = 25f;
-        private const float OrbitMinDistanceFromNpc = 15f;
-        private const float OrbitMaxDistanceFromNpc = 30f;
+        private const float OrbitTargetRadius = 15f;
+        private const float OrbitMinDistanceFromNpc = 8f;
+        private const float OrbitMaxDistanceFromNpc = 15f;
         private const float OrbitStopDistanceThreshold = 5f;
 
         private float _idleTimer;
@@ -82,6 +82,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 OrbitMaxDistanceFromNpc,
                 out Vector3 orbitDestination,
                 orbitClockwise);
+            Debug.Log($"{GetType().Name} TryFindPositionOnTargetRadius status: {foundOrbitPosition}");
             if (!foundOrbitPosition)
             {
                 _idleTimer = IdleDurationSeconds;
