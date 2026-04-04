@@ -1,26 +1,26 @@
 using AICharacterModule.NPC.StateMachine.Core;
 using AICharacterModule.NPC.StateMachine.Data;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace AICharacterModule.NPC.StateMachine.States
 {
     public class CombatCircleState : IState<CombatData, NPCGlobalData>
     {
         private const float IdleDurationSeconds = 4f;
-        private const float OrbitDurationSeconds = 10f;
+        private const float OrbitTargetRadius = 25f;
+        private const float OrbitMinDistanceFromNpc = 6f;
+        private const float OrbitMaxDistanceFromNpc = 60f;
+        private const float OrbitStopDistanceThreshold = 5f;
 
-        private float _orbitDirection = 1f;
         private float _idleTimer;
-        private float _orbitTimer;
         private bool IsIdle;
         private bool IsOrbiting = false;
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
             globalData.NavAgent.isStopped = false;
-            _orbitDirection = localData.CircleClockwise ? -1f : 1f;
             _idleTimer = IdleDurationSeconds;
-            _orbitTimer = OrbitDurationSeconds;
             IsIdle = true;
             IsOrbiting = false;
             globalData.Anim.SetTrigger("Idle");
@@ -46,20 +46,16 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         private void WhileOrbiting(CombatData localData, NPCGlobalData globalData, float deltaTime)
         {
-            Vector3 targetPosition = globalData.CurrentTarget.position;
-            Vector3 toNpc = (globalData.NpcTransform.position - targetPosition).normalized;
-            Vector3 tangent = Vector3.Cross(Vector3.up, toNpc) * _orbitDirection;
-            Vector3 orbitDestination = targetPosition + (toNpc * 25f) + (tangent * 6f);
-            globalData.NavAgent.SetDestination(orbitDestination);
-
-            _orbitTimer -= deltaTime;
-
-            if (_orbitTimer > 0f)
+            if (!globalData.NavAgent.hasPath)
             {
                 return;
             }
 
-            _orbitTimer = OrbitDurationSeconds;
+            if (globalData.NavAgent.remainingDistance >= OrbitStopDistanceThreshold)
+            {
+                return;
+            }
+
             _idleTimer = IdleDurationSeconds;
             IsOrbiting = false;
             IsIdle = true;
@@ -77,11 +73,24 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             bool orbitClockwise = Random.value < 0.5f;
             localData.CircleClockwise = orbitClockwise;
-            _orbitDirection = localData.CircleClockwise ? -1f : 1f;
             globalData.Anim.SetTrigger(orbitClockwise ? "OrbitClockwise" : "OrbitAntiClockwise");
+            NavMeshPath orbitPath = globalData.FindPathOnTargetRadius(
+                OrbitTargetRadius,
+                globalData.CurrentTarget.position,
+                OrbitMinDistanceFromNpc,
+                OrbitMaxDistanceFromNpc,
+                orbitClockwise);
+            if (orbitPath.corners == null || orbitPath.corners.Length == 0)
+            {
+                _idleTimer = IdleDurationSeconds;
+                IsIdle = true;
+                IsOrbiting = false;
+                return;
+            }
+
+            globalData.NavAgent.SetPath(orbitPath);
 
             _idleTimer = IdleDurationSeconds;
-            _orbitTimer = OrbitDurationSeconds;
             IsIdle = false;
             IsOrbiting = true;
         }
