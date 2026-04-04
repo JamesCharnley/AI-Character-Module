@@ -24,6 +24,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             _idleTimer = IdleDurationSeconds;
             IsIdle = true;
             IsOrbiting = false;
+            globalData.Anim.SetBool("IsOrbiting01", true);
             globalData.Anim.SetTrigger("Idle");
         }
 
@@ -98,6 +99,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Exit(CombatData localData, NPCGlobalData globalData)
         {
+            globalData.Anim.SetBool("IsOrbiting01", false);
             globalData.NavAgent.ResetPath();
         }
     }
