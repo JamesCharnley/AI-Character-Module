@@ -56,23 +56,22 @@ namespace AICharacterModule.NPC
             
             // Combat state machine
             var combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
-            combatStateManager.RegisterState("Attack", new AttackState());
+            combatStateManager.RegisterState("CombatCircle", new CombatCircleState());
 
-            
-            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "Attack", combatStateManager);
+            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", combatStateManager);
             
             // Master state machine
             _masterStateMachine.RegisterSubMachine(navigationSubMachine);
             _masterStateMachine.RegisterSubMachine(combatSubMachine);
 
-            //_masterStateMachine.RegisterTransition(
-            //    "Navigation",
-            //    "Combat",
-            //    data => HasTargetWithinRange(data, data.AttackRange));
+            _masterStateMachine.RegisterTransition(
+                "Navigation",
+                "Combat",
+                data => navigationStateManager.CurrentStateName == "Chase" && ShouldEnterCombatCircleFromChase(data));
             _masterStateMachine.RegisterTransition(
                 "Combat",
                 "Navigation",
-                data => !HasTargetWithinRange(data, data.AttackRange));
+                data => !HasTargetWithinRange(data, data.DetectionRange));
 
             _masterStateMachine.SwitchTo("Navigation");
         }
@@ -111,6 +110,21 @@ namespace AICharacterModule.NPC
 
             return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
         }
+
+
+        private static bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
+        {
+            if (data.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            float distance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position);
+            float targetSpeed = data.GetTargetVelocity().magnitude;
+
+            return distance >= 20f && distance <= 30f && targetSpeed < 0.05f;
+        }
+
         private void OnAnimatorMove()
         {
             Vector3 localVelocity = transform.InverseTransformDirection(_masterStateMachine.GlobalData.Anim.velocity);
