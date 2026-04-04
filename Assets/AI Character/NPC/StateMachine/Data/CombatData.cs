@@ -8,5 +8,6 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public float CooldownSeconds = 1f;
         public float CooldownTimer;
         public float DamagePerHit = 15f;
+        public bool CircleClockwise = true;
     }
 }
