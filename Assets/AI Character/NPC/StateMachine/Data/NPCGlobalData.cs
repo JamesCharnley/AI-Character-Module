@@ -60,7 +60,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
 
 
         public NavMeshPath FindPathOnTargetRadius(float targetRadius, Vector3 targetPosition, float minDistanceFromNpc,
-            float maxDistanceFromNpc, float radiusErrorMargin = 0.5f, int sampleCount = 32)
+            float maxDistanceFromNpc, bool? orbitClockwise = null, float radiusErrorMargin = 0.5f, int sampleCount = 32)
         {
             NavMeshPath bestPath = new NavMeshPath();
 
@@ -71,6 +71,9 @@ namespace AICharacterModule.NPC.StateMachine.Data
 
             Vector3 npcPosition = NpcTransform != null ? NpcTransform.position : NavAgent.transform.position;
             float targetNpcDistance = (minDistanceFromNpc + maxDistanceFromNpc) * 0.5f;
+            Vector3 toNpcFromTarget = npcPosition - targetPosition;
+            toNpcFromTarget.y = 0f;
+            toNpcFromTarget = toNpcFromTarget.sqrMagnitude > 0.0001f ? toNpcFromTarget.normalized : Vector3.forward;
             float bestScore = float.MaxValue;
             float angleStep = Mathf.PI * 2f / Mathf.Max(1, sampleCount);
 
@@ -79,6 +82,22 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 float angle = i * angleStep;
                 Vector3 radialOffset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * targetRadius;
                 Vector3 candidate = targetPosition + radialOffset;
+                if (orbitClockwise.HasValue)
+                {
+                    Vector3 toCandidateFromTarget = candidate - targetPosition;
+                    toCandidateFromTarget.y = 0f;
+                    if (toCandidateFromTarget.sqrMagnitude < 0.0001f)
+                    {
+                        continue;
+                    }
+
+                    float signedAngle = Vector3.SignedAngle(toNpcFromTarget, toCandidateFromTarget.normalized, Vector3.up);
+                    bool isClockwiseDirection = signedAngle < 0f;
+                    if (isClockwiseDirection != orbitClockwise.Value)
+                    {
+                        continue;
+                    }
+                }
 
                 float distanceFromNpc = Vector3.Distance(npcPosition, candidate);
                 if (distanceFromNpc < minDistanceFromNpc || distanceFromNpc > maxDistanceFromNpc)
