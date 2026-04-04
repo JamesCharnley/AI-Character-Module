@@ -119,7 +119,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
             // Flattened direction from target to NPC, used as the directional reference when orbit side is constrained.
             Vector3 toNpcFromTarget = npcPosition - targetPosition;
             toNpcFromTarget.y = 0f;
-            toNpcFromTarget = toNpcFromTarget.sqrMagnitude > 0.0001f ? toNpcFromTarget.normalized : Vector3.forward;
+            toNpcFromTarget = toNpcFromTarget.normalized;
 
             float bestScore = float.MaxValue;
             bool foundValidPoint = false;
@@ -132,7 +132,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 float angle = i * angleStep;
                 Vector3 radialOffset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * targetRadius;
                 Vector3 candidate = targetPosition + radialOffset;
-
+                Debug.DrawLine(candidate, candidate + Vector3.up * 10, Color.yellow, 100);
                 // Optional orbit-direction filter so callers can enforce side consistency.
                 if (orbitClockwise.HasValue)
                 {
@@ -140,6 +140,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                     toCandidateFromTarget.y = 0f;
                     if (toCandidateFromTarget.sqrMagnitude < 0.0001f)
                     {
+                        Debug.LogError("141");
                         continue;
                     }
 
@@ -148,6 +149,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                     bool isClockwiseDirection = signedAngle < 0f;
                     if (isClockwiseDirection != orbitClockwise.Value)
                     {
+                        Debug.LogError("152 Direction does not match");
                         continue;
                     }
                 }
@@ -156,12 +158,15 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 float distanceFromNpc = Vector3.Distance(npcPosition, candidate);
                 if (distanceFromNpc < minDistanceFromNpc || distanceFromNpc > maxDistanceFromNpc)
                 {
+                    Debug.LogError($"161 DistanceFromNPC not within range. DistanceFromNpc = {distanceFromNpc}");
                     continue;
                 }
 
                 // Snap candidate onto the NavMesh near the sampled point.
                 if (!NavMesh.SamplePosition(candidate, out NavMeshHit navHit, radiusErrorMargin, NavMesh.AllAreas))
                 {
+                    Debug.DrawLine(candidate, candidate + Vector3.up * 10, Color.red, 100);
+                    Debug.LogError("166");
                     continue;
                 }
 
@@ -169,6 +174,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 float radiusError = Mathf.Abs(Vector3.Distance(navHit.position, targetPosition) - targetRadius);
                 if (radiusError > radiusErrorMargin)
                 {
+                    Debug.LogError("174");
                     continue;
                 }
 
@@ -177,6 +183,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 if (!NavMesh.CalculatePath(npcPosition, navHit.position, NavMesh.AllAreas, candidatePath) ||
                     candidatePath.status != NavMeshPathStatus.PathComplete)
                 {
+                    Debug.LogError("182");
                     continue;
                 }
 
@@ -186,6 +193,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
                 float score = Mathf.Abs(distanceFromNpc - targetNpcDistance) + radiusError;
                 if (score >= bestScore)
                 {
+                    Debug.LogError("193");
                     continue;
                 }
 

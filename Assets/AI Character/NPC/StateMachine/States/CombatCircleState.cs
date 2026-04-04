@@ -9,7 +9,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         private const float IdleDurationSeconds = 4f;
         private const float OrbitMinDistanceFromNpc = 8f;
         private const float OrbitMaxDistanceFromNpc = 15f;
-        private const float OrbitStopDistanceThreshold = 5f;
+        private const float OrbitStopDistanceThreshold = 3.75f;
 
         private float _idleTimer;
         private float _orbitTargetRadius;
@@ -24,6 +24,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             _orbitTargetRadius = globalData.CurrentTarget == null
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            Debug.Log(_orbitTargetRadius);
             IsIdle = true;
             IsOrbiting = false;
             globalData.Anim.SetBool("IsOrbiting01", true);
@@ -80,7 +81,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             globalData.Anim.SetTrigger(orbitClockwise ? "OrbitClockwise" : "OrbitAntiClockwise");
             bool foundOrbitPosition = globalData.TryFindPositionOnTargetRadius(
                 _orbitTargetRadius,
-                globalData.CurrentTarget.position,
+                globalData.CurrentTarget.position - Vector3.up,
                 OrbitMinDistanceFromNpc,
                 OrbitMaxDistanceFromNpc,
                 out Vector3 orbitDestination,
