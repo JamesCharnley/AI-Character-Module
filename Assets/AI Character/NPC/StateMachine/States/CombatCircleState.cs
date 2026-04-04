@@ -9,8 +9,8 @@ namespace AICharacterModule.NPC.StateMachine.States
     {
         private const float IdleDurationSeconds = 4f;
         private const float OrbitTargetRadius = 25f;
-        private const float OrbitMinDistanceFromNpc = 6f;
-        private const float OrbitMaxDistanceFromNpc = 60f;
+        private const float OrbitMinDistanceFromNpc = 15f;
+        private const float OrbitMaxDistanceFromNpc = 30f;
         private const float OrbitStopDistanceThreshold = 5f;
 
         private float _idleTimer;
