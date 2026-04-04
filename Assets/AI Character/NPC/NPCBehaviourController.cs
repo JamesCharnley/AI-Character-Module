@@ -122,7 +122,7 @@ namespace AICharacterModule.NPC
             float distance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position);
             float targetSpeed = data.GetTargetVelocity().magnitude;
 
-            return distance >= 20f && distance <= 30f && targetSpeed < 0.05f;
+            return distance >= 10f && distance <= 20f && targetSpeed < 0.05f;
         }
 
         private void OnAnimatorMove()

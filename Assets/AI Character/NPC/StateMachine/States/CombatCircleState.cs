@@ -7,12 +7,12 @@ namespace AICharacterModule.NPC.StateMachine.States
     public class CombatCircleState : IState<CombatData, NPCGlobalData>
     {
         private const float IdleDurationSeconds = 4f;
-        private const float OrbitTargetRadius = 15f;
         private const float OrbitMinDistanceFromNpc = 8f;
         private const float OrbitMaxDistanceFromNpc = 15f;
         private const float OrbitStopDistanceThreshold = 5f;
 
         private float _idleTimer;
+        private float _orbitTargetRadius;
         private bool IsIdle;
         private bool IsOrbiting = false;
 
@@ -21,6 +21,9 @@ namespace AICharacterModule.NPC.StateMachine.States
             Debug.Log($"{GetType().Name} Enter");
             globalData.NavAgent.isStopped = false;
             _idleTimer = IdleDurationSeconds;
+            _orbitTargetRadius = globalData.CurrentTarget == null
+                ? 0f
+                : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             IsIdle = true;
             IsOrbiting = false;
             globalData.Anim.SetBool("IsOrbiting01", true);
@@ -76,7 +79,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             localData.CircleClockwise = orbitClockwise;
             globalData.Anim.SetTrigger(orbitClockwise ? "OrbitClockwise" : "OrbitAntiClockwise");
             bool foundOrbitPosition = globalData.TryFindPositionOnTargetRadius(
-                OrbitTargetRadius,
+                _orbitTargetRadius,
                 globalData.CurrentTarget.position,
                 OrbitMinDistanceFromNpc,
                 OrbitMaxDistanceFromNpc,
