@@ -126,6 +126,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             Debug.Log("Exit Chase");
             UnsubscribeFromChaseAnimationCycleEndingEvent(globalData);
+            globalData.Anim.SetBool("IsChasing01", false);
             globalData.NavAgent.ResetPath();
             _localData = null;
             _globalData = null;
