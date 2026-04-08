@@ -20,6 +20,11 @@ namespace AICharacterModule.NPC
         public event Action chaseAnimationCycleEndingEvent;
 
         private StateMachineManager<NPCGlobalData> _masterStateMachine;
+        private StateManager<NavigationData, NPCGlobalData> _navigationStateManager;
+        private StateManager<CombatData, NPCGlobalData> _combatStateManager;
+
+        public bool IsNavigationStateLocked => _navigationStateManager?.IsCurrentStateLocked ?? false;
+        public bool IsCombatStateLocked => _combatStateManager?.IsCurrentStateLocked ?? false;
 
         private void Awake()
         {
@@ -39,32 +44,32 @@ namespace AICharacterModule.NPC
             _masterStateMachine = new StateMachineManager<NPCGlobalData>(globalData);
 
             // Navigation State machine
-            var navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
-            navigationStateManager.RegisterState("Patrol", new PatrolState(this));
-            navigationStateManager.RegisterState("Chase", new ChaseState(this));
-            navigationStateManager.RegisterTransition(
+            _navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
+            _navigationStateManager.RegisterState("Patrol", new PatrolState(this));
+            _navigationStateManager.RegisterState("Chase", new ChaseState(this));
+            _navigationStateManager.RegisterTransition(
                 "Patrol",
                 "Chase",
                 (_, data) => HasTargetWithinRange(data, data.DetectionRange));
             
             
-            var navigationSubMachine = new SubStateMachine<NavigationData, NPCGlobalData>("Navigation", "Chase", navigationStateManager);
+            var navigationSubMachine = new SubStateMachine<NavigationData, NPCGlobalData>("Navigation", "Chase", _navigationStateManager);
             
             
             // Combat state machine
-            var combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
-            combatStateManager.RegisterState("CombatCircle", new CombatCircleState(this));
-            combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState(this));
-            combatStateManager.RegisterTransition(
+            _combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
+            _combatStateManager.RegisterState("CombatCircle", new CombatCircleState(this));
+            _combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState(this));
+            _combatStateManager.RegisterTransition(
                 "CombatCircle",
                 "ApproachCombatTarget",
                 ShouldApproachTargetAfterCirclingForDuration);
-            combatStateManager.RegisterTransition(
+            _combatStateManager.RegisterTransition(
                 "CombatCircle",
                 "ApproachCombatTarget",
                 ShouldApproachTargetWhenItMovesCloser);
 
-            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", combatStateManager);
+            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", _combatStateManager);
             
             // Master state machine
             _masterStateMachine.RegisterSubMachine(navigationSubMachine);
@@ -73,7 +78,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine.RegisterTransition(
                 "Navigation",
                 "Combat",
-                data => navigationStateManager.CurrentStateName == "Chase" && ShouldEnterCombatCircleFromChase(data));
+                data => _navigationStateManager.CurrentStateName == "Chase" && ShouldEnterCombatCircleFromChase(data));
             _masterStateMachine.RegisterTransition(
                 "Combat",
                 "Navigation",

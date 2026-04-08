@@ -11,6 +11,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         private AttackAnimationData[] attackAnimations;
         private NavigationData _localData;
         private NPCGlobalData _globalData;
+        public bool IsLocked { get; private set; }
 
         public ChaseState(MonoBehaviour controllerMonoBehaviour)
         {
@@ -62,6 +63,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             Debug.Log($"{GetType().Name} Enter");
             _localData = localData;
             _globalData = globalData;
@@ -69,6 +71,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             globalData.NavAgent.isStopped = false;
             globalData.Anim.SetBool("IsChasing01", true);
             SubscribeToChaseAnimationCycleEndingEvent(globalData);
+            IsLocked = false;
         }
 
         private bool hasAttacked = false;
@@ -126,6 +129,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             Debug.Log("Exit Chase");
             UnsubscribeFromChaseAnimationCycleEndingEvent(globalData);
             globalData.Anim.SetBool("IsChasing01", false);

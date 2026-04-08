@@ -9,6 +9,7 @@ namespace AICharacterModule.NPC.StateMachine.States
     {
         private readonly MonoBehaviour _controllerMonoBehaviour;
         private bool isIdle = false;
+        public bool IsLocked { get; private set; }
 
         public PatrolState(MonoBehaviour controllerMonoBehaviour)
         {
@@ -17,6 +18,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             Debug.Log($"{GetType().Name} Enter");
             if (localData.PatrolPoint == Vector3.zero)
             {
@@ -26,6 +28,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             globalData.NavAgent.isStopped = false;
             globalData.NavAgent.SetDestination(localData.PatrolPoint);
             globalData.Anim.SetTrigger("Walk");
+            IsLocked = false;
         }
 
         public void Tick(NavigationData localData, NPCGlobalData globalData, float deltaTime)
@@ -40,6 +43,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Exit(NavigationData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             globalData.NavAgent.ResetPath();
         }
 

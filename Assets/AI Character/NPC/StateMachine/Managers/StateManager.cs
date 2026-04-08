@@ -41,6 +41,7 @@ namespace AICharacterModule.NPC.StateMachine.Managers
         public TGlobalData GlobalData => MachineManager.GlobalData;
 
         public string CurrentStateName { get; private set; }
+        public bool IsCurrentStateLocked => _current?.IsLocked ?? false;
 
         public void RegisterState(string name, IState<TLocalData, TGlobalData> state)
         {
@@ -55,6 +56,11 @@ namespace AICharacterModule.NPC.StateMachine.Managers
         public bool SwitchTo(string name)
         {
             if (!_states.TryGetValue(name, out var next) || next == _current)
+            {
+                return false;
+            }
+            
+            if (_current != null && _current.IsLocked)
             {
                 return false;
             }
