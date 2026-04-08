@@ -141,6 +141,7 @@ namespace AICharacterModule.NPC
 
             float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             float distanceChange = Mathf.Abs(currentDistance - localData.CombatCircleEntryDistanceToTarget);
+            if(distanceChange <= 2) Debug.Log("ShouldApproachTargetAfterCirclingForDuration");
             return distanceChange <= 2f;
         }
 
@@ -153,7 +154,7 @@ namespace AICharacterModule.NPC
 
             float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             float movedCloserDistance = localData.CombatCircleEntryDistanceToTarget - currentDistance;
-
+            if(movedCloserDistance >= 2 && currentDistance > 8) Debug.Log("ShouldApproachTargetWhenItMovesCloser");
             return movedCloserDistance >= 2f && currentDistance > 8f;
         }
 
