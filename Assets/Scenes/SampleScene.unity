@@ -550,7 +550,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 100
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -1522,15 +1522,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.1856
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.1856
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.1856
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1572,6 +1572,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -5652265841876359296, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1608,6 +1612,14 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: a4503830359778a478b4e16a16ebcdde, type: 2}
+    - target: {fileID: 5866666021909216657, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+      propertyPath: m_CullingMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -5671,7 +5683,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3381194472674883443}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69eb62252bdbba449be6cdeb5a23fb26, type: 3}
   m_Name: 

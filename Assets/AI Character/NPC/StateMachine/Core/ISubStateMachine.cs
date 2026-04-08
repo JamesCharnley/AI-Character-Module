@@ -7,5 +7,7 @@ namespace AICharacterModule.NPC.StateMachine.Core
         void Tick(float deltaTime);
         void Exit();
         TGlobalData GlobalData { get; }
+
+        bool IsLocked { get; }
     }
 }

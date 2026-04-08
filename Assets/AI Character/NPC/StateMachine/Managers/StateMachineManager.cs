@@ -54,6 +54,7 @@ namespace AICharacterModule.NPC.StateMachine.Managers
                 return false;
             }
 
+            if (_current != null && _current.IsLocked) return false;
             _current?.Exit();
             _current = next;
             CurrentSubMachineName = name;

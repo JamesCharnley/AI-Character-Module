@@ -19,6 +19,7 @@ namespace AICharacterModule.NPC.StateMachine.SubMachines
         public StateManager<TLocalData, TGlobalData> StateManager { get; }
 
         public TGlobalData GlobalData => StateManager.GlobalData;
+        public bool IsLocked => StateManager.IsCurrentStateLocked;
 
         public void Enter()
         {

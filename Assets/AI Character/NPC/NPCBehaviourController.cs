@@ -85,6 +85,7 @@ namespace AICharacterModule.NPC
                 ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle);
 
             _masterStateMachine.SwitchTo("Navigation");
+            
         }
 
         private void Update()
@@ -153,8 +154,8 @@ namespace AICharacterModule.NPC
             float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position - Vector3.up);
             float movedCloserDistance = localData.CombatCircleEntryDistanceToTarget - currentDistance;
             if(movedCloserDistance >= 5 && currentDistance > 8) Debug.Log("ShouldApproachTargetWhenItMovesCloser");
-            //return movedCloserDistance >= 5f && currentDistance > 8f;
-            return false;
+            return movedCloserDistance >= 5f && currentDistance > 8f;
+            
         }
 
         private static bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
@@ -181,8 +182,8 @@ namespace AICharacterModule.NPC
             float distanceIncreaseSinceCombatCircleEnter =
                 currentDistance - data.CombatCircleEntryDistanceToTarget;
 
-            //return distanceIncreaseSinceCombatCircleEnter >= 2.5f;
-            return false;
+            return distanceIncreaseSinceCombatCircleEnter >= 2.5f;
+            
         }
 
         private void OnAnimatorMove()

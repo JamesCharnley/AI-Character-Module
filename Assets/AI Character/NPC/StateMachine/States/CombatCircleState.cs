@@ -27,9 +27,8 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
-            IsLocked = true;
             Debug.Log($"{GetType().Name} Enter");
-            
+            IsLocked = true;
             _idleTimer = IdleDurationSeconds;
             localData.CombatCircleElapsedSeconds = 0f;
             globalData.Anim.SetBool("IsOrbiting01", true);
@@ -46,12 +45,14 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 Setup(localData, globalData);
             }
-            IsLocked = false;
+            
         }
 
         private void Setup(CombatData localData, NPCGlobalData globalData)
         {
-            globalData.NavAgent.isStopped = false;
+            Debug.LogWarning("Setup CombatCircleState");
+            globalData.NavAgent.isStopped = true;
+            globalData.NavAgent.ResetPath();
             localData.CombatCircleEntryDistanceToTarget = globalData.CurrentTarget == null
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
@@ -60,6 +61,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             Debug.Log(_orbitTargetRadius);
+            IsLocked = false;
         }
 
         public void Tick(CombatData localData, NPCGlobalData globalData, float deltaTime)
