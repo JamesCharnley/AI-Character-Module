@@ -7,12 +7,14 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public sealed class ChaseState : IState<NavigationData, NPCGlobalData>
     {
+        private readonly MonoBehaviour _controllerMonoBehaviour;
         private AttackAnimationData[] attackAnimations;
         private NavigationData _localData;
         private NPCGlobalData _globalData;
 
-        public ChaseState()
+        public ChaseState(MonoBehaviour controllerMonoBehaviour)
         {
+            _controllerMonoBehaviour = controllerMonoBehaviour;
             Debug.Log("Chase state construct");
             attackAnimations = new[]
             {

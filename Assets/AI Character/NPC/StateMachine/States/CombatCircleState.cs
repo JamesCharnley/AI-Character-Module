@@ -7,6 +7,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public class CombatCircleState : IState<CombatData, NPCGlobalData>
     {
+        private readonly MonoBehaviour _controllerMonoBehaviour;
         private const float IdleDurationSeconds = 8f;
         private const float OrbitMinDistanceFromNpc = 8f;
         private const float OrbitMaxDistanceFromNpc = 15f;
@@ -17,6 +18,11 @@ namespace AICharacterModule.NPC.StateMachine.States
         private bool IsIdle;
         private bool IsOrbiting = false;
         private bool WaitingForZeroSpeed = false;
+
+        public CombatCircleState(MonoBehaviour controllerMonoBehaviour)
+        {
+            _controllerMonoBehaviour = controllerMonoBehaviour;
+        }
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
@@ -32,7 +38,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             if (globalData.NavAgent.speed != 0)
             {
                 WaitingForZeroSpeed = true;
-                //StartCoroutine(WaitingForZeroSpeed(globalData));
+                _controllerMonoBehaviour.StartCoroutine(WaitForZeroSpeed(globalData));
             }
             else
             {
