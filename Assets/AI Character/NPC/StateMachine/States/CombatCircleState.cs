@@ -8,6 +8,7 @@ namespace AICharacterModule.NPC.StateMachine.States
     public class CombatCircleState : IState<CombatData, NPCGlobalData>
     {
         private readonly MonoBehaviour _controllerMonoBehaviour;
+        public bool IsLocked { get; private set; }
         private const float IdleDurationSeconds = 8f;
         private const float OrbitMinDistanceFromNpc = 8f;
         private const float OrbitMaxDistanceFromNpc = 15f;
@@ -26,6 +27,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             Debug.Log($"{GetType().Name} Enter");
             
             _idleTimer = IdleDurationSeconds;
@@ -44,7 +46,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 Setup(localData, globalData);
             }
-            
+            IsLocked = false;
         }
 
         private void Setup(CombatData localData, NPCGlobalData globalData)
@@ -196,6 +198,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Exit(CombatData localData, NPCGlobalData globalData)
         {
+            IsLocked = true;
             globalData.Anim.SetBool("IsOrbiting01", false);
             globalData.NavAgent.ResetPath();
         }
