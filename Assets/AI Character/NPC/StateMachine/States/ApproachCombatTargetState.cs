@@ -6,6 +6,13 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public class ApproachCombatTargetState : IState<CombatData, NPCGlobalData>
     {
+        private readonly MonoBehaviour _controllerMonoBehaviour;
+
+        public ApproachCombatTargetState(MonoBehaviour controllerMonoBehaviour)
+        {
+            _controllerMonoBehaviour = controllerMonoBehaviour;
+        }
+
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
             Debug.Log($"{GetType().Name} Enter");

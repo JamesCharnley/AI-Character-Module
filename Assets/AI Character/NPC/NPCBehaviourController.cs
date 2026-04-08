@@ -40,8 +40,8 @@ namespace AICharacterModule.NPC
 
             // Navigation State machine
             var navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
-            navigationStateManager.RegisterState("Patrol", new PatrolState());
-            navigationStateManager.RegisterState("Chase", new ChaseState());
+            navigationStateManager.RegisterState("Patrol", new PatrolState(this));
+            navigationStateManager.RegisterState("Chase", new ChaseState(this));
             navigationStateManager.RegisterTransition(
                 "Patrol",
                 "Chase",
@@ -56,8 +56,8 @@ namespace AICharacterModule.NPC
             
             // Combat state machine
             var combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
-            combatStateManager.RegisterState("CombatCircle", new CombatCircleState());
-            combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState());
+            combatStateManager.RegisterState("CombatCircle", new CombatCircleState(this));
+            combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState(this));
             combatStateManager.RegisterTransition(
                 "CombatCircle",
                 "ApproachCombatTarget",

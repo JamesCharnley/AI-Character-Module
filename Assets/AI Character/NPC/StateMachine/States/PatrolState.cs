@@ -7,7 +7,14 @@ namespace AICharacterModule.NPC.StateMachine.States
 {
     public class PatrolState : IState<NavigationData, NPCGlobalData>
     {
+        private readonly MonoBehaviour _controllerMonoBehaviour;
         private bool isIdle = false;
+
+        public PatrolState(MonoBehaviour controllerMonoBehaviour)
+        {
+            _controllerMonoBehaviour = controllerMonoBehaviour;
+        }
+
         public void Enter(NavigationData localData, NPCGlobalData globalData)
         {
             Debug.Log($"{GetType().Name} Enter");
@@ -25,7 +32,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             if (!isIdle && !globalData.NavAgent.pathPending && globalData.NavAgent.remainingDistance <= localData.ReachedThreshold)
             {
-                globalData.NpcTransform.GetComponent<MonoBehaviour>().StartCoroutine(WaitForSeconds(5, localData, globalData));
+                _controllerMonoBehaviour.StartCoroutine(WaitForSeconds(5, localData, globalData));
                 isIdle = true;
                 globalData.Anim.SetTrigger("Idle");
             }
