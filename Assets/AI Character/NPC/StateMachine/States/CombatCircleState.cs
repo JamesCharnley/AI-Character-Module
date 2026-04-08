@@ -1,3 +1,4 @@
+using System.Collections;
 using AICharacterModule.NPC.StateMachine.Core;
 using AICharacterModule.NPC.StateMachine.Data;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace AICharacterModule.NPC.StateMachine.States
         private float _orbitTargetRadius;
         private bool IsIdle;
         private bool IsOrbiting = false;
+        private bool WaitingForZeroSpeed = false;
 
         public void Enter(CombatData localData, NPCGlobalData globalData)
         {
@@ -22,22 +24,33 @@ namespace AICharacterModule.NPC.StateMachine.States
             globalData.NavAgent.isStopped = false;
             _idleTimer = IdleDurationSeconds;
             localData.CombatCircleElapsedSeconds = 0f;
-            localData.CombatCircleEntryDistanceToTarget = globalData.CurrentTarget == null
-                ? 0f
-                : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
-            globalData.CombatCircleEntryDistanceToTarget = localData.CombatCircleEntryDistanceToTarget;
-            _orbitTargetRadius = globalData.CurrentTarget == null
-                ? 0f
-                : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
-            Debug.Log(_orbitTargetRadius);
-            IsIdle = true;
-            IsOrbiting = false;
             globalData.Anim.SetBool("IsOrbiting01", true);
             globalData.Anim.SetTrigger("Idle");
+            IsIdle = true;
+            IsOrbiting = false;
+
+            if (globalData.NavAgent.speed != 0)
+            {
+                WaitingForZeroSpeed = true;
+                //StartCoroutine(WaitingForZeroSpeed(globalData));
+            }
+            else
+            {
+                localData.CombatCircleEntryDistanceToTarget = globalData.CurrentTarget == null
+                    ? 0f
+                    : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+                globalData.CombatCircleEntryDistanceToTarget = localData.CombatCircleEntryDistanceToTarget;
+                _orbitTargetRadius = globalData.CurrentTarget == null
+                    ? 0f
+                    : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+                Debug.Log(_orbitTargetRadius);
+            }
+            
         }
 
         public void Tick(CombatData localData, NPCGlobalData globalData, float deltaTime)
         {
+            if (WaitingForZeroSpeed) return;
             localData.CombatCircleElapsedSeconds += deltaTime;
 
             if (globalData.CurrentTarget == null)
@@ -173,6 +186,12 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             globalData.Anim.SetBool("IsOrbiting01", false);
             globalData.NavAgent.ResetPath();
+        }
+
+        IEnumerator WaitForZeroSpeed(NPCGlobalData _globalData)
+        {
+            yield return new WaitUntil(() => _globalData.NavAgent.speed == 0);
+            WaitingForZeroSpeed = false;
         }
     }
 }
