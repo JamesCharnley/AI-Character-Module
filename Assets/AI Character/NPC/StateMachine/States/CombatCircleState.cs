@@ -21,6 +21,10 @@ namespace AICharacterModule.NPC.StateMachine.States
             Debug.Log($"{GetType().Name} Enter");
             globalData.NavAgent.isStopped = false;
             _idleTimer = IdleDurationSeconds;
+            localData.CombatCircleElapsedSeconds = 0f;
+            localData.CombatCircleEntryDistanceToTarget = globalData.CurrentTarget == null
+                ? 0f
+                : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             _orbitTargetRadius = globalData.CurrentTarget == null
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
@@ -33,6 +37,8 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         public void Tick(CombatData localData, NPCGlobalData globalData, float deltaTime)
         {
+            localData.CombatCircleElapsedSeconds += deltaTime;
+
             if (globalData.CurrentTarget == null)
             {
                 return;

@@ -57,6 +57,15 @@ namespace AICharacterModule.NPC
             // Combat state machine
             var combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
             combatStateManager.RegisterState("CombatCircle", new CombatCircleState());
+            combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState());
+            combatStateManager.RegisterTransition(
+                "CombatCircle",
+                "ApproachCombatTarget",
+                ShouldApproachTargetAfterCirclingForDuration);
+            combatStateManager.RegisterTransition(
+                "CombatCircle",
+                "ApproachCombatTarget",
+                ShouldApproachTargetWhenItMovesCloser);
 
             var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", combatStateManager);
             
@@ -111,6 +120,38 @@ namespace AICharacterModule.NPC
             return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
         }
 
+
+
+
+        private static bool ShouldApproachTargetAfterCirclingForDuration(CombatData localData, NPCGlobalData globalData)
+        {
+            if (globalData.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            if (localData.CombatCircleElapsedSeconds < 5f)
+            {
+                return false;
+            }
+
+            float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            float distanceChange = Mathf.Abs(currentDistance - localData.CombatCircleEntryDistanceToTarget);
+            return distanceChange <= 2f;
+        }
+
+        private static bool ShouldApproachTargetWhenItMovesCloser(CombatData localData, NPCGlobalData globalData)
+        {
+            if (globalData.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            float movedCloserDistance = localData.CombatCircleEntryDistanceToTarget - currentDistance;
+
+            return movedCloserDistance >= 2f && currentDistance > 8f;
+        }
 
         private static bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
         {
