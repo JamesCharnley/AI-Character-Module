@@ -78,15 +78,15 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 return;
             }
-            if (hasAttacked && !globalData.IsAttacking)
-            {
-                hasAttacked = false;
-                globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
-            }
-            if(globalData.NavAgent.remainingDistance < 0.5f)
-            {
-                globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
-            }
+            //if (hasAttacked && !globalData.IsAttacking)
+            //{
+            //    hasAttacked = false;
+            //    globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
+            //}
+            //if(globalData.NavAgent.remainingDistance < 0.5f)
+            //{
+            //    globalData.NavAgent.Warp(new Vector3(0, 0.5f, 0));
+            //}
             //OnChaseAnimationCycleEnding();
             globalData.NavAgent.SetDestination(globalData.CurrentTarget.position);
 
@@ -141,7 +141,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 Debug.Log("Subscribe cycle Failed");
                 return;
             }
-            Debug.Log("Subscribe cycle");
+           // Debug.Log("Subscribe cycle");
             globalData.BehaviourController.chaseAnimationCycleEndingEvent += OnChaseAnimationCycleEnding;
         }
 
@@ -152,7 +152,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 Debug.Log("UnSubscribe cycle Failed");
                 return;
             }
-            Debug.Log("UnSubscribe cycle");
+           // Debug.Log("UnSubscribe cycle");
             globalData.BehaviourController.chaseAnimationCycleEndingEvent -= OnChaseAnimationCycleEnding;
         }
 
