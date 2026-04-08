@@ -42,6 +42,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public float Health = 100f;
         public float DetectionRange = 70f;
         public float AttackRange = 2f;
+        public float CombatCircleEntryDistanceToTarget;
         public Vector3 NpcLastVelocity;
         public float PredictTargetDistanceInTime(float _time)
         {

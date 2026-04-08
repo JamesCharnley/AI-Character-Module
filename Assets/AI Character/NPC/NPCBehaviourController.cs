@@ -80,6 +80,10 @@ namespace AICharacterModule.NPC
             _masterStateMachine.RegisterTransition(
                 "Combat",
                 "Navigation",
+                ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle);
+            _masterStateMachine.RegisterTransition(
+                "Combat",
+                "Navigation",
                 data => !HasTargetWithinRange(data, data.DetectionRange));
 
             _masterStateMachine.SwitchTo("Navigation");
@@ -164,6 +168,20 @@ namespace AICharacterModule.NPC
             float targetSpeed = data.GetTargetVelocity().magnitude;
 
             return distance >= 10f && distance <= 15f && targetSpeed < 0.05f;
+        }
+
+        private static bool ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle(NPCGlobalData data)
+        {
+            if (data.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            float currentDistance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position);
+            float distanceIncreaseSinceCombatCircleEnter =
+                currentDistance - data.CombatCircleEntryDistanceToTarget;
+
+            return distanceIncreaseSinceCombatCircleEnter >= 2.5f;
         }
 
         private void OnAnimatorMove()

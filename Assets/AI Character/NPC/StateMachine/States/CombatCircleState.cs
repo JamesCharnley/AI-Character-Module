@@ -25,6 +25,7 @@ namespace AICharacterModule.NPC.StateMachine.States
             localData.CombatCircleEntryDistanceToTarget = globalData.CurrentTarget == null
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            globalData.CombatCircleEntryDistanceToTarget = localData.CombatCircleEntryDistanceToTarget;
             _orbitTargetRadius = globalData.CurrentTarget == null
                 ? 0f
                 : Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
