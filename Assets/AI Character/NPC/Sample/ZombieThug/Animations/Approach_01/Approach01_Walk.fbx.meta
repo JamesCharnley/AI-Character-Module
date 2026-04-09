@@ -19,10 +19,10 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
       copied configuration does not match position in animation file:\n\t'clavicle_r'
-      : position error = 2.232705 mm\n\t'clavicle_l' : position error = 2.159750
+      : position error = 2.239663 mm\n\t'clavicle_l' : position error = 2.254460
       mm\nCopied Avatar Rig Configuration mis-match. Inbetween bone rotation in copied
       configuration does not match rotation in animation file:\n\t'spine_04' : rotation
-      error = 1.402848 deg\n\t'spine_05' : rotation error = 0.648160 deg\n"
+      error = 0.569191 deg\n\t'spine_05' : rotation error = 0.214540 deg\n"
     animationImportErrors: 
     animationImportWarnings: "\nClip 'Approach01_Walk' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
@@ -38,9 +38,9 @@ ModelImporter:
     importAnimatedCustomProperties: 0
     importConstraints: 1
     animationCompression: 3
-    animationRotationError: 0.5
-    animationPositionError: 0.5
-    animationScaleError: 0.5
+    animationRotationError: 0.2
+    animationPositionError: 0.2
+    animationScaleError: 0.2
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
@@ -50,7 +50,7 @@ ModelImporter:
       takeName: Approach01_Walk
       internalID: 4245795830181334776
       firstFrame: 0
-      lastFrame: 32
+      lastFrame: 30
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
