@@ -60,6 +60,7 @@ namespace AICharacterModule.NPC
             _combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
             _combatStateManager.RegisterState("CombatCircle", new CombatCircleState(this));
             _combatStateManager.RegisterState("ApproachCombatTarget", new ApproachCombatTargetState(this));
+            _combatStateManager.RegisterState("HandCombat", new HandCombatState(this));
             _combatStateManager.RegisterTransition(
                 "CombatCircle",
                 "ApproachCombatTarget",
@@ -68,6 +69,14 @@ namespace AICharacterModule.NPC
                 "CombatCircle",
                 "ApproachCombatTarget",
                 ShouldApproachTargetWhenItMovesCloser);
+            _combatStateManager.RegisterTransition(
+                "ApproachCombatTarget",
+                "HandCombat",
+                ShouldEnterHandCombatFromApproach);
+            _combatStateManager.RegisterTransition(
+                "HandCombat",
+                "ApproachCombatTarget",
+                ShouldReturnToApproachFromHandCombat);
 
             var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", _combatStateManager);
             
@@ -169,6 +178,28 @@ namespace AICharacterModule.NPC
             float targetSpeed = data.GetTargetVelocity().magnitude;
 
             return distance >= 10f && distance <= 15f && targetSpeed < 0.05f;
+        }
+
+        private static bool ShouldEnterHandCombatFromApproach(CombatData localData, NPCGlobalData globalData)
+        {
+            if (globalData.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            float distance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            return distance <= 3f;
+        }
+
+        private static bool ShouldReturnToApproachFromHandCombat(CombatData localData, NPCGlobalData globalData)
+        {
+            if (globalData.CurrentTarget == null)
+            {
+                return false;
+            }
+
+            float distance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            return distance > 4f;
         }
 
         private static bool ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle(NPCGlobalData data)
