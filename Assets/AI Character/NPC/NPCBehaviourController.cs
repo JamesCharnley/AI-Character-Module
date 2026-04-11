@@ -17,6 +17,18 @@ namespace AICharacterModule.NPC
     {
         [SerializeField] private Transform target;
 
+        [Header("Combat Transition Thresholds")]
+        [SerializeField] private float combatCircleApproachDelaySeconds = 5f;
+        [SerializeField] private float combatCircleMaxDistanceChange = 2f;
+        [SerializeField] private float combatCircleMovedCloserDistance = 5f;
+        [SerializeField] private float combatCircleMinDistanceAfterMoveCloser = 8f;
+        [SerializeField] private float chaseToCombatMinDistance = 10f;
+        [SerializeField] private float chaseToCombatMaxDistance = 15f;
+        [SerializeField] private float chaseToCombatMaxTargetSpeed = 0.05f;
+        [SerializeField] private float approachToHandCombatDistance = 3f;
+        [SerializeField] private float handCombatExitDistance = 4f;
+        [SerializeField] private float combatToChaseDistanceIncrease = 2.5f;
+
         public event Action chaseAnimationCycleEndingEvent;
 
         private StateMachineManager<NPCGlobalData> _masterStateMachine;
@@ -135,25 +147,25 @@ namespace AICharacterModule.NPC
 
 
 
-        private static bool ShouldApproachTargetAfterCirclingForDuration(CombatData localData, NPCGlobalData globalData)
+        private bool ShouldApproachTargetAfterCirclingForDuration(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
             {
                 return false;
             }
 
-            if (localData.CombatCircleElapsedSeconds < 5f)
+            if (localData.CombatCircleElapsedSeconds < combatCircleApproachDelaySeconds)
             {
                 return false;
             }
 
             float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             float distanceChange = Mathf.Abs(currentDistance - localData.CombatCircleEntryDistanceToTarget);
-            if(distanceChange <= 2) Debug.Log("ShouldApproachTargetAfterCirclingForDuration");
-            return distanceChange <= 2f;
+            if (distanceChange <= combatCircleMaxDistanceChange) Debug.Log("ShouldApproachTargetAfterCirclingForDuration");
+            return distanceChange <= combatCircleMaxDistanceChange;
         }
 
-        private static bool ShouldApproachTargetWhenItMovesCloser(CombatData localData, NPCGlobalData globalData)
+        private bool ShouldApproachTargetWhenItMovesCloser(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
             {
@@ -162,12 +174,12 @@ namespace AICharacterModule.NPC
 
             float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position - Vector3.up);
             float movedCloserDistance = localData.CombatCircleEntryDistanceToTarget - currentDistance;
-            if(movedCloserDistance >= 5 && currentDistance > 8) Debug.Log("ShouldApproachTargetWhenItMovesCloser");
-            return movedCloserDistance >= 5f && currentDistance > 8f;
+            if (movedCloserDistance >= combatCircleMovedCloserDistance && currentDistance > combatCircleMinDistanceAfterMoveCloser) Debug.Log("ShouldApproachTargetWhenItMovesCloser");
+            return movedCloserDistance >= combatCircleMovedCloserDistance && currentDistance > combatCircleMinDistanceAfterMoveCloser;
             
         }
 
-        private static bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
+        private bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
         {
             if (data.CurrentTarget == null)
             {
@@ -177,10 +189,10 @@ namespace AICharacterModule.NPC
             float distance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position - Vector3.up);
             float targetSpeed = data.GetTargetVelocity().magnitude;
 
-            return distance >= 10f && distance <= 15f && targetSpeed < 0.05f;
+            return distance >= chaseToCombatMinDistance && distance <= chaseToCombatMaxDistance && targetSpeed < chaseToCombatMaxTargetSpeed;
         }
 
-        private static bool ShouldEnterHandCombatFromApproach(CombatData localData, NPCGlobalData globalData)
+        private bool ShouldEnterHandCombatFromApproach(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
             {
@@ -188,10 +200,10 @@ namespace AICharacterModule.NPC
             }
 
             float distance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
-            return distance <= 3f;
+            return distance <= approachToHandCombatDistance;
         }
 
-        private static bool ShouldReturnToApproachFromHandCombat(CombatData localData, NPCGlobalData globalData)
+        private bool ShouldReturnToApproachFromHandCombat(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
             {
@@ -199,10 +211,10 @@ namespace AICharacterModule.NPC
             }
 
             float distance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
-            return distance > 4f;
+            return distance > handCombatExitDistance;
         }
 
-        private static bool ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle(NPCGlobalData data)
+        private bool ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle(NPCGlobalData data)
         {
             if (data.CurrentTarget == null)
             {
@@ -213,7 +225,7 @@ namespace AICharacterModule.NPC
             float distanceIncreaseSinceCombatCircleEnter =
                 currentDistance - data.CombatCircleEntryDistanceToTarget;
 
-            return distanceIncreaseSinceCombatCircleEnter >= 2.5f;
+            return distanceIncreaseSinceCombatCircleEnter >= combatToChaseDistanceIncrease;
             
         }
 
