@@ -25,8 +25,8 @@ namespace AICharacterModule.NPC
         [SerializeField] private float chaseToCombatMinDistance = 10f;
         [SerializeField] private float chaseToCombatMaxDistance = 15f;
         [SerializeField] private float chaseToCombatMaxTargetSpeed = 0.05f;
-        [SerializeField] private float approachToHandCombatDistance = 3f;
-        [SerializeField] private float handCombatExitDistance = 4f;
+        [SerializeField] private float approachToHandCombatDistance = 6f;
+        [SerializeField] private float handCombatExitDistance = 8f;
         [SerializeField] private float combatToChaseDistanceIncrease = 2.5f;
 
         public event Action chaseAnimationCycleEndingEvent;

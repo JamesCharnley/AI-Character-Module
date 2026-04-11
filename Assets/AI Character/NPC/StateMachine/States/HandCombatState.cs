@@ -7,6 +7,9 @@ namespace AICharacterModule.NPC.StateMachine.States
     public class HandCombatState : IState<CombatData, NPCGlobalData>
     {
         private readonly MonoBehaviour _controllerMonoBehaviour;
+
+        private bool IsIdle = false;
+        private bool IsMovingCloser = false;
         public bool IsLocked { get; private set; }
 
         public HandCombatState(MonoBehaviour controllerMonoBehaviour)
@@ -18,7 +21,9 @@ namespace AICharacterModule.NPC.StateMachine.States
         {
             IsLocked = true;
             Debug.Log($"{GetType().Name} Enter");
-
+            IsIdle = true;
+            IsMovingCloser = false;
+            globalData.Anim.SetTrigger("Idle");
             globalData.NavAgent.isStopped = true;
             IsLocked = false;
         }
@@ -29,20 +34,60 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 return;
             }
+            
+            float distanceToTarget =
+                Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
 
-            Vector3 directionToTarget = globalData.CurrentTarget.position - globalData.NpcTransform.position;
-            directionToTarget.y = 0f;
-            if (directionToTarget.sqrMagnitude > 0.01f)
+            if (distanceToTarget < 2)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(directionToTarget.normalized);
-                globalData.NpcTransform.rotation = Quaternion.RotateTowards(globalData.NpcTransform.rotation, targetRotation, 720f * deltaTime);
+                IsIdle = true;
+                IsMovingCloser = false;
             }
+            else
+            {
+                IsMovingCloser = true;
+                IsIdle = false;
+            }
+            Animator anim = globalData.Anim;
+            if (IsIdle)
+            {
+                anim.SetBool("Combat01_MoveCloserLong", false);  
+                anim.SetBool("Combat01_MoveCloserShort", false); 
+                Vector3 directionToTarget = globalData.CurrentTarget.position - globalData.NpcTransform.position;
+                directionToTarget.y = 0f;
+                if (directionToTarget.sqrMagnitude > 0.01f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(directionToTarget.normalized);
+                    globalData.NpcTransform.rotation = Quaternion.RotateTowards(globalData.NpcTransform.rotation, targetRotation, 720f * deltaTime);
+                }
+            }
+
+            if (IsMovingCloser)
+            {
+                globalData.NavAgent.isStopped = false;
+                globalData.NavAgent.SetDestination(globalData.CurrentTarget.position - Vector3.up);
+                
+                if (distanceToTarget > 3)
+                {
+                    anim.SetBool("Combat01_MoveCloserShort", false);   
+                    anim.SetBool("Combat01_MoveCloserLong", true);   
+                }
+                else if (distanceToTarget <= 3)
+                {
+                    anim.SetBool("Combat01_MoveCloserLong", false);  
+                    anim.SetBool("Combat01_MoveCloserShort", true);   
+                }
+            }
+            
         }
 
         public void Exit(CombatData localData, NPCGlobalData globalData)
         {
             IsLocked = true;
             globalData.NavAgent.isStopped = false;
+            Animator anim = globalData.Anim;
+            anim.SetBool("Combat01_MoveCloserLong", false);  
+            anim.SetBool("Combat01_MoveCloserShort", false);  
             IsLocked = false;
         }
     }

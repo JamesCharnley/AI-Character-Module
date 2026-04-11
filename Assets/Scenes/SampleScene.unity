@@ -539,6 +539,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 189356296}
+  combatCircleApproachDelaySeconds: 5
+  combatCircleMaxDistanceChange: 2
+  combatCircleMovedCloserDistance: 5
+  combatCircleMinDistanceAfterMoveCloser: 8
+  chaseToCombatMinDistance: 10
+  chaseToCombatMaxDistance: 15
+  chaseToCombatMaxTargetSpeed: 0.05
+  approachToHandCombatDistance: 3
+  handCombatExitDistance: 4
+  combatToChaseDistanceIncrease: 2.5
 --- !u!195 &405209233
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -553,7 +563,7 @@ NavMeshAgent:
   m_Acceleration: 100
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
   m_AutoRepath: 1
