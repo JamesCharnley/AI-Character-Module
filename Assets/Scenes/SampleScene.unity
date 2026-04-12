@@ -547,7 +547,7 @@ MonoBehaviour:
   chaseToCombatMaxDistance: 15
   chaseToCombatMaxTargetSpeed: 0.05
   approachToHandCombatDistance: 3
-  handCombatExitDistance: 4
+  handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
 --- !u!195 &405209233
 NavMeshAgent:

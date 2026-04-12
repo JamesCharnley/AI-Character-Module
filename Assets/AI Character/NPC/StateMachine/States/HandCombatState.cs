@@ -66,16 +66,23 @@ namespace AICharacterModule.NPC.StateMachine.States
             {
                 globalData.NavAgent.isStopped = false;
                 globalData.NavAgent.SetDestination(globalData.CurrentTarget.position - Vector3.up);
-                
                 if (distanceToTarget > 3)
                 {
                     anim.SetBool("Combat01_MoveCloserShort", false);   
-                    anim.SetBool("Combat01_MoveCloserLong", true);   
+                    anim.SetBool("Combat01_MoveCloserLong", false);   
+                    anim.SetBool("Combat01_MoveCloserXLong", true);  
                 }
-                else if (distanceToTarget <= 3)
+                else if (distanceToTarget > 2)
                 {
-                    anim.SetBool("Combat01_MoveCloserLong", false);  
+                    anim.SetBool("Combat01_MoveCloserShort", false);   
+                    anim.SetBool("Combat01_MoveCloserLong", true);   
+                    anim.SetBool("Combat01_MoveCloserXLong", false);   
+                }
+                else if (distanceToTarget <= 2)
+                {
                     anim.SetBool("Combat01_MoveCloserShort", true);   
+                    anim.SetBool("Combat01_MoveCloserLong", false);
+                    anim.SetBool("Combat01_MoveCloserXLong", false);   
                 }
             }
             
@@ -86,8 +93,9 @@ namespace AICharacterModule.NPC.StateMachine.States
             IsLocked = true;
             globalData.NavAgent.isStopped = false;
             Animator anim = globalData.Anim;
-            anim.SetBool("Combat01_MoveCloserLong", false);  
-            anim.SetBool("Combat01_MoveCloserShort", false);  
+            anim.SetBool("Combat01_MoveCloserShort", false);   
+            anim.SetBool("Combat01_MoveCloserLong", false);
+            anim.SetBool("Combat01_MoveCloserXLong", false);  
             IsLocked = false;
         }
     }
