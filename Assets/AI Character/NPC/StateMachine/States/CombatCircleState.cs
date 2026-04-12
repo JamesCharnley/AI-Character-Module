@@ -127,7 +127,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             bool orbitClockwise = Random.value < 0.5f;
             localData.CircleClockwise = orbitClockwise;
-            globalData.Anim.SetTrigger(orbitClockwise ? "OrbitClockwise" : "OrbitAntiClockwise");
+            globalData.Anim.SetTrigger(orbitClockwise ? "OrbitAntiClockwise" : "OrbitClockwise");
             bool foundOrbitPosition = globalData.TryFindPositionOnTargetRadius(
                 _orbitTargetRadius,
                 globalData.CurrentTarget.position - Vector3.up,
@@ -164,37 +164,45 @@ namespace AICharacterModule.NPC.StateMachine.States
 
 // Ignore vertical difference if needed
                 toPlayer.y = 0;
-
+                toPlayer.Normalize();
+                float dot2 = Vector3.Dot(_globalData.NpcTransform.forward, toPlayer);
                 float dot = Vector3.Dot(_globalData.NpcTransform.right, toPlayer);
-
-                if (dot > 0.1f)
+                Debug.LogWarning($"Dot: {dot}, Dot2: {dot2}");
+                if (dot > 0.2f)
                 {
                     // Player is to the RIGHT of NPC
                     _globalData.Anim.SetBool("IsTurningRight", true);
                 }
-                else if (dot < -0.1f)
+                else if (dot < -0.2f)
                 {
                     // Player is to the LEFT of NPC
                     _globalData.Anim.SetBool("IsTurningLeft", true);
                 }
-                else
+                if(dot2 > 0.85f)
                 {
                     _globalData.Anim.SetBool("IsTurningLeft", false);
                     _globalData.Anim.SetBool("IsTurningRight", false);
 
                     isFacingPlayer = true;
                 }
+                Quaternion targetRotation = Quaternion.LookRotation(toPlayer);
 
-                if (toPlayer.sqrMagnitude > 0.001f && !isFacingPlayer)
-                {
-                    Quaternion targetRotation = Quaternion.LookRotation(toPlayer);
+                _globalData.NpcTransform.rotation = Quaternion.RotateTowards(
+                    _globalData.NpcTransform.rotation,
+                    targetRotation,
+                    120 * Time.deltaTime
+                );
 
-                    _globalData.NpcTransform.rotation = Quaternion.RotateTowards(
-                        _globalData.NpcTransform.rotation,
-                        targetRotation,
-                        120 * Time.deltaTime
-                    );
-                }
+                //if (toPlayer.sqrMagnitude > 0.001f && !isFacingPlayer)
+                //{
+                //    Quaternion targetRotation = Quaternion.LookRotation(toPlayer);
+//
+                //    _globalData.NpcTransform.rotation = Quaternion.RotateTowards(
+                //        _globalData.NpcTransform.rotation,
+                //        targetRotation,
+                //        120 * Time.deltaTime
+                //    );
+                //}
             }
         }
 

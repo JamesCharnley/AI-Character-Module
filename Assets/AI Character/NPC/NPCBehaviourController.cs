@@ -22,8 +22,8 @@ namespace AICharacterModule.NPC
         [SerializeField] private float combatCircleMaxDistanceChange = 2f;
         [SerializeField] private float combatCircleMovedCloserDistance = 5f;
         [SerializeField] private float combatCircleMinDistanceAfterMoveCloser = 8f;
-        [SerializeField] private float chaseToCombatMinDistance = 10f;
-        [SerializeField] private float chaseToCombatMaxDistance = 15f;
+        [SerializeField] private float chaseToCombatMinDistance = 15f;
+        [SerializeField] private float chaseToCombatMaxDistance = 20f;
         [SerializeField] private float chaseToCombatMaxTargetSpeed = 0.05f;
         [SerializeField] private float approachToHandCombatDistance = 6f;
         [SerializeField] private float handCombatExitDistance = 8f;
