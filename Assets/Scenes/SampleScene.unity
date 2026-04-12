@@ -416,6 +416,11 @@ Transform:
   - {fileID: 963194228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!4 &288514806 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6173754733725934867, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &317525280
 GameObject:
   m_ObjectHideFlags: 0
@@ -549,6 +554,8 @@ MonoBehaviour:
   approachToHandCombatDistance: 4.5
   handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
+  rightHandTarget: {fileID: 963194228}
+  leftHandTarget: {fileID: 963194228}
 --- !u!195 &405209233
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1136,6 +1143,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 500
   playerBody: {fileID: 189356296}
+  PunchTarget: {fileID: 288514806}
+  PunchOffsetResult: {x: 0, y: 0, z: 0}
+  npcBehaviourController: {fileID: 405209232}
 --- !u!1 &980999955
 GameObject:
   m_ObjectHideFlags: 0

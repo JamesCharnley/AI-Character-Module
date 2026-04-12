@@ -39,6 +39,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public CharacterController PlayerCharacterController;
         public Animator Anim;
         public bool IsAttacking;
+        public bool IsDodging;
         public float Health = 100f;
         public float DetectionRange = 70f;
         public float AttackRange = 2f;

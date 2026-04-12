@@ -129,6 +129,11 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.IsAttacking = false;
         }
 
+        public void DodgeAnimationCompleted()
+        {
+            _masterStateMachine.GlobalData.IsDodging = false;
+        }
+
         public void ChaseAnimationCycleEnding()
         {
             chaseAnimationCycleEndingEvent?.Invoke();
@@ -228,6 +233,17 @@ namespace AICharacterModule.NPC
             return distanceIncreaseSinceCombatCircleEnter >= combatToChaseDistanceIncrease;
             
         }
+        
+        // ANIMATOR CODE
+        
+        [Header("IK Targets")]
+        [SerializeField] private Transform rightHandTarget;
+        [SerializeField] private Transform leftHandTarget;
+
+        
+
+        private static readonly int RightHandIKWeightHash = Animator.StringToHash("RightHandIKWeight");
+        private static readonly int LeftHandIKWeightHash = Animator.StringToHash("LeftHandIKWeight");
 
         private void OnAnimatorMove()
         {
@@ -235,5 +251,74 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.Anim.SetFloat("Speed", localVelocity.z);
             _masterStateMachine.GlobalData.NpcLastVelocity = _masterStateMachine.GlobalData.Anim.velocity;
         }
+        private void OnAnimatorIK(int layerIndex)
+        {
+            Animator animator = _masterStateMachine.GlobalData.Anim;
+            if (animator == null)
+                return;
+
+            float rightWeight = animator.GetFloat(RightHandIKWeightHash);
+            float leftWeight = animator.GetFloat(LeftHandIKWeightHash);
+
+            ApplyHandIK(AvatarIKGoal.RightHand, rightHandTarget, rightWeight);
+            ApplyHandIK(AvatarIKGoal.LeftHand, leftHandTarget, leftWeight);
+        }
+
+        private void ApplyHandIK(AvatarIKGoal handGoal, Transform target, float weight)
+        {
+            Animator animator = _masterStateMachine.GlobalData.Anim;
+            
+            animator.SetIKPositionWeight(handGoal, weight);
+            //animator.SetIKRotationWeight(handGoal, weight);
+
+            if (target == null || weight <= 0f)
+                return;
+
+            animator.SetIKPosition(handGoal, target.position);
+            //animator.SetIKRotation(handGoal, target.rotation);
+        }
+
+        public void IncomingAttack(Vector3 _offset)
+        {
+            Animator anim = _masterStateMachine.GlobalData.Anim;
+            if (_masterStateMachine.GlobalData.IsAttacking || _masterStateMachine.GlobalData.IsDodging)
+            {
+                return;
+            }
+
+            _masterStateMachine.GlobalData.IsDodging = true;
+            
+            if (_offset.y == 1)
+            {
+                // duck
+                anim.SetTrigger("DodgePunchDown");
+                return;
+            }
+            if (_offset.y == -1)
+            {
+                // back
+                anim.SetTrigger("DodgePunchBack");
+                return;
+            }
+            if (_offset.z == -1)
+            {
+                // back
+                anim.SetTrigger("DodgePunchBack");
+                return;
+            }
+            if (_offset.x == 1)
+            {
+                // left
+                anim.SetTrigger("DodgePunchLeft");
+                return;
+            }
+            if (_offset.x == -1)
+            {
+                // right
+                anim.SetTrigger("DodgePunchRight");
+                return;
+            }
+        }
     }
+    
 }

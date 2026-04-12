@@ -1,3 +1,4 @@
+using System.Collections;
 using AICharacterModule.NPC.StateMachine.Core;
 using AICharacterModule.NPC.StateMachine.Data;
 using UnityEngine;
@@ -13,7 +14,8 @@ namespace AICharacterModule.NPC.StateMachine.States
         public bool IsLocked { get; private set; }
         
         private AttackAnimationData[] attackAnimations;
-
+        private bool WasAttacking = false;
+        private bool AttackCoolingDown = false;
         public HandCombatState(MonoBehaviour controllerMonoBehaviour)
         {
             _controllerMonoBehaviour = controllerMonoBehaviour;
@@ -98,9 +100,18 @@ namespace AICharacterModule.NPC.StateMachine.States
                     globalData.NpcTransform.rotation = Quaternion.RotateTowards(globalData.NpcTransform.rotation, targetRotation, 720f * deltaTime);
                 }
 
-                if (!globalData.IsAttacking)
+                if (!globalData.IsAttacking && !globalData.IsDodging)
                 {
-                    EvaluateAttacks(localData, globalData);
+                    if (!WasAttacking && !AttackCoolingDown)
+                    {
+                        EvaluateAttacks(localData, globalData);
+                    }
+                    else if(!AttackCoolingDown)
+                    {
+                        AttackCoolingDown = true;
+                        _controllerMonoBehaviour.StartCoroutine(AttackCooldown());
+                    }
+                    
                 }
             }
 
@@ -127,7 +138,15 @@ namespace AICharacterModule.NPC.StateMachine.States
                     anim.SetBool("Combat01_MoveCloserXLong", false);   
                 }
             }
-            
+
+            WasAttacking = globalData.IsAttacking;
+
+        }
+
+        IEnumerator AttackCooldown()
+        {
+            yield return new WaitForSeconds(2);
+            AttackCoolingDown = false;
         }
 
         void EvaluateAttacks(CombatData _localData, NPCGlobalData _globalData)
