@@ -152,7 +152,7 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
-      - time: 0.9608753
+      - time: 0.7844047
         functionName: AttackAnimationCompleted
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}

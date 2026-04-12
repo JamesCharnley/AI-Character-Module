@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b407155581890454fadda43979676102
+guid: 4a176a85a7b681f4a8aa6f512ddfe14c
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -19,49 +19,42 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
       copied configuration does not match position in animation file:\n\t'spine_01'
-      : position error = 1.542325 mm\n\t'clavicle_r' : position error = 1.220728
-      mm\n\t'clavicle_l' : position error = 1.215573 mm\nCopied Avatar Rig Configuration
+      : position error = 1.588836 mm\n\t'clavicle_r' : position error = 1.930983
+      mm\n\t'clavicle_l' : position error = 2.153598 mm\nCopied Avatar Rig Configuration
       mis-match. Inbetween bone rotation in copied configuration does not match rotation
-      in animation file:\n\t'spine_04' : rotation error = 8.275273 deg\n\t'spine_05'
-      : rotation error = 3.367799 deg\n"
+      in animation file:\n\t'spine_04' : rotation error = 11.154092 deg\n\t'spine_05'
+      : rotation error = 4.882105 deg\n"
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Combat01_DodgeBack1' has import animation warnings
-      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'thigh_l' has translation animation that
-      will be discarded.\n\t'thigh_r' has translation animation that will be discarded.\n\t'spine_01'
-      has translation animation that will be discarded.\n\t'spine_03' has translation
-      animation that will be discarded.\n\t'spine_04' has translation animation that
-      will be discarded.\n\t'spine_04' is inbetween humanoid transforms and has rotation
-      animation that will be discarded.\n\t'spine_05' has translation animation that
-      will be discarded.\n\t'spine_05' is inbetween humanoid transforms and has rotation
-      animation that will be discarded.\n\t'clavicle_r' has translation animation
-      that will be discarded.\n\t'clavicle_l' has translation animation that will
-      be discarded.\n\t'neck_01' has translation animation that will be discarded.\n"
+    animationImportWarnings: "\nClip 'Combat01_StepBackXLarge' has import animation
+      warnings that might lower retargeting quality:\nNote: Activate translation
+      DOF on avatar to improve retargeting quality.\n\t'spine_04' is inbetween humanoid
+      transforms and has rotation animation that will be discarded.\n\t'spine_05'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 1
     animationCompression: 3
-    animationRotationError: 0.2
-    animationPositionError: 0.2
-    animationScaleError: 0.2
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Combat01_DodgeBack1
-      takeName: Combat01_DodgeBack1
-      internalID: 5800640934777576639
+      name: Combat01_StepBackXLarge
+      takeName: Combat01_StepBackXLarge
+      internalID: -2906140528804044272
       firstFrame: 0
-      lastFrame: 38
+      lastFrame: 21
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
@@ -73,14 +66,7 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events:
-      - time: 0.8018906
-        functionName: DodgeAnimationCompleted
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
+      events: []
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

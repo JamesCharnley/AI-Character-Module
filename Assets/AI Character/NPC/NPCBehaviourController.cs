@@ -248,7 +248,7 @@ namespace AICharacterModule.NPC
         private void OnAnimatorMove()
         {
             Vector3 localVelocity = transform.InverseTransformDirection(_masterStateMachine.GlobalData.Anim.velocity);
-            _masterStateMachine.GlobalData.Anim.SetFloat("Speed", localVelocity.z);
+            _masterStateMachine.GlobalData.Anim.SetFloat("Speed", Mathf.Abs(localVelocity.z));
             _masterStateMachine.GlobalData.NpcLastVelocity = _masterStateMachine.GlobalData.Anim.velocity;
         }
         private void OnAnimatorIK(int layerIndex)
