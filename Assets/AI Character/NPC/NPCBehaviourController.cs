@@ -330,34 +330,41 @@ namespace AICharacterModule.NPC
         {
             Animator anim = _masterStateMachine.GlobalData.Anim;
             
-            if (_offset.y == 1)
+            
+            if (_offset == new Vector3(0,1))
             {
-                // duck
-                anim.SetTrigger("DodgePunchDown");
+                // high front
+                anim.SetTrigger("TorsoeDamageHigh_Front");
                 return;
             }
-            if (_offset.y == -1)
+            if (_offset == new Vector3(1, 1))
             {
-                // back
-                anim.SetTrigger("DodgePunchBack");
+                // High left
+                anim.SetTrigger("TorsoeDamageHigh_Left");
                 return;
             }
-            if (_offset.z == -1)
+            if (_offset == new Vector3(-1, 1))
             {
-                // back
-                anim.SetTrigger("DodgePunchBack");
+                // High right
+                anim.SetTrigger("TorsoeDamageHigh_Right");
                 return;
             }
-            if (_offset.x == 1)
+            if (_offset == new Vector3(1, -1))
             {
-                // left
-                anim.SetTrigger("DodgePunchLeft");
+                // Low left
+                anim.SetTrigger("TorsoeDamageLow_Left");
                 return;
             }
-            if (_offset.x == -1)
+            if (_offset == new Vector3(-1, -1))
             {
-                // right
-                anim.SetTrigger("DodgePunchRight");
+                // Low right
+                anim.SetTrigger("TorsoeDamageLow_Right");
+                return;
+            }
+            if (_offset == new Vector3(0, -1))
+            {
+                // Low front
+                anim.SetTrigger("TorsoeDamageLow_Front");
                 return;
             }
         }

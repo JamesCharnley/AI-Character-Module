@@ -34,8 +34,10 @@ public class CameraLook : MonoBehaviour
         playerBody.Rotate(Vector3.up * mouseX);
     }
 
-    public static Vector2 GetVerticalLookZone(Transform reference, Camera cam, float horizontalCenterThreshold = 0.2f)
+    [SerializeField] private float horizontalThreshold = 0.1f;
+    public Vector2 GetVerticalLookZone(Transform reference, Camera cam, float horizontalCenterThreshold = 0.1f)
     {
+        horizontalCenterThreshold = horizontalThreshold;
         Vector3 toCamera = (cam.transform.position - reference.position).normalized;
 
         float rightDot = Vector3.Dot(reference.right, toCamera);
@@ -52,7 +54,8 @@ public class CameraLook : MonoBehaviour
         }
 
         float yZone = upDot >= 0f ? 1f : -1f;
-
+        
+        Debug.LogWarning($"Dam: {new Vector2(xZone, yZone)}");
         return new Vector2(xZone, yZone);
     }
     public static Vector3 GetLookDirection(Camera cam, Transform target, float centerThreshold = 0.99f)
