@@ -21,9 +21,10 @@ public class CameraLook : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Camera cam = GetComponent<Camera>();
-            PunchOffsetResult = GetLookDirection(cam, DodgeTarget);
+            Vector2 punchZone = GetLookDirection(cam, DodgeTarget);
+            PunchOffsetResult = punchZone;
             DamageOffsetResult = GetLookDirection(cam, DamageTarget);
-            npcBehaviourController.IncomingAttack(GetLookDirection(cam, DodgeTarget));
+            npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
             npcBehaviourController.TakeDamage(20, DamageOffsetResult);
         }
 
@@ -76,32 +77,27 @@ public class CameraLook : MonoBehaviour
         Debug.LogWarning($"Dam: {new Vector2(xZone, yZone)}");
         return new Vector2(xZone, yZone);
     }
-    public static Vector3 GetLookDirection(Camera cam, Transform target, float centerThreshold = 0.99f)
+    public static Vector2 GetLookDirection(Camera cam, Transform target)
     {
-        Vector3 toTarget = (target.position - cam.transform.position).normalized;
+        Vector3 viewportPoint = cam.WorldToViewportPoint(target.position);
 
-        float forwardDot = Vector3.Dot(cam.transform.forward, toTarget);
-
-        // 1. Check if looking directly at target
-        if (forwardDot >= centerThreshold)
+        if (viewportPoint.z <= 0f)
         {
-            return new Vector3(0f, 0f, -1f);
+            return Vector2.zero;
         }
 
-        // 2. Compare horizontal vs vertical deviation
-        float rightDot = Vector3.Dot(cam.transform.right, toTarget);
-        float upDot = Vector3.Dot(cam.transform.up, toTarget);
+        float xZone = viewportPoint.x < (1f / 3f)
+            ? -1f
+            : viewportPoint.x > (2f / 3f)
+                ? 1f
+                : 0f;
 
-        // Decide dominant axis (whichever is stronger)
-        if (Mathf.Abs(rightDot) > Mathf.Abs(upDot))
-        {
-            // Horizontal
-            return new Vector3(Mathf.Sign(rightDot), 0f, 0f);
-        }
-        else
-        {
-            // Vertical
-            return new Vector3(0f, -Mathf.Sign(upDot), 0f);
-        }
+        float yZone = viewportPoint.y < (1f / 3f)
+            ? -1f
+            : viewportPoint.y > (2f / 3f)
+                ? 1f
+                : 0f;
+
+        return new Vector2(xZone, yZone);
     }
 }
