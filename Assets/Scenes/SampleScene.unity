@@ -596,11 +596,6 @@ MonoBehaviour:
   Walk01GoIdleDistance: 3
   run01GoIdleDistance: 8.5
   goWalkDistance: 20
---- !u!4 &413330211 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -2707054796494011859, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
-  m_PrefabInstance: {fileID: 1641631263}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &677131158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1149,11 +1144,12 @@ MonoBehaviour:
   mouseSensitivity: 500
   playerBody: {fileID: 189356296}
   DodgeTarget: {fileID: 288514806}
-  DamageTarget: {fileID: 413330211}
-  PunchOffsetResult: {x: 0, y: 0, z: 0}
-  DamageOffsetResult: {x: 0, y: 0, z: 0}
+  DamageTarget: {fileID: 1812382097}
+  PunchOffsetResult: {x: 0, y: 0}
+  DamageOffsetResult: {x: 0, y: 0}
   npcBehaviourController: {fileID: 405209232}
   horizontalThreshold: 0.1
+  verticalThreshold: 0.1
 --- !u!1 &980999955
 GameObject:
   m_ObjectHideFlags: 0
@@ -1670,6 +1666,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 405209234}
   m_SourcePrefab: {fileID: 100100000, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+--- !u!4 &1812382097 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8322877604069642926, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &87657134531344296
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,8 +11,8 @@ public class CameraLook : MonoBehaviour
     [FormerlySerializedAs("PunchTarget")] [SerializeField] private Transform DodgeTarget;
     [SerializeField] private Transform DamageTarget;
     private float xRotation = 0f;
-    [SerializeField] private Vector3 PunchOffsetResult;
-    [SerializeField] private Vector3 DamageOffsetResult;
+    [SerializeField] private Vector2 PunchOffsetResult;
+    [SerializeField] private Vector2 DamageOffsetResult;
     [SerializeField] private NPCBehaviourController npcBehaviourController;
     void Update()
     {
