@@ -42,8 +42,16 @@ public class CameraLook : MonoBehaviour
         verticalCenterThreshold = verticalThreshold;
         Vector3 toCamera = (cam.transform.position - reference.position).normalized;
 
-        float rightDot = Vector3.Dot(reference.right, toCamera);
-        float upDot = Vector3.Dot(reference.up, toCamera);
+        // Decouple horizontal and vertical checks so one axis does not suppress the other.
+        Vector3 horizontalPlaneDirection = Vector3.ProjectOnPlane(toCamera, reference.up).normalized;
+        Vector3 verticalPlaneDirection = Vector3.ProjectOnPlane(toCamera, reference.right).normalized;
+
+        float rightDot = horizontalPlaneDirection.sqrMagnitude > 0f
+            ? Vector3.Dot(reference.right, horizontalPlaneDirection)
+            : 0f;
+        float upDot = verticalPlaneDirection.sqrMagnitude > 0f
+            ? Vector3.Dot(reference.up, verticalPlaneDirection)
+            : 0f;
 
         float xZone = 0f;
         if (rightDot > horizontalCenterThreshold)
