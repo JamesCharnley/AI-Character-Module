@@ -3,6 +3,7 @@ using AICharacterModule.NPC.StateMachine.Managers;
 using AICharacterModule.NPC.StateMachine.States;
 using AICharacterModule.NPC.StateMachine.SubMachines;
 using System;
+using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,7 +14,7 @@ namespace AICharacterModule.NPC
     /// Master machine chooses between navigation and combat sub-machines.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NPCBehaviourController : MonoBehaviour
+    public class NPCBehaviourController : MonoBehaviour, ITakeDamage
     {
         [SerializeField] private Transform target;
 
@@ -287,6 +288,47 @@ namespace AICharacterModule.NPC
             }
 
             _masterStateMachine.GlobalData.IsDodging = true;
+            
+            if (_offset.y == 1)
+            {
+                // duck
+                anim.SetTrigger("DodgePunchDown");
+                return;
+            }
+            if (_offset.y == -1)
+            {
+                // back
+                anim.SetTrigger("DodgePunchBack");
+                return;
+            }
+            if (_offset.z == -1)
+            {
+                // back
+                anim.SetTrigger("DodgePunchBack");
+                return;
+            }
+            if (_offset.x == 1)
+            {
+                // left
+                anim.SetTrigger("DodgePunchLeft");
+                return;
+            }
+            if (_offset.x == -1)
+            {
+                // right
+                anim.SetTrigger("DodgePunchRight");
+                return;
+            }
+        }
+
+        public void TakeDamage(float _amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void TakeDamage(float _amount, Vector3 _offset)
+        {
+            Animator anim = _masterStateMachine.GlobalData.Anim;
             
             if (_offset.y == 1)
             {

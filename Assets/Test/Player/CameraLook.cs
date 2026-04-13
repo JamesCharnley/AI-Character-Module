@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using AICharacterModule.NPC;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CameraLook : MonoBehaviour
 {
     public float mouseSensitivity = 100f;
     public Transform playerBody;
-    [SerializeField] private Transform PunchTarget;
+    [FormerlySerializedAs("PunchTarget")] [SerializeField] private Transform DodgeTarget;
+    [SerializeField] private Transform DamageTarget;
     private float xRotation = 0f;
     [SerializeField] private Vector3 PunchOffsetResult;
+    [SerializeField] private Vector3 DamageOffsetResult;
     [SerializeField] private NPCBehaviourController npcBehaviourController;
     void Update()
     {
@@ -18,8 +21,10 @@ public class CameraLook : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Camera cam = GetComponent<Camera>();
-            PunchOffsetResult = GetLookDirection(cam, PunchTarget);
-            npcBehaviourController.IncomingAttack(GetLookDirection(cam, PunchTarget));
+            PunchOffsetResult = GetLookDirection(cam, DodgeTarget);
+            DamageOffsetResult = GetLookDirection(cam, DamageTarget);
+            npcBehaviourController.IncomingAttack(GetLookDirection(cam, DodgeTarget));
+            npcBehaviourController.TakeDamage(20, DamageOffsetResult);
         }
 
         xRotation -= mouseY;
