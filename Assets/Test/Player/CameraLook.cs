@@ -33,6 +33,28 @@ public class CameraLook : MonoBehaviour
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         playerBody.Rotate(Vector3.up * mouseX);
     }
+
+    public static Vector2 GetVerticalLookZone(Transform reference, Camera cam, float horizontalCenterThreshold = 0.2f)
+    {
+        Vector3 toCamera = (cam.transform.position - reference.position).normalized;
+
+        float rightDot = Vector3.Dot(reference.right, toCamera);
+        float upDot = Vector3.Dot(reference.up, toCamera);
+
+        float xZone = 0f;
+        if (rightDot > horizontalCenterThreshold)
+        {
+            xZone = 1f;
+        }
+        else if (rightDot < -horizontalCenterThreshold)
+        {
+            xZone = -1f;
+        }
+
+        float yZone = upDot >= 0f ? 1f : -1f;
+
+        return new Vector2(xZone, yZone);
+    }
     public static Vector3 GetLookDirection(Camera cam, Transform target, float centerThreshold = 0.99f)
     {
         Vector3 toTarget = (target.position - cam.transform.position).normalized;
