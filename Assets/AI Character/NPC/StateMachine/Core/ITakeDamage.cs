@@ -7,6 +7,6 @@ namespace AICharacterModule.NPC.StateMachine.Core
     public interface ITakeDamage
     {
         void TakeDamage(float _amount);
-        void TakeDamage(float _amount, Vector2 _offset);
+        void TakeDamage(float _amount, Vector3 _direction, Vector2 _offset);
     }
 }

@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using AICharacterModule.NPC.StateMachine.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ITakeDamage
 {
     public float moveSpeed = 5f;
     public float gravity = -9.81f;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
     // external velocity (impulses, knockbacks, etc.)
     private Vector3 externalVelocity;
+    
 
     public float drag = 5f;        // how fast impulse dies off
     
@@ -80,5 +82,16 @@ public class PlayerController : MonoBehaviour
 
         
         controller.Move(velocity * Time.deltaTime);
+    }
+
+
+    public void TakeDamage(float _amount)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void TakeDamage(float _amount, Vector3 _direction, Vector2 _offset)
+    {
+        AddImpulse(_direction * 20);
     }
 }

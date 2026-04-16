@@ -25,7 +25,7 @@ public class CameraLook : MonoBehaviour
             PunchOffsetResult = punchZone;
             DamageOffsetResult = GetLookDirection(cam, DamageTarget);
             //npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
-            npcBehaviourController.TakeDamage(20, DamageOffsetResult);
+            npcBehaviourController.TakeDamage(20, transform.forward, DamageOffsetResult);
         }
 
         xRotation -= mouseY;

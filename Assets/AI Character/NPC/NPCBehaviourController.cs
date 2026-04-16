@@ -165,7 +165,7 @@ namespace AICharacterModule.NPC
                     continue;
                 }
 
-                takeDamage.TakeDamage(damageAmount);
+                takeDamage.TakeDamage(damageAmount, transform.forward, Vector3.zero);
             }
         }
 
@@ -354,8 +354,8 @@ namespace AICharacterModule.NPC
         {
             throw new NotImplementedException();
         }
-
-        public void TakeDamage(float _amount, Vector2 _offset)
+        
+        public void TakeDamage(float _amount, Vector3 _direction, Vector2 _offset)
         {
             Animator anim = _masterStateMachine.GlobalData.Anim;
             if (_offset.y == 0) _offset = new Vector2(_offset.x, 1);

@@ -115,14 +115,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 }
                 
             }
-            if (distanceToTarget < 1f)
-            {
-                if (globalData.CurrentTarget.TryGetComponent(out PlayerController player))
-                {
-                    player.AddImpulse(globalData.NavAgent.transform.forward * 40);
-                    hasAttacked = true;
-                }
-            }
+           
 
             
         }

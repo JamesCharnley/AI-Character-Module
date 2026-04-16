@@ -103,7 +103,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                     globalData.NpcTransform.rotation = Quaternion.RotateTowards(globalData.NpcTransform.rotation, targetRotation, 720f * deltaTime);
                 }
 
-                if (!globalData.IsAttacking && !globalData.IsDodging)
+                if (!globalData.IsAttacking && !globalData.IsDodging && globalData.NavAgent.speed < 0.1f)
                 {
                     if (!WasAttacking && !AttackCoolingDown)
                     {
