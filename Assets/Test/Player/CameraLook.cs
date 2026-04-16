@@ -24,7 +24,7 @@ public class CameraLook : MonoBehaviour
             Vector2 punchZone = GetLookDirection(cam, DodgeTarget);
             PunchOffsetResult = punchZone;
             DamageOffsetResult = GetLookDirection(cam, DamageTarget);
-            npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
+            //npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
             npcBehaviourController.TakeDamage(20, DamageOffsetResult);
         }
 
@@ -37,7 +37,7 @@ public class CameraLook : MonoBehaviour
 
     [SerializeField] private float horizontalThreshold = 0.1f;
     [SerializeField] private float verticalThreshold = 0.1f;
-    public Vector2 GetVerticalLookZone(Transform reference, Camera cam, float horizontalCenterThreshold = 0.1f, float verticalCenterThreshold = 0.1f)
+    public Vector2 GetVerticalLookZone(Transform reference, Camera cam, float horizontalCenterThreshold = 0.07f, float verticalCenterThreshold = 0.07f)
     {
         horizontalCenterThreshold = horizontalThreshold;
         verticalCenterThreshold = verticalThreshold;
