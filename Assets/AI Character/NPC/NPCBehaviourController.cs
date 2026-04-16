@@ -29,6 +29,9 @@ namespace AICharacterModule.NPC
         [SerializeField] private float approachToHandCombatDistance = 6f;
         [SerializeField] private float handCombatExitDistance = 8f;
         [SerializeField] private float combatToChaseDistanceIncrease = 2.5f;
+        [SerializeField] private float damageOverlapRadius = 0.75f;
+        [SerializeField] private float damageAmount = 20f;
+        [SerializeField] private LayerMask damageOverlapLayers = ~0;
 
         public event Action chaseAnimationCycleEndingEvent;
 
@@ -138,6 +141,32 @@ namespace AICharacterModule.NPC
         public void ChaseAnimationCycleEnding()
         {
             chaseAnimationCycleEndingEvent?.Invoke();
+        }
+
+        public void DoDamageOverlap()
+        {
+            DoDamageOverlap(new Vector3(0f, 1f, 1f));
+        }
+
+        public void DoDamageOverlap(Vector3 localOffset)
+        {
+            Vector3 overlapCenter = transform.TransformPoint(localOffset);
+            Collider[] hitColliders = Physics.OverlapSphere(overlapCenter, damageOverlapRadius, damageOverlapLayers);
+            foreach (Collider hitCollider in hitColliders)
+            {
+                if (hitCollider.transform == transform)
+                {
+                    continue;
+                }
+
+                ITakeDamage takeDamage = hitCollider.GetComponentInParent<ITakeDamage>();
+                if (takeDamage == null)
+                {
+                    continue;
+                }
+
+                takeDamage.TakeDamage(damageAmount);
+            }
         }
 
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)
