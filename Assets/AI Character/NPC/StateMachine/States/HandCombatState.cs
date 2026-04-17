@@ -184,10 +184,22 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             AttackAnimationData bestAttack = new();
             float shortestDiff = 9999f;
-            
+
+            float buff = 0;
+            if (_globalData.GetTargetVelocity().magnitude > 0.1f)
+            {
+                buff = -0.25f;
+            }
+            if (_globalData.GetTargetVelocity().magnitude < -0.1f)
+            {
+                buff = 0.25f;
+            }
+
+            distanceToTarget += buff;
             foreach (AttackAnimationData attackAnimationData in attackAnimations)
             {
                 float diff = Mathf.Abs(distanceToTarget - attackAnimationData.TargetDistanceOnAction);
+                
                 if (diff < shortestDiff)
                 {
                     shortestDiff = diff;
