@@ -34,6 +34,9 @@ namespace FirstPersonCharacter
         [SerializeField] private float inwardDistance = 0.05f;
         [SerializeField] private float upwardDistance = 0.02f;
         [SerializeField] private float windUpBackDistance = 0.08f;
+        [SerializeField] private float centerlineX = 0f;
+        [Range(0f, 1f)] [SerializeField] private float centerBias = 0.7f;
+        [SerializeField] private float strikeArcHeight = 0.045f;
 
         [Header("Spine Motion")]
         [SerializeField] private float spinePitch = 8f;
@@ -123,12 +126,13 @@ namespace FirstPersonCharacter
 
             Vector3 windUpPos = rest + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
             Vector3 strikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
+            strikePos.x = Mathf.Lerp(strikePos.x, centerlineX, Mathf.Clamp01(centerBias));
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
 
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
-            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset);
+            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight);
             yield return MoveTarget(activeTarget, strikePos, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
 
             activeTarget.localPosition = rest;
@@ -147,7 +151,8 @@ namespace FirstPersonCharacter
             float duration,
             AnimationCurve curve,
             Quaternion spineStart,
-            Quaternion spineOffset)
+            Quaternion spineOffset,
+            float arcHeight = 0f)
         {
             float elapsed = 0f;
             while (elapsed < duration)
@@ -156,7 +161,13 @@ namespace FirstPersonCharacter
                 float t = Mathf.Clamp01(elapsed / duration);
                 float curvedT = curve != null ? curve.Evaluate(t) : t;
 
-                target.localPosition = Vector3.LerpUnclamped(start, end, curvedT);
+                Vector3 nextPosition = Vector3.LerpUnclamped(start, end, curvedT);
+                if (arcHeight > 0f)
+                {
+                    nextPosition.y += Mathf.Sin(curvedT * Mathf.PI) * arcHeight;
+                }
+
+                target.localPosition = nextPosition;
 
                 if (spine != null)
                 {
