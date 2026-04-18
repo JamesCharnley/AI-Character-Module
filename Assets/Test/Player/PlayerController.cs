@@ -92,6 +92,6 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
-        AddImpulse(_direction * 20);
+        //AddImpulse(_direction * 20);
     }
 }
