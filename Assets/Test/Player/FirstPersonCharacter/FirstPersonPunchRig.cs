@@ -226,7 +226,7 @@ namespace FirstPersonCharacter
 
         private void DoPunchOverlapDamage(Transform handBone, HashSet<ITakeDamage> damagedTargets)
         {
-            Collider[] hitColliders = Physics.OverlapSphere(handBone.position, punchOverlapSphereRadius, enemyLayerMask, QueryTriggerInteraction.Ignore);
+            Collider[] hitColliders = Physics.OverlapSphere(handBone.position + transform.forward * 0.2f, punchOverlapSphereRadius, enemyLayerMask, QueryTriggerInteraction.Ignore);
             foreach (Collider hitCollider in hitColliders)
             {
                 ITakeDamage damageReceiver = hitCollider.GetComponentInParent<ITakeDamage>();
@@ -284,12 +284,14 @@ namespace FirstPersonCharacter
         private void DrawPunchOverlapDebugSphere(Transform handBone, Transform handTarget)
         {
             Transform debugSource = handBone != null ? handBone : handTarget;
+            
             if (debugSource == null)
             {
                 return;
             }
+            
 
-            Gizmos.DrawWireSphere(debugSource.position, punchOverlapSphereRadius);
+            Gizmos.DrawWireSphere(debugSource.position + transform.forward * 0.2f, punchOverlapSphereRadius);
         }
     }
 }

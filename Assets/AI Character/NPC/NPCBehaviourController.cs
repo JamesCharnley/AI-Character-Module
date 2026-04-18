@@ -397,6 +397,7 @@ namespace AICharacterModule.NPC
             Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
             Animator anim = _masterStateMachine.GlobalData.Anim;
             if (offset.y == 0) offset = new Vector2(offset.x, 1);
+            Debug.LogError($"TakeDamage: {offset}");
             
             if (offset == new Vector3(0,-1, 1))
             {
