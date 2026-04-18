@@ -350,6 +350,23 @@ namespace AICharacterModule.NPC
             }
         }
 
+        public static Vector3 GetRelativePositionAxes(Transform referenceTransform, Vector3 worldPosition, float axisCenterThreshold = 0.1f)
+        {
+            if (referenceTransform == null)
+            {
+                throw new ArgumentNullException(nameof(referenceTransform));
+            }
+
+            Vector3 toPosition = worldPosition - referenceTransform.position;
+            Vector3 localDirection = referenceTransform.InverseTransformDirection(toPosition);
+
+            float horizontal = Mathf.Abs(localDirection.x) <= axisCenterThreshold ? 0f : Mathf.Sign(localDirection.x);
+            float vertical = Mathf.Abs(localDirection.y) <= axisCenterThreshold ? 0f : Mathf.Sign(localDirection.y);
+            float depth = localDirection.z >= 0f ? 1f : -1f;
+
+            return new Vector3(horizontal, vertical, depth);
+        }
+
         public void TakeDamage(float _amount)
         {
             throw new NotImplementedException();
