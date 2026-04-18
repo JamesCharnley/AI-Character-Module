@@ -377,11 +377,13 @@ namespace AICharacterModule.NPC
             }
 
             Vector3 toPosition = worldPosition - referenceTransform.position;
-            Vector3 localDirection = referenceTransform.InverseTransformDirection(toPosition);
+            float rightAmount = Vector3.Dot(toPosition, referenceTransform.right);
+            float upAmount = Vector3.Dot(toPosition, referenceTransform.up);
+            float forwardAmount = Vector3.Dot(toPosition, referenceTransform.forward);
 
-            float horizontal = Mathf.Abs(localDirection.x) <= axisCenterThreshold ? 0f : Mathf.Sign(localDirection.x);
-            float vertical = Mathf.Abs(localDirection.y) <= axisCenterThreshold ? 0f : Mathf.Sign(localDirection.y);
-            float depth = localDirection.z >= 0f ? 1f : -1f;
+            float horizontal = Mathf.Abs(rightAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(rightAmount);
+            float vertical = Mathf.Abs(upAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(upAmount);
+            float depth = Mathf.Abs(forwardAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(forwardAmount);
 
             return new Vector3(horizontal, vertical, depth);
         }
