@@ -63,6 +63,7 @@ namespace FirstPersonCharacter
         private bool punchRunning;
         private bool punchRightNext = true;
         private float lastPunchTime = -10f;
+        private bool punchDamageResolved;
 
         private void Awake()
         {
@@ -128,6 +129,7 @@ namespace FirstPersonCharacter
             if (activeTarget == null)
             {
                 punchRunning = false;
+                punchDamageResolved = false;
                 yield break;
             }
 
@@ -143,6 +145,7 @@ namespace FirstPersonCharacter
                 activeHandBone = activeTarget;
             }
             HashSet<ITakeDamage> damagedTargets = new HashSet<ITakeDamage>();
+            punchDamageResolved = false;
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
@@ -158,6 +161,7 @@ namespace FirstPersonCharacter
             }
 
             punchRunning = false;
+            punchDamageResolved = false;
         }
 
         private IEnumerator MoveTarget(
@@ -192,7 +196,7 @@ namespace FirstPersonCharacter
                     spine.localRotation = Quaternion.SlerpUnclamped(spineStart, spineStart * spineOffset, curvedT);
                 }
 
-                if (activeHandBone != null && ShouldApplyPunchDamageWindow(t))
+                if (activeHandBone != null && !punchDamageResolved && ShouldApplyPunchDamageWindow(t))
                 {
                     DoPunchOverlapDamage(activeHandBone, damagedTargets);
                 }
@@ -206,7 +210,7 @@ namespace FirstPersonCharacter
                 spine.localRotation = spineStart * spineOffset;
             }
 
-            if (activeHandBone != null && ShouldApplyPunchDamageWindow(1f))
+            if (activeHandBone != null && !punchDamageResolved && ShouldApplyPunchDamageWindow(1f))
             {
                 DoPunchOverlapDamage(activeHandBone, damagedTargets);
             }
@@ -234,7 +238,11 @@ namespace FirstPersonCharacter
                     continue;
                 }
 
-                damageReceiver.TakeDamage(punchDamageAmount, transform.forward, Vector2.zero);
+                Vector3 handPosition = handBone.position;
+                Vector2 handOffset = new Vector2(handPosition.x, handPosition.y);
+                damageReceiver.TakeDamage(punchDamageAmount, transform.forward, handOffset);
+                punchDamageResolved = true;
+                return;
             }
         }
 
@@ -256,6 +264,7 @@ namespace FirstPersonCharacter
             }
 
             punchRunning = false;
+            punchDamageResolved = false;
         }
     }
 }
