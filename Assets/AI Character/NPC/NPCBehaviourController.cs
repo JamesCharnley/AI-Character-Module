@@ -400,40 +400,60 @@ namespace AICharacterModule.NPC
         {
             Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
             Animator anim = _masterStateMachine.GlobalData.Anim;
-            if (offset.y == 0) offset = new Vector2(offset.x, 1);
+            if (offset.y == 0f) offset = new Vector3(offset.x, 1f, offset.z);
             Debug.LogError($"TakeDamage: {offset}");
-            
-            if (offset == new Vector3(0,-1, 1))
+
+            // Expected axis mapping:
+            // X: +1 left, -1 right
+            // Y: +1 above, -1 below
+            // Z: +1 front, -1 back
+
+            if (offset.z == -1f)
+            {
+                if (offset.y == 1f)
+                {
+                    anim.SetTrigger("TorsoeDamageHigh_Back");
+                    return;
+                }
+
+                if (offset.y == -1f)
+                {
+                    anim.SetTrigger("TorsoeDamageLow_Back");
+                    return;
+                }
+            }
+
+            if (offset == new Vector3(0, 1, 1))
             {
                 // high front
                 anim.SetTrigger("TorsoeDamageHigh_Front");
                 return;
             }
-            if (offset == new Vector3(1, -1, 1))
+            if (offset == new Vector3(1, 1, 1))
             {
                 // High left
                 anim.SetTrigger("TorsoeDamageHigh_Left");
                 return;
             }
-            if (offset == new Vector3(-1, -1, 1))
+            if (offset == new Vector3(-1, 1, 1))
             {
                 // High right
                 anim.SetTrigger("TorsoeDamageHigh_Right");
                 return;
             }
-            if (offset == new Vector3(1, 1, 1))
+            if (offset == new Vector3(1, -1, 1))
             {
                 // Low left
                 anim.SetTrigger("TorsoeDamageLow_Left");
                 return;
             }
-            if (offset == new Vector3(-1, 1, 1))
+            if (offset == new Vector3(-1, -1, 1))
             {
                 // Low right
                 anim.SetTrigger("TorsoeDamageLow_Right");
                 return;
             }
-            if (offset == new Vector3(0, 1, 1))
+            if (offset == new Vector3(0, -1, 1))
             {
                 // Low front
                 anim.SetTrigger("TorsoeDamageLow_Front");
