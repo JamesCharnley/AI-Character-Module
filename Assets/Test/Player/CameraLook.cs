@@ -22,10 +22,10 @@ public class CameraLook : MonoBehaviour
         {
             Camera cam = GetComponent<Camera>();
             Vector2 punchZone = GetLookDirection(cam, DodgeTarget);
-            PunchOffsetResult = punchZone;
-            DamageOffsetResult = GetLookDirection(cam, DamageTarget);
+            //PunchOffsetResult = punchZone;
+            //DamageOffsetResult = GetLookDirection(cam, DamageTarget);
             //npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
-            npcBehaviourController.TakeDamage(20, transform.forward, DamageOffsetResult);
+            //npcBehaviourController.TakeDamage(20, transform.forward, DamageOffsetResult);
         }
 
         xRotation -= mouseY;

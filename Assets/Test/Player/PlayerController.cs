@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         throw new System.NotImplementedException();
     }
 
-    public void TakeDamage(float _amount, Vector3 _direction, Vector2 _offset)
+    public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
         AddImpulse(_direction * 20);
     }

@@ -371,43 +371,45 @@ namespace AICharacterModule.NPC
         {
             throw new NotImplementedException();
         }
-        
-        public void TakeDamage(float _amount, Vector3 _direction, Vector2 _offset)
+
+        [SerializeField] private Transform TorsoeBone;
+        public void TakeDamage(float _amount, Vector3 _direction, Vector3 _damagerPos)
         {
+            Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
             Animator anim = _masterStateMachine.GlobalData.Anim;
-            if (_offset.y == 0) _offset = new Vector2(_offset.x, 1);
+            if (offset.y == 0) offset = new Vector2(offset.x, 1);
             
-            if (_offset == new Vector2(0,-1))
+            if (offset == new Vector3(0,-1, 1))
             {
                 // high front
                 anim.SetTrigger("TorsoeDamageHigh_Front");
                 return;
             }
-            if (_offset == new Vector2(1, -1))
+            if (offset == new Vector3(1, -1, 1))
             {
                 // High left
                 anim.SetTrigger("TorsoeDamageHigh_Left");
                 return;
             }
-            if (_offset == new Vector2(-1, -1))
+            if (offset == new Vector3(-1, -1, 1))
             {
                 // High right
                 anim.SetTrigger("TorsoeDamageHigh_Right");
                 return;
             }
-            if (_offset == new Vector2(1, 1))
+            if (offset == new Vector3(1, 1, 1))
             {
                 // Low left
                 anim.SetTrigger("TorsoeDamageLow_Left");
                 return;
             }
-            if (_offset == new Vector2(-1, 1))
+            if (offset == new Vector3(-1, 1, 1))
             {
                 // Low right
                 anim.SetTrigger("TorsoeDamageLow_Right");
                 return;
             }
-            if (_offset == new Vector2(0, 1))
+            if (offset == new Vector3(0, 1, 1))
             {
                 // Low front
                 anim.SetTrigger("TorsoeDamageLow_Front");
