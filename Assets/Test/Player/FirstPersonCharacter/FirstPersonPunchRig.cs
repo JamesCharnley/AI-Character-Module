@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -19,6 +21,8 @@ namespace FirstPersonCharacter
         [Header("IK Targets")]
         [SerializeField] private Transform leftHandTarget;
         [SerializeField] private Transform rightHandTarget;
+        [SerializeField] private Transform leftHandBone;
+        [SerializeField] private Transform rightHandBone;
 
         [Header("Input")]
         [SerializeField] private int mouseButton = 0;
@@ -28,6 +32,7 @@ namespace FirstPersonCharacter
         [Min(0.01f)] [SerializeField] private float strikeDuration = 0.1f;
         [Min(0.01f)] [SerializeField] private float recoverDuration = 0.12f;
         [Min(0f)] [SerializeField] private float punchCooldown = 0.03f;
+        [Range(0f, 1f)] [SerializeField] private float punchDamageWindowNormalized = 0.2f;
 
         [Header("Punch Shape (Local Space)")]
         [SerializeField] private float forwardDistance = 0.33f;
@@ -41,6 +46,11 @@ namespace FirstPersonCharacter
         [Header("Spine Motion")]
         [SerializeField] private float spinePitch = 8f;
         [SerializeField] private float spineYaw = 4f;
+
+        [Header("Punch Damage")]
+        [SerializeField] private float punchDamageAmount = 20f;
+        [Min(0.01f)] [SerializeField] private float punchOverlapSphereRadius = 0.2f;
+        [SerializeField] private LayerMask enemyLayerMask;
 
         [Header("Curves")]
         [SerializeField] private AnimationCurve windUpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -127,12 +137,18 @@ namespace FirstPersonCharacter
             Vector3 windUpPos = rest + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
             Vector3 strikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
             strikePos.x = Mathf.Lerp(strikePos.x, centerlineX, Mathf.Clamp01(centerBias));
+            Transform activeHandBone = useRightArm ? rightHandBone : leftHandBone;
+            if (activeHandBone == null)
+            {
+                activeHandBone = activeTarget;
+            }
+            HashSet<ITakeDamage> damagedTargets = new HashSet<ITakeDamage>();
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
 
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
-            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight);
+            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets);
             yield return MoveTarget(activeTarget, strikePos, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
 
             activeTarget.localPosition = rest;
@@ -152,7 +168,9 @@ namespace FirstPersonCharacter
             AnimationCurve curve,
             Quaternion spineStart,
             Quaternion spineOffset,
-            float arcHeight = 0f)
+            float arcHeight = 0f,
+            Transform activeHandBone = null,
+            HashSet<ITakeDamage> damagedTargets = null)
         {
             float elapsed = 0f;
             while (elapsed < duration)
@@ -174,6 +192,11 @@ namespace FirstPersonCharacter
                     spine.localRotation = Quaternion.SlerpUnclamped(spineStart, spineStart * spineOffset, curvedT);
                 }
 
+                if (activeHandBone != null && ShouldApplyPunchDamageWindow(t))
+                {
+                    DoPunchOverlapDamage(activeHandBone, damagedTargets);
+                }
+
                 yield return null;
             }
 
@@ -181,6 +204,37 @@ namespace FirstPersonCharacter
             if (spine != null)
             {
                 spine.localRotation = spineStart * spineOffset;
+            }
+
+            if (activeHandBone != null && ShouldApplyPunchDamageWindow(1f))
+            {
+                DoPunchOverlapDamage(activeHandBone, damagedTargets);
+            }
+        }
+
+        private bool ShouldApplyPunchDamageWindow(float normalizedProgress)
+        {
+            float checkStart = 1f - Mathf.Clamp01(punchDamageWindowNormalized);
+            return normalizedProgress >= checkStart;
+        }
+
+        private void DoPunchOverlapDamage(Transform handBone, HashSet<ITakeDamage> damagedTargets)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(handBone.position, punchOverlapSphereRadius, enemyLayerMask, QueryTriggerInteraction.Ignore);
+            foreach (Collider hitCollider in hitColliders)
+            {
+                ITakeDamage damageReceiver = hitCollider.GetComponentInParent<ITakeDamage>();
+                if (damageReceiver == null)
+                {
+                    continue;
+                }
+
+                if (damagedTargets != null && !damagedTargets.Add(damageReceiver))
+                {
+                    continue;
+                }
+
+                damageReceiver.TakeDamage(punchDamageAmount, transform.forward, Vector2.zero);
             }
         }
 
