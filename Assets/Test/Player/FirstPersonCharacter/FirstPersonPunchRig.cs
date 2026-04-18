@@ -51,6 +51,8 @@ namespace FirstPersonCharacter
         [SerializeField] private float punchDamageAmount = 20f;
         [Min(0.01f)] [SerializeField] private float punchOverlapSphereRadius = 0.2f;
         [SerializeField] private LayerMask enemyLayerMask;
+        [SerializeField] private bool showPunchOverlapDebugSpheres = true;
+        [SerializeField] private Color punchOverlapDebugColor = new(1f, 0.2f, 0.2f, 0.75f);
 
         [Header("Curves")]
         [SerializeField] private AnimationCurve windUpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -265,6 +267,29 @@ namespace FirstPersonCharacter
 
             punchRunning = false;
             punchDamageResolved = false;
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!showPunchOverlapDebugSpheres)
+            {
+                return;
+            }
+
+            Gizmos.color = punchOverlapDebugColor;
+            DrawPunchOverlapDebugSphere(leftHandBone, leftHandTarget);
+            DrawPunchOverlapDebugSphere(rightHandBone, rightHandTarget);
+        }
+
+        private void DrawPunchOverlapDebugSphere(Transform handBone, Transform handTarget)
+        {
+            Transform debugSource = handBone != null ? handBone : handTarget;
+            if (debugSource == null)
+            {
+                return;
+            }
+
+            Gizmos.DrawWireSphere(debugSource.position, punchOverlapSphereRadius);
         }
     }
 }
