@@ -369,25 +369,24 @@ namespace AICharacterModule.NPC
             }
         }
 
-        public static Vector3 GetRelativePositionAxes(Transform referenceTransform, Vector3 worldPosition, float axisCenterThreshold = 0.1f)
+        [SerializeField] private float HorizontalCenterWidth = 0.4f;
+        public Vector3 GetRelativePositionAxes(Transform referenceTransform, Vector3 worldPosition)
         {
-            if (referenceTransform == null)
+            
+            float x = 0, y = 0, z = 0;
+            Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
+            
+            if (localPosition.x > HorizontalCenterWidth / 2)
             {
-                throw new ArgumentNullException(nameof(referenceTransform));
+                x = 1;
             }
-
-            Vector3 toPosition = worldPosition - referenceTransform.position;
-            float rightAmount = Vector3.Dot(toPosition, referenceTransform.right);
-            float upAmount = Vector3.Dot(toPosition, referenceTransform.up);
-            float forwardAmount = Vector3.Dot(toPosition, referenceTransform.forward);
-
-            // X axis for this API is defined as "left/right" where:
-            //   +1 = left, -1 = right (opposite of Transform.right).
-            float horizontal = Mathf.Abs(rightAmount) <= axisCenterThreshold ? 0f : -Mathf.Sign(rightAmount);
-            float vertical = Mathf.Abs(upAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(upAmount);
-            float depth = Mathf.Abs(forwardAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(forwardAmount);
-
-            return new Vector3(horizontal, vertical, depth);
+            else if (localPosition.x < -HorizontalCenterWidth / 2)
+            {
+                x = -1;
+            }
+            y = localPosition.y > 1.3f ? 1 : -1;
+            z = localPosition.z < 0 ? -1 : 1;
+            return new Vector3(x, y, z);
         }
 
         public void TakeDamage(float _amount)
@@ -400,7 +399,6 @@ namespace AICharacterModule.NPC
         {
             Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
             Animator anim = _masterStateMachine.GlobalData.Anim;
-            if (offset.y == 0f) offset = new Vector3(offset.x, 1f, offset.z);
             Debug.LogError($"TakeDamage: {offset}");
 
             // Expected axis mapping:

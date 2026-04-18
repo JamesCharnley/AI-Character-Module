@@ -445,7 +445,7 @@ MonoBehaviour:
   punchDamageWindowNormalized: 0.2
   forwardDistance: 0.33
   inwardDistance: 0.05
-  upwardDistance: 0.02
+  upwardDistance: 0.075
   windUpBackDistance: 0.15
   centerlineX: 0
   centerBias: 0.7
@@ -457,6 +457,8 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  showPunchOverlapDebugSpheres: 1
+  punchOverlapDebugColor: {r: 1, g: 0.2, b: 0.2, a: 0.75}
   windUpCurve:
     serializedVersion: 2
     m_Curve:
@@ -677,6 +679,7 @@ MonoBehaviour:
   damageOverlapDebugColor: {r: 1, g: 0.2, b: 0.2, a: 0.75}
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
+  HorizontalCenterWidth: 0.3
   TorsoeBone: {fileID: 1641631264}
 --- !u!195 &405209233
 NavMeshAgent:
