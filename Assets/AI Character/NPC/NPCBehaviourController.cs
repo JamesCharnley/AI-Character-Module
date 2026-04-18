@@ -381,7 +381,9 @@ namespace AICharacterModule.NPC
             float upAmount = Vector3.Dot(toPosition, referenceTransform.up);
             float forwardAmount = Vector3.Dot(toPosition, referenceTransform.forward);
 
-            float horizontal = Mathf.Abs(rightAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(rightAmount);
+            // X axis for this API is defined as "left/right" where:
+            //   +1 = left, -1 = right (opposite of Transform.right).
+            float horizontal = Mathf.Abs(rightAmount) <= axisCenterThreshold ? 0f : -Mathf.Sign(rightAmount);
             float vertical = Mathf.Abs(upAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(upAmount);
             float depth = Mathf.Abs(forwardAmount) <= axisCenterThreshold ? 0f : Mathf.Sign(forwardAmount);
 
