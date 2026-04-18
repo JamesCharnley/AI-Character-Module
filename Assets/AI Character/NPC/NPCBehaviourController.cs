@@ -32,6 +32,9 @@ namespace AICharacterModule.NPC
         [SerializeField] private float damageOverlapRadius = 0.75f;
         [SerializeField] private float damageAmount = 20f;
         [SerializeField] private LayerMask damageOverlapLayers = ~0;
+        [SerializeField] private Vector3 defaultDamageOverlapOffset = new(0f, 1f, 1f);
+        [SerializeField] private bool showDamageOverlapDebugSphere = true;
+        [SerializeField] private Color damageOverlapDebugColor = new(1f, 0.2f, 0.2f, 0.75f);
 
         public event Action chaseAnimationCycleEndingEvent;
 
@@ -145,12 +148,12 @@ namespace AICharacterModule.NPC
 
         public void DoDamageOverlap()
         {
-            DoDamageOverlap(new Vector3(0f, 1f, 1f));
+            DoDamageOverlap(defaultDamageOverlapOffset);
         }
 
         public void DoDamageOverlap(Vector3 localOffset)
         {
-            Vector3 overlapCenter = transform.TransformPoint(localOffset);
+            Vector3 overlapCenter = GetDamageOverlapCenter(localOffset);
             Collider[] hitColliders = Physics.OverlapSphere(overlapCenter, damageOverlapRadius, damageOverlapLayers);
             foreach (Collider hitCollider in hitColliders)
             {
@@ -167,6 +170,22 @@ namespace AICharacterModule.NPC
 
                 takeDamage.TakeDamage(damageAmount, transform.forward, Vector3.zero);
             }
+        }
+
+        private Vector3 GetDamageOverlapCenter(Vector3 localOffset)
+        {
+            return transform.TransformPoint(localOffset);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!showDamageOverlapDebugSphere)
+            {
+                return;
+            }
+
+            Gizmos.color = damageOverlapDebugColor;
+            Gizmos.DrawWireSphere(GetDamageOverlapCenter(defaultDamageOverlapOffset), damageOverlapRadius);
         }
 
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)
