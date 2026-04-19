@@ -42,6 +42,7 @@ namespace FirstPersonCharacter
         [SerializeField] private float centerlineX = 0f;
         [Range(0f, 1f)] [SerializeField] private float centerBias = 0.7f;
         [SerializeField] private float strikeArcHeight = 0.045f;
+        [Range(0f, 1f)] [SerializeField] private float minimumForwardTravelRatio = 0.7f;
 
         [Header("Spine Motion")]
         [SerializeField] private float spinePitch = 8f;
@@ -266,6 +267,8 @@ namespace FirstPersonCharacter
                 : Mathf.Clamp(desiredDelta.x, maxDelta.x, 0f);
             float clampedY = Mathf.Clamp(desiredDelta.y, 0f, upwardDistance);
             float clampedZ = Mathf.Clamp(desiredDelta.z, 0f, forwardDistance);
+            float minForwardDistance = forwardDistance * Mathf.Clamp01(minimumForwardTravelRatio);
+            clampedZ = Mathf.Max(clampedZ, minForwardDistance);
 
             return restPosition + new Vector3(clampedX, clampedY, clampedZ);
         }
