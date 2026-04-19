@@ -409,7 +409,7 @@ namespace AICharacterModule.NPC
         {
             Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
             Animator anim = _masterStateMachine.GlobalData.Anim;
-            Debug.LogError($"TakeDamage: {offset}");
+            //Debug.LogError($"TakeDamage: {offset}");
 
             // Expected axis mapping:
             // X: +1 left, -1 right

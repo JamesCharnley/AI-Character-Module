@@ -112,6 +112,7 @@ namespace FirstPersonCharacter
                 if (_hitInfo.transform.TryGetComponent(out IHasHitZones hasHitZones))
                 {
                     CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
+                    Debug.LogWarning("Got HitZone");
                 }
             }
 
@@ -148,6 +149,7 @@ namespace FirstPersonCharacter
             {
                 punchRunning = false;
                 punchDamageResolved = false;
+                Debug.LogError("Punch Active Target Null");
                 yield break;
             }
 
