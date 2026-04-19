@@ -474,7 +474,7 @@ MonoBehaviour:
   recoverDuration: 0.12
   punchCooldown: 0.1
   punchDamageWindowNormalized: 0.2
-  forwardDistance: 0.33
+  forwardDistance: 0.4
   inwardDistance: 0.05
   upwardDistance: 0.075
   windUpBackDistance: 0.15

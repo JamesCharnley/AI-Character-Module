@@ -174,7 +174,7 @@ namespace FirstPersonCharacter
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
             yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets);
             yield return MoveTarget(activeTarget, strikePos, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
-
+            Debug.DrawLine(transform.TransformPoint(strikePos), transform.TransformPoint(strikePos) + Vector3.up, Color.green, 3);
             activeTarget.localPosition = rest;
             if (spine != null)
             {
@@ -197,6 +197,8 @@ namespace FirstPersonCharacter
             Transform activeHandBone = null,
             HashSet<ITakeDamage> damagedTargets = null)
         {
+            
+            
             float elapsed = 0f;
             while (elapsed < duration)
             {
