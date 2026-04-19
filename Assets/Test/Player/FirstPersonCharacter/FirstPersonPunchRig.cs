@@ -305,7 +305,7 @@ namespace FirstPersonCharacter
 
                 Vector3 handPosition = handBone.position;
                 Vector2 handOffset = new Vector2(handPosition.x, handPosition.y);
-                damageReceiver.TakeDamage(punchDamageAmount, transform.forward, handOffset);
+                damageReceiver.TakeDamage(punchDamageAmount, transform.forward, CurrentHitZone);
                 punchDamageResolved = true;
                 return;
             }

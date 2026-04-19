@@ -395,9 +395,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14abbd2d463c92b43bc218c172d2dc6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 6
+  moveSpeed: 2
   gravity: -9.81
-  jumpForce: 1.5
+  jumpForce: 3
   sprintMulti: 1.5
   groundCheck: {fileID: 915592386}
   groundDistance: 0.4
@@ -474,13 +474,15 @@ MonoBehaviour:
   recoverDuration: 0.12
   punchCooldown: 0.1
   punchDamageWindowNormalized: 0.2
-  forwardDistance: 0.4
-  inwardDistance: 0.05
-  upwardDistance: 0.075
-  windUpBackDistance: 0.15
+  forwardDistance: 1
+  inwardDistance: 0
+  upwardDistance: 0
+  windUpBackDistance: 0.2
   centerlineX: 0
   centerBias: 0.7
   strikeArcHeight: 0.08
+  minimumForwardTravelRatio: 0.913
+  trackHitZoneDuringStrike: 1
   spinePitch: 0
   spineYaw: 0
   punchDamageAmount: 20
@@ -1843,7 +1845,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd7af45908ea52a4a826a6721cbecc0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 500
+  mouseSensitivity: 350
   playerBody: {fileID: 189356296}
   DodgeTarget: {fileID: 288514806}
   DamageTarget: {fileID: 1812382097}
