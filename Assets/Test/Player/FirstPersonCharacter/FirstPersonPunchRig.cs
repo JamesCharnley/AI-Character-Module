@@ -105,6 +105,7 @@ namespace FirstPersonCharacter
                 return;
             }
             
+            CurrentHitZone = new();
             if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
                     CamRaycastMask))
             {
@@ -112,10 +113,6 @@ namespace FirstPersonCharacter
                 {
                     CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
                 }
-            }
-            else
-            {
-                CurrentHitZone = new();
             }
 
             StartCoroutine(PunchRoutine(punchRightNext));
@@ -160,6 +157,7 @@ namespace FirstPersonCharacter
             Vector3 windUpPos = rest + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
             Vector3 strikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
             strikePos.x = Mathf.Lerp(strikePos.x, centerlineX, Mathf.Clamp01(centerBias));
+            strikePos = GetStrikePositionFromCurrentHitZone(rest, strikePos);
             Transform activeHandBone = useRightArm ? rightHandBone : leftHandBone;
             if (activeHandBone == null)
             {
@@ -235,6 +233,29 @@ namespace FirstPersonCharacter
             {
                 DoPunchOverlapDamage(activeHandBone, damagedTargets);
             }
+        }
+
+        private Vector3 GetStrikePositionFromCurrentHitZone(Vector3 restPosition, Vector3 defaultStrikePosition)
+        {
+            if (CurrentHitZone.SelfTransform == null)
+            {
+                return defaultStrikePosition;
+            }
+
+            Vector3 zonePositionWorld = CurrentHitZone.SelfTransform.position +
+                                        CurrentHitZone.SelfTransform.TransformVector(CurrentHitZone.LocalOffset);
+            Vector3 zonePositionLocal = transform.InverseTransformPoint(zonePositionWorld);
+
+            Vector3 desiredDelta = zonePositionLocal - restPosition;
+            Vector3 maxDelta = defaultStrikePosition - restPosition;
+
+            float clampedX = maxDelta.x >= 0f
+                ? Mathf.Clamp(desiredDelta.x, 0f, maxDelta.x)
+                : Mathf.Clamp(desiredDelta.x, maxDelta.x, 0f);
+            float clampedY = Mathf.Clamp(desiredDelta.y, 0f, upwardDistance);
+            float clampedZ = Mathf.Clamp(desiredDelta.z, 0f, forwardDistance);
+
+            return restPosition + new Vector3(clampedX, clampedY, clampedZ);
         }
 
         private bool ShouldApplyPunchDamageWindow(float normalizedProgress)
