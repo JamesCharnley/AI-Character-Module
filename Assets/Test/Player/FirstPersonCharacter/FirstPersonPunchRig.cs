@@ -109,7 +109,16 @@ namespace FirstPersonCharacter
             if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
                     CamRaycastMask))
             {
-                if (_hitInfo.transform.TryGetComponent(out IHasHitZones hasHitZones))
+                IHasHitZones hasHitZones = _hitInfo.collider != null
+                    ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
+                    : null;
+
+                if (hasHitZones == null)
+                {
+                    _hitInfo.transform.TryGetComponent(out hasHitZones);
+                }
+
+                if (hasHitZones != null)
                 {
                     CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
                     Debug.LogWarning("Got HitZone");
@@ -246,7 +255,8 @@ namespace FirstPersonCharacter
                 return defaultStrikePosition;
             }
 
-            Vector3 zonePositionLocal = transform.InverseTransformPoint(CurrentHitZone.SelfTransform.position);
+            Vector3 zonePositionWorld = CurrentHitZone.SelfTransform.TransformPoint(CurrentHitZone.LocalOffset);
+            Vector3 zonePositionLocal = transform.InverseTransformPoint(zonePositionWorld);
 
             Vector3 desiredDelta = zonePositionLocal - restPosition;
             Vector3 maxDelta = defaultStrikePosition - restPosition;
