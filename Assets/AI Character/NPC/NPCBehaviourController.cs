@@ -3,6 +3,7 @@ using AICharacterModule.NPC.StateMachine.Managers;
 using AICharacterModule.NPC.StateMachine.States;
 using AICharacterModule.NPC.StateMachine.SubMachines;
 using System;
+using System.Collections.Generic;
 using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 using UnityEngine.AI;
@@ -14,7 +15,7 @@ namespace AICharacterModule.NPC
     /// Master machine chooses between navigation and combat sub-machines.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NPCBehaviourController : MonoBehaviour, ITakeDamage
+    public class NPCBehaviourController : MonoBehaviour, ITakeDamage, IHasHitZones
     {
         [SerializeField] private Transform target;
 
@@ -114,6 +115,15 @@ namespace AICharacterModule.NPC
 
             _masterStateMachine.SwitchTo("Navigation");
             
+        }
+
+        private void Start()
+        {
+            HitZones = new();
+            foreach (HitZoneInfo zoneInfo in HitZonesCache)
+            {
+                HitZones.Add(zoneInfo);
+            }
         }
 
         private void Update()
@@ -459,7 +469,88 @@ namespace AICharacterModule.NPC
             }
         }
 
-        
+        public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
+        {
+            Vector3 offset = _hitZoneInfo.LocalOffset;
+            Animator anim = _masterStateMachine.GlobalData.Anim;
+            Debug.LogError($"TakeDamage: {offset}");
+
+            // Expected axis mapping:
+            // X: +1 left, -1 right
+            // Y: +1 above, -1 below
+            // Z: +1 front, -1 back
+
+            if (offset.z == -1f)
+            {
+                if (offset.y == 1f)
+                {
+                    anim.SetTrigger("TorsoeDamageHigh_Back");
+                    return;
+                }
+
+                if (offset.y == -1f)
+                {
+                    anim.SetTrigger("TorsoeDamageLow_Back");
+                    return;
+                }
+            }
+
+            if (offset == new Vector3(0, 1, 1))
+            {
+                // high front
+                anim.SetTrigger("TorsoeDamageHigh_Front");
+                return;
+            }
+            if (offset == new Vector3(1, 1, 1))
+            {
+                // High left
+                anim.SetTrigger("TorsoeDamageHigh_Left");
+                return;
+            }
+            if (offset == new Vector3(-1, 1, 1))
+            {
+                // High right
+                anim.SetTrigger("TorsoeDamageHigh_Right");
+                return;
+            }
+            if (offset == new Vector3(1, -1, 1))
+            {
+                // Low left
+                anim.SetTrigger("TorsoeDamageLow_Left");
+                return;
+            }
+            if (offset == new Vector3(-1, -1, 1))
+            {
+                // Low right
+                anim.SetTrigger("TorsoeDamageLow_Right");
+                return;
+            }
+            if (offset == new Vector3(0, -1, 1))
+            {
+                // Low front
+                anim.SetTrigger("TorsoeDamageLow_Front");
+                return;
+            }
+        }
+
+        [SerializeField] private HitZoneInfo[] HitZonesCache;
+        public List<HitZoneInfo> HitZones { get; set; }
+        public HitZoneInfo GetClosestHitzoneTransform(Vector3 _RelativeTo)
+        {
+            HitZoneInfo closestHitZone = new();
+            float shortestDist = 999;
+            foreach (HitZoneInfo hitZone in HitZones)
+            {
+                float dist = Vector3.Distance(hitZone.SelfTransform.position, _RelativeTo);
+                if (dist < shortestDist)
+                {
+                    shortestDist = dist;
+                    closestHitZone = hitZone;
+                }
+            }
+
+            return closestHitZone;
+        }
     }
     
 }

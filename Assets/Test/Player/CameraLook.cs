@@ -14,6 +14,8 @@ public class CameraLook : MonoBehaviour
     [SerializeField] private Vector2 PunchOffsetResult;
     [SerializeField] private Vector2 DamageOffsetResult;
     [SerializeField] private NPCBehaviourController npcBehaviourController;
+
+    
     void Update()
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
@@ -26,6 +28,8 @@ public class CameraLook : MonoBehaviour
             //DamageOffsetResult = GetLookDirection(cam, DamageTarget);
             //npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
             //npcBehaviourController.TakeDamage(20, transform.forward, DamageOffsetResult);
+
+            
         }
 
         xRotation -= mouseY;

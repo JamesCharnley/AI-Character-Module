@@ -94,4 +94,9 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     {
         //AddImpulse(_direction * 20);
     }
+
+    public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
+    {
+        throw new System.NotImplementedException();
+    }
 }

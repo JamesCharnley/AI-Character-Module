@@ -8,5 +8,6 @@ namespace AICharacterModule.NPC.StateMachine.Core
     {
         void TakeDamage(float _amount);
         void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset);
+        void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo);
     }
 }

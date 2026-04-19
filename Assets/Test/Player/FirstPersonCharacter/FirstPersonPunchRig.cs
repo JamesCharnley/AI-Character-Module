@@ -66,6 +66,10 @@ namespace FirstPersonCharacter
         private bool punchRightNext = true;
         private float lastPunchTime = -10f;
         private bool punchDamageResolved;
+        
+        [SerializeField] private LayerMask CamRaycastMask;
+        [SerializeField] private float PunchRaycastDistance = 1;
+        [SerializeField] private Camera cam;
 
         private void Awake()
         {
@@ -87,8 +91,10 @@ namespace FirstPersonCharacter
             }
         }
 
+        [SerializeField] private HitZoneInfo CurrentHitZone;
         private void Update()
         {
+            
             if (!Input.GetMouseButtonDown(mouseButton))
             {
                 return;
@@ -97,6 +103,19 @@ namespace FirstPersonCharacter
             if (punchRunning || Time.time < lastPunchTime + punchCooldown)
             {
                 return;
+            }
+            
+            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
+                    CamRaycastMask))
+            {
+                if (_hitInfo.transform.TryGetComponent(out IHasHitZones hasHitZones))
+                {
+                    CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
+                }
+            }
+            else
+            {
+                CurrentHitZone = new();
             }
 
             StartCoroutine(PunchRoutine(punchRightNext));
