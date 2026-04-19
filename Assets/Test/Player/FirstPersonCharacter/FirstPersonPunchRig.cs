@@ -244,9 +244,7 @@ namespace FirstPersonCharacter
                 return defaultStrikePosition;
             }
 
-            Vector3 zonePositionWorld = CurrentHitZone.SelfTransform.position +
-                                        CurrentHitZone.SelfTransform.TransformVector(CurrentHitZone.LocalOffset);
-            Vector3 zonePositionLocal = transform.InverseTransformPoint(zonePositionWorld);
+            Vector3 zonePositionLocal = transform.InverseTransformPoint(CurrentHitZone.SelfTransform.position);
 
             Vector3 desiredDelta = zonePositionLocal - restPosition;
             Vector3 maxDelta = defaultStrikePosition - restPosition;
