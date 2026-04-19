@@ -43,6 +43,7 @@ namespace FirstPersonCharacter
         [Range(0f, 1f)] [SerializeField] private float centerBias = 0.7f;
         [SerializeField] private float strikeArcHeight = 0.045f;
         [Range(0f, 1f)] [SerializeField] private float minimumForwardTravelRatio = 0.7f;
+        [SerializeField] private bool trackHitZoneDuringStrike = true;
 
         [Header("Spine Motion")]
         [SerializeField] private float spinePitch = 8f;
@@ -167,9 +168,9 @@ namespace FirstPersonCharacter
             float sideSign = useRightArm ? -1f : 1f;
 
             Vector3 windUpPos = rest + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
-            Vector3 strikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
-            strikePos.x = Mathf.Lerp(strikePos.x, centerlineX, Mathf.Clamp01(centerBias));
-            strikePos = GetStrikePositionFromCurrentHitZone(rest, strikePos);
+            Vector3 defaultStrikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
+            defaultStrikePos.x = Mathf.Lerp(defaultStrikePos.x, centerlineX, Mathf.Clamp01(centerBias));
+            Vector3 strikePos = GetStrikePositionFromCurrentHitZone(rest, defaultStrikePos);
             Transform activeHandBone = useRightArm ? rightHandBone : leftHandBone;
             if (activeHandBone == null)
             {
@@ -182,8 +183,9 @@ namespace FirstPersonCharacter
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
 
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
-            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets);
-            yield return MoveTarget(activeTarget, strikePos, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
+            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
+            Vector3 recoverStart = activeTarget.localPosition;
+            yield return MoveTarget(activeTarget, recoverStart, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
             Debug.DrawLine(transform.TransformPoint(strikePos), transform.TransformPoint(strikePos) + Vector3.up, Color.green, 3);
             activeTarget.localPosition = rest;
             if (spine != null)
@@ -205,18 +207,24 @@ namespace FirstPersonCharacter
             Quaternion spineOffset,
             float arcHeight = 0f,
             Transform activeHandBone = null,
-            HashSet<ITakeDamage> damagedTargets = null)
+            HashSet<ITakeDamage> damagedTargets = null,
+            bool trackHitZone = false,
+            Vector3 restPosition = default,
+            Vector3 defaultStrikePosition = default)
         {
             
             
             float elapsed = 0f;
+            Vector3 finalEnd = end;
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
                 float curvedT = curve != null ? curve.Evaluate(t) : t;
+                Vector3 dynamicEnd = trackHitZone ? GetStrikePositionFromCurrentHitZone(restPosition, defaultStrikePosition) : end;
+                finalEnd = dynamicEnd;
 
-                Vector3 nextPosition = Vector3.LerpUnclamped(start, end, curvedT);
+                Vector3 nextPosition = Vector3.LerpUnclamped(start, dynamicEnd, curvedT);
                 if (arcHeight > 0f)
                 {
                     nextPosition.y += Mathf.Sin(curvedT * Mathf.PI) * arcHeight;
@@ -237,7 +245,7 @@ namespace FirstPersonCharacter
                 yield return null;
             }
 
-            target.localPosition = end;
+            target.localPosition = finalEnd;
             if (spine != null)
             {
                 spine.localRotation = spineStart * spineOffset;
