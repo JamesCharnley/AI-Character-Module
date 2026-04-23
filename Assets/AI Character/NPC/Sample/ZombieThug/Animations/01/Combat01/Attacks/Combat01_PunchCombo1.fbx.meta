@@ -206,6 +206,13 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
+      - time: 0.20950001
+        functionName: PlayHeavyPunchWoosh
+        data: false
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.23372325
         functionName: DoDamageOverlapActivate
         data: RightHand
@@ -227,9 +234,9 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.87844247
-        functionName: AttackAnimationCompleted
-        data: 
+      - time: 0.4870317
+        functionName: PlayLightPunchWoosh
+        data: true
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0
@@ -248,9 +255,23 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.80473304
+        functionName: PlayHeavyPunchWoosh
+        data: true
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.87319887
         functionName: DoDamageOverlapDeactivate
         data: LeftHand
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.87844247
+        functionName: AttackAnimationCompleted
+        data: 
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0

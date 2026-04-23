@@ -125,8 +125,22 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
+      - time: 0.21246365
+        functionName: PlayHeavyKickWoosh
+        data: true
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.31434688
         functionName: DoDamageOverlapActivate
+        data: LeftFoot
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.389049
+        functionName: DoDamageOverlapDeactivate
         data: LeftFoot
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
@@ -135,13 +149,6 @@ ModelImporter:
       - time: 0.824645
         functionName: AttackAnimationCompleted
         data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.389049
-        functionName: DoDamageOverlapDeactivate
-        data: LeftFoot
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0

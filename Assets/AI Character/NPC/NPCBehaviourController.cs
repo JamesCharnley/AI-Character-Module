@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace AICharacterModule.NPC
 {
@@ -557,6 +558,10 @@ namespace AICharacterModule.NPC
             }
         }
 
+        [SerializeField] private AudioClip[] HighBodyHitSounds;
+        [SerializeField] private AudioClip[] LowBodyHitSounds;
+        [SerializeField] private AudioClip[] FaceHitSounds;
+
         public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
         {
             Vector3 offset = _hitZoneInfo.LocalOffset;
@@ -587,40 +592,68 @@ namespace AICharacterModule.NPC
             {
                 // high front
                 anim.SetTrigger("TorsoeDamageHigh_Front");
+                PlayHighBodyHit(_hitZoneInfo);
                 return;
             }
             if (offset == new Vector3(1, 1, 1))
             {
                 // High left
                 anim.SetTrigger("TorsoeDamageHigh_Left");
+                PlayHighBodyHit(_hitZoneInfo);
                 return;
             }
             if (offset == new Vector3(-1, 1, 1))
             {
                 // High right
                 anim.SetTrigger("TorsoeDamageHigh_Right");
+                PlayHighBodyHit(_hitZoneInfo);
                 return;
             }
             if (offset == new Vector3(1, -1, 1))
             {
                 // Low left
                 anim.SetTrigger("TorsoeDamageLow_Left");
+                PlayLowBodyHit(_hitZoneInfo);
                 return;
             }
             if (offset == new Vector3(-1, -1, 1))
             {
                 // Low right
                 anim.SetTrigger("TorsoeDamageLow_Right");
+                PlayLowBodyHit(_hitZoneInfo);
                 return;
             }
             if (offset == new Vector3(0, -1, 1))
             {
                 // Low front
                 anim.SetTrigger("TorsoeDamageLow_Front");
+                PlayLowBodyHit(_hitZoneInfo);
                 return;
             }
         }
 
+        void PlayLowBodyHit(HitZoneInfo _hitZone)
+        {
+            if (!_hitZone.SelfTransform.TryGetComponent(out AudioSource source))
+            {
+                return;
+            }
+            int rand = Random.Range(0, LowBodyHitSounds.Length);
+            source.clip = LowBodyHitSounds[rand];
+            source.Play();
+
+        }
+        void PlayHighBodyHit(HitZoneInfo _hitZone)
+        {
+            if (!_hitZone.SelfTransform.TryGetComponent(out AudioSource source))
+            {
+                return;
+            }
+            int rand = Random.Range(0, HighBodyHitSounds.Length);
+            source.clip = HighBodyHitSounds[rand];
+            source.Play();
+        }
+        
         [SerializeField] private HitZoneInfo[] HitZonesCache;
         public List<HitZoneInfo> HitZones { get; set; }
         public HitZoneInfo GetClosestHitzoneTransform(Vector3 _RelativeTo)
@@ -638,6 +671,79 @@ namespace AICharacterModule.NPC
             }
 
             return closestHitZone;
+        }
+
+        [SerializeField] private AudioClip[] HeavyPunchWooshSounds;
+        [SerializeField] private AudioClip[] LightPunchWooshSounds;
+        [SerializeField] private AudioClip[] HeavyKickWooshSounds;
+        [SerializeField] private AudioClip[] LightKickWooshSounds;
+
+        public void PlayHeavyPunchWoosh(string _isLeftHand)
+        {
+            int maxEx = HeavyPunchWooshSounds.Length;
+            AudioClip[] clips = HeavyPunchWooshSounds;
+            int rand = Random.Range(0, maxEx);
+            AudioSource source = _isLeftHand == "true"
+                ? LeftHandDamageBone.GetComponent<AudioSource>()
+                : RightHandDamageBone.GetComponent<AudioSource>();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.clip = clips[rand];
+            source.Play();
+
+        }
+        public void PlayLightPunchWoosh(string _isLeftHand)
+        {
+            int maxEx = LightPunchWooshSounds.Length;
+            AudioClip[] clips = LightPunchWooshSounds;
+            int rand = Random.Range(0, maxEx);
+            AudioSource source = _isLeftHand == "true"
+                ? LeftHandDamageBone.GetComponent<AudioSource>()
+                : RightHandDamageBone.GetComponent<AudioSource>();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.clip = clips[rand];
+            source.Play();
+
+        }
+
+        public void PlayHeavyKickWoosh(string _isLeftHand)
+        {
+            int maxEx = HeavyKickWooshSounds.Length;
+            AudioClip[] clips = HeavyKickWooshSounds;
+            int rand = Random.Range(0, maxEx);
+            AudioSource source = _isLeftHand == "true"
+                ? LeftFootDamageBone.GetComponent<AudioSource>()
+                : RightFootDamageBone.GetComponent<AudioSource>();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.clip = clips[rand];
+            source.Play();
+        }
+        public void PlayLightKickWoosh(string _isLeftHand)
+        {
+            int maxEx = HeavyKickWooshSounds.Length;
+            AudioClip[] clips = HeavyKickWooshSounds;
+            int rand = Random.Range(0, maxEx);
+            AudioSource source = _isLeftHand == "true"
+                ? LeftFootDamageBone.GetComponent<AudioSource>()
+                : RightFootDamageBone.GetComponent<AudioSource>();
+            if (source == null)
+            {
+                return;
+            }
+
+            source.clip = clips[rand];
+            source.Play();
         }
     }
     

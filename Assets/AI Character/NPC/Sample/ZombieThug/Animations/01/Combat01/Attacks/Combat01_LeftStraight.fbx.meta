@@ -151,6 +151,13 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
+      - time: 0.42144144
+        functionName: PlayHeavyPunchWoosh
+        data: true
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.5116054
         functionName: DoDamageOverlapActivate
         data: LeftHand
