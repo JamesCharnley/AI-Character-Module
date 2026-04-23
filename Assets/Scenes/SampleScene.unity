@@ -474,6 +474,7 @@ MonoBehaviour:
   recoverDuration: 0.12
   punchCooldown: 0.1
   punchDamageWindowNormalized: 0.2
+  impulseForwardTimingNormalized: 0.626
   forwardDistance: 1
   inwardDistance: 0
   upwardDistance: 0
@@ -569,11 +570,11 @@ MonoBehaviour:
     m_Bits: 8
   PunchRaycastDistance: 1
   cam: {fileID: 963194227}
-  playerController: {fileID: 0}
+  playerController: {fileID: 189356294}
   CurrentHitZone:
     SelfTransform: {fileID: 0}
     LocalOffset: {x: 0, y: 0, z: 0}
-  punchMobileForce: 0.3
+  punchMobileForce: 20
 --- !u!4 &288514806 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6173754733725934867, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
