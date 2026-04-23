@@ -33,6 +33,7 @@ namespace FirstPersonCharacter
         [Min(0.01f)] [SerializeField] private float recoverDuration = 0.12f;
         [Min(0f)] [SerializeField] private float punchCooldown = 0.03f;
         [Range(0f, 1f)] [SerializeField] private float punchDamageWindowNormalized = 0.2f;
+        [Range(0f, 1f)] [SerializeField] private float impulseForwardTimingNormalized = 0.3f;
 
         [Header("Punch Shape (Local Space)")]
         [SerializeField] private float forwardDistance = 0.33f;
@@ -190,6 +191,9 @@ namespace FirstPersonCharacter
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
+            float totalPunchDuration = windUpDuration + strikeDuration + recoverDuration;
+            float impulseDelay = totalPunchDuration * Mathf.Clamp01(impulseForwardTimingNormalized);
+            StartCoroutine(ImpulseForwardRoutine(impulseDelay));
 
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
             yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
@@ -204,6 +208,19 @@ namespace FirstPersonCharacter
 
             punchRunning = false;
             punchDamageResolved = false;
+        }
+
+        private IEnumerator ImpulseForwardRoutine(float delaySeconds)
+        {
+            if (delaySeconds > 0f)
+            {
+                yield return new WaitForSeconds(delaySeconds);
+            }
+
+            if (punchRunning)
+            {
+                ImpulseForward();
+            }
         }
 
         private IEnumerator MoveTarget(
