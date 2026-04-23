@@ -206,23 +206,23 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
-      - time: 0.286125
-        functionName: DoDamageOverlap
-        data: 
+      - time: 0.23372325
+        functionName: DoDamageOverlapActivate
+        data: RightHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.51975
-        functionName: DoDamageOverlap
-        data: 
+      - time: 0.3314121
+        functionName: DoDamageOverlapDeactivate
+        data: RightHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.84
-        functionName: DoDamageOverlap
-        data: 
+      - time: 0.47271058
+        functionName: DoDamageOverlapActivate
+        data: LeftHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0
@@ -230,6 +230,27 @@ ModelImporter:
       - time: 0.87844247
         functionName: AttackAnimationCompleted
         data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.57636887
+        functionName: DoDamageOverlapDeactivate
+        data: LeftHand
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.79250723
+        functionName: DoDamageOverlapActivate
+        data: LeftHand
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.87319887
+        functionName: DoDamageOverlapDeactivate
+        data: LeftHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0

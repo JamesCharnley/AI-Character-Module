@@ -404,7 +404,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
-  drag: 5
+  drag: 20
 --- !u!143 &189356295
 CharacterController:
   m_ObjectHideFlags: 0
@@ -569,9 +569,11 @@ MonoBehaviour:
     m_Bits: 8
   PunchRaycastDistance: 1
   cam: {fileID: 963194227}
+  playerController: {fileID: 0}
   CurrentHitZone:
     SelfTransform: {fileID: 0}
     LocalOffset: {x: 0, y: 0, z: 0}
+  punchMobileForce: 0.3
 --- !u!4 &288514806 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6173754733725934867, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
@@ -710,7 +712,7 @@ MonoBehaviour:
   approachToHandCombatDistance: 4.5
   handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
-  damageOverlapRadius: 0.75
+  damageOverlapRadius: 0.2
   damageAmount: 20
   damageOverlapLayers:
     serializedVersion: 2
@@ -718,6 +720,10 @@ MonoBehaviour:
   defaultDamageOverlapOffset: {x: 0, y: 1, z: 1}
   showDamageOverlapDebugSphere: 1
   damageOverlapDebugColor: {r: 1, g: 0.2, b: 0.2, a: 0.75}
+  RightHandDamageBone: {fileID: 1641631271}
+  LeftHandDamageBone: {fileID: 1641631270}
+  LeftFootDamageBone: {fileID: 1641631269}
+  RightFootDamageBone: {fileID: 1641631268}
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
   HorizontalCenterWidth: 0.3
@@ -3078,6 +3084,26 @@ Transform:
 --- !u!4 &1641631267 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6962757643806011377, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1641631268 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5176393074398667330, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1641631269 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4520667811460685156, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1641631270 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 803932062607491501, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1641631271 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7774490119401427302, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
   m_PrefabInstance: {fileID: 1641631263}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1722874544 stripped

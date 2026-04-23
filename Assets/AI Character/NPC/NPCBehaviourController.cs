@@ -132,6 +132,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.CurrentTarget = target;
             _masterStateMachine.Tick(Time.deltaTime);
             _masterStateMachine.GlobalData.Tick(Time.deltaTime);
+            DoDamageCheck();
         }
 
 
@@ -156,15 +157,83 @@ namespace AICharacterModule.NPC
             chaseAnimationCycleEndingEvent?.Invoke();
         }
 
-        public void DoDamageOverlap()
+
+        [SerializeField] private Transform RightHandDamageBone;
+        [SerializeField] private Transform LeftHandDamageBone;
+        [SerializeField] private Transform LeftFootDamageBone;
+        [SerializeField] private Transform RightFootDamageBone;
+        
+        private bool LeftHandDamageActive = false;
+        private bool RightHandDamageActive = false;
+        private bool LeftFootDamageActive = false;
+        private bool RightFootDamageActive = false;
+
+        void DoDamageCheck()
         {
-            DoDamageOverlap(defaultDamageOverlapOffset);
+            if (LeftHandDamageActive)
+            {
+                DoDamageOverlap(LeftHandDamageBone);
+            }
+            if (RightHandDamageActive)
+            {
+                DoDamageOverlap(RightHandDamageBone);
+            }
+            if (LeftFootDamageActive)
+            {
+                DoDamageOverlap(LeftFootDamageBone);
+            }
+            if (RightHandDamageActive)
+            {
+                DoDamageOverlap(RightFootDamageBone);
+            }
+        }
+        public void DoDamageOverlapActivate(string _damagePointId)
+        {
+            switch (_damagePointId)
+            {
+                case "LeftHand":
+                    LeftHandDamageActive = true;
+                    break;
+                case "RightHand":
+                    RightHandDamageActive = true;
+                    break;
+                case "LeftFoot":
+                    LeftFootDamageActive = true;
+                    break;
+                case "RightFoot":
+                    RightFootDamageActive = true;
+                    break;
+                default:
+                    RightHandDamageActive = true;
+                    break;
+            }
+        }
+        public void DoDamageOverlapDeactivate(string _damagePointId)
+        {
+            switch (_damagePointId)
+            {
+                case "LeftHand":
+                    LeftHandDamageActive = false;
+                    break;
+                case "RightHand":
+                    RightHandDamageActive = false;
+                    break;
+                case "LeftFoot":
+                    LeftFootDamageActive = false;
+                    break;
+                case "RightFoot":
+                    RightFootDamageActive = false;
+                    break;
+                default:
+                    RightHandDamageActive = false;
+                    break;
+            }
         }
 
-        public void DoDamageOverlap(Vector3 localOffset)
+        public void DoDamageOverlap(Transform _originTransform)
         {
-            Vector3 overlapCenter = GetDamageOverlapCenter(localOffset);
-            Collider[] hitColliders = Physics.OverlapSphere(overlapCenter, damageOverlapRadius, damageOverlapLayers);
+            
+            Collider[] hitColliders = Physics.OverlapSphere(_originTransform.position, damageOverlapRadius, damageOverlapLayers);
             foreach (Collider hitCollider in hitColliders)
             {
                 if (hitCollider.transform == transform)
@@ -193,9 +262,28 @@ namespace AICharacterModule.NPC
             {
                 return;
             }
+            if (LeftHandDamageActive)
+            {
+                Gizmos.color = damageOverlapDebugColor;
+                Gizmos.DrawWireSphere(LeftHandDamageBone.position, damageOverlapRadius);
+            }
+            if (RightHandDamageActive)
+            {
+                Gizmos.color = damageOverlapDebugColor;
+                Gizmos.DrawWireSphere(RightHandDamageBone.position, damageOverlapRadius);
+            }
+            if (LeftFootDamageActive)
+            {
+                Gizmos.color = damageOverlapDebugColor;
+                Gizmos.DrawWireSphere(LeftFootDamageBone.position, damageOverlapRadius);
+            }
+            if (RightHandDamageActive)
+            {
+                Gizmos.color = damageOverlapDebugColor;
+                Gizmos.DrawWireSphere(RightFootDamageBone.position, damageOverlapRadius);
+            }
 
-            Gizmos.color = damageOverlapDebugColor;
-            Gizmos.DrawWireSphere(GetDamageOverlapCenter(defaultDamageOverlapOffset), damageOverlapRadius);
+            
         }
 
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)

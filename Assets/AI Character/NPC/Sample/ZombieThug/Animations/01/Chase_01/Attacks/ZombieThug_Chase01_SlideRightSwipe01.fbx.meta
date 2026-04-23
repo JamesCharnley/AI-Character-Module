@@ -74,9 +74,9 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.370125
-        functionName: DoDamageOverlap
-        data: 
+      - time: 0.25658786
+        functionName: DoDamageOverlapActivate
+        data: RightHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0
@@ -84,6 +84,13 @@ ModelImporter:
       - time: 0.95571953
         functionName: AttackAnimationCompleted
         data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.41786745
+        functionName: DoDamageOverlapDeactivate
+        data: RightHand
         objectReferenceParameter: {fileID: 11500000, guid: 8b15c2a9007357d468ced397332f1277, type: 3}
         floatParameter: 0
         intParameter: 0

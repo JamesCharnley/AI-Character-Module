@@ -73,6 +73,8 @@ namespace FirstPersonCharacter
         [SerializeField] private float PunchRaycastDistance = 1;
         [SerializeField] private Camera cam;
 
+        [SerializeField] private PlayerController playerController;
+
         private void Awake()
         {
             CacheRestPose();
@@ -149,6 +151,13 @@ namespace FirstPersonCharacter
             {
                 spineRestLocalRot = spine.localRotation;
             }
+        }
+
+        [SerializeField] private float punchMobileForce = 0.3f;
+
+        void ImpulseForward()
+        {
+            playerController.AddImpulse(transform.forward * punchMobileForce);
         }
 
         private IEnumerator PunchRoutine(bool useRightArm)
