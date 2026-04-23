@@ -34,6 +34,7 @@ namespace FirstPersonCharacter
         [Min(0f)] [SerializeField] private float punchCooldown = 0.03f;
         [Range(0f, 1f)] [SerializeField] private float punchDamageWindowNormalized = 0.2f;
         [Range(0f, 1f)] [SerializeField] private float impulseForwardTimingNormalized = 0.3f;
+        [Range(0f, 1f)] [SerializeField] private float punchWooshTimingNormalized = 0.25f;
 
         [Header("Punch Shape (Local Space)")]
         [SerializeField] private float forwardDistance = 0.33f;
@@ -56,6 +57,11 @@ namespace FirstPersonCharacter
         [SerializeField] private LayerMask enemyLayerMask;
         [SerializeField] private bool showPunchOverlapDebugSpheres = true;
         [SerializeField] private Color punchOverlapDebugColor = new(1f, 0.2f, 0.2f, 0.75f);
+
+        [Header("Punch Audio")]
+        [SerializeField] private AudioSource leftHandAudioSource;
+        [SerializeField] private AudioSource rightHandAudioSource;
+        [SerializeField] private AudioClip[] punchWooshSounds;
 
         [Header("Curves")]
         [SerializeField] private AnimationCurve windUpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -193,7 +199,9 @@ namespace FirstPersonCharacter
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
             float totalPunchDuration = windUpDuration + strikeDuration + recoverDuration;
             float impulseDelay = totalPunchDuration * Mathf.Clamp01(impulseForwardTimingNormalized);
+            float punchWooshDelay = totalPunchDuration * Mathf.Clamp01(punchWooshTimingNormalized);
             StartCoroutine(ImpulseForwardRoutine(impulseDelay));
+            StartCoroutine(PlayPunchWooshRoutine(punchWooshDelay, useRightArm));
 
             yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
             yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
@@ -221,6 +229,41 @@ namespace FirstPersonCharacter
             {
                 ImpulseForward();
             }
+        }
+
+        private IEnumerator PlayPunchWooshRoutine(float delaySeconds, bool isRightHand)
+        {
+            if (delaySeconds > 0f)
+            {
+                yield return new WaitForSeconds(delaySeconds);
+            }
+
+            if (punchRunning)
+            {
+                PlayPunchWoosh(isRightHand);
+            }
+        }
+
+        private void PlayPunchWoosh(bool isRightHand)
+        {
+            if (punchWooshSounds == null || punchWooshSounds.Length == 0)
+            {
+                return;
+            }
+
+            AudioSource handAudioSource = isRightHand ? rightHandAudioSource : leftHandAudioSource;
+            if (handAudioSource == null)
+            {
+                return;
+            }
+
+            AudioClip randomWooshClip = punchWooshSounds[Random.Range(0, punchWooshSounds.Length)];
+            if (randomWooshClip == null)
+            {
+                return;
+            }
+
+            handAudioSource.PlayOneShot(randomWooshClip);
         }
 
         private IEnumerator MoveTarget(
