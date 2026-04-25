@@ -580,8 +580,10 @@ MonoBehaviour:
   leftHandBone: {fileID: 2112423593}
   rightHandBone: {fileID: 2112423589}
   mouseButton: 0
-  windUpDuration: 0.28
-  strikeDuration: 0.25
+  minWindUpDuration: 0.2
+  maxWindUpDuration: 0.7
+  minStrikeDuration: 0.1
+  maxStrikeDuration: 0.33
   recoverDuration: 0.12
   punchCooldown: 0.1
   punchDamageWindowNormalized: 0.2
@@ -3650,7 +3652,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1193340829816115258, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_Layer
