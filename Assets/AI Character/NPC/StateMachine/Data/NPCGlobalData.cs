@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using AICharacterModule.NPC;
+using AICharacterModule.NPC.Animation;
 
 namespace AICharacterModule.NPC.StateMachine.Data
 {
@@ -45,6 +46,7 @@ namespace AICharacterModule.NPC.StateMachine.Data
         public float AttackRange = 2f;
         public float CombatCircleEntryDistanceToTarget;
         public Vector3 NpcLastVelocity;
+        public AnimationEventHandler AnimationController;
         public float PredictTargetDistanceInTime(float _time)
         {
             Vector3 predictedPlayerPosition = (PlayerCharacterController.transform.position + Vector3.down) +

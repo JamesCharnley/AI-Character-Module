@@ -139,7 +139,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
            // Debug.Log("Subscribe cycle");
-            globalData.BehaviourController.chaseAnimationCycleEndingEvent += OnChaseAnimationCycleEnding;
+            globalData.AnimationController.chaseAnimationCycleEndingEvent += OnChaseAnimationCycleEnding;
         }
 
         private void UnsubscribeFromChaseAnimationCycleEndingEvent(NPCGlobalData globalData)
@@ -150,7 +150,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                 return;
             }
            // Debug.Log("UnSubscribe cycle");
-            globalData.BehaviourController.chaseAnimationCycleEndingEvent -= OnChaseAnimationCycleEnding;
+           globalData.AnimationController.chaseAnimationCycleEndingEvent -= OnChaseAnimationCycleEnding;
         }
 
         private void OnChaseAnimationCycleEnding()

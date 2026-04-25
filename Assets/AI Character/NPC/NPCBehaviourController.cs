@@ -4,6 +4,7 @@ using AICharacterModule.NPC.StateMachine.States;
 using AICharacterModule.NPC.StateMachine.SubMachines;
 using System;
 using System.Collections.Generic;
+using AICharacterModule.NPC.Animation;
 using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 using UnityEngine.AI;
@@ -31,16 +32,10 @@ namespace AICharacterModule.NPC
         [SerializeField] private float approachToHandCombatDistance = 6f;
         [SerializeField] private float handCombatExitDistance = 8f;
         [SerializeField] private float combatToChaseDistanceIncrease = 2.5f;
-        [SerializeField] private float damageOverlapRadius = 0.75f;
-        [SerializeField] private float damageAmount = 20f;
-        [SerializeField] private LayerMask damageOverlapLayers = ~0;
-        [SerializeField] private Vector3 defaultDamageOverlapOffset = new(0f, 1f, 1f);
-        [SerializeField] private bool showDamageOverlapDebugSphere = true;
-        [SerializeField] private Color damageOverlapDebugColor = new(1f, 0.2f, 0.2f, 0.75f);
-
-        public event Action chaseAnimationCycleEndingEvent;
-
+        
+        
         private StateMachineManager<NPCGlobalData> _masterStateMachine;
+        public StateMachineManager<NPCGlobalData> GetMasterStateMachine => _masterStateMachine;
         private StateManager<NavigationData, NPCGlobalData> _navigationStateManager;
         private StateManager<CombatData, NPCGlobalData> _combatStateManager;
 
@@ -59,7 +54,9 @@ namespace AICharacterModule.NPC
                 CurrentTarget = target,
                 Anim = GetComponent<Animator>(),
                 DetectionRange = navAgent.stoppingDistance + 60f,
-                AttackRange = navAgent.stoppingDistance
+                AttackRange = navAgent.stoppingDistance,
+                AnimationController = GetComponent<AnimationEventHandler>()
+                
             };
 
             _masterStateMachine = new StateMachineManager<NPCGlobalData>(globalData);
@@ -133,157 +130,6 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.CurrentTarget = target;
             _masterStateMachine.Tick(Time.deltaTime);
             _masterStateMachine.GlobalData.Tick(Time.deltaTime);
-            DoDamageCheck();
-        }
-
-
-        public void AttackAnimationCompleted()
-        {
-            if (_masterStateMachine == null)
-            {
-                Debug.Log("AttackAnimationCompleted failed");
-                return;
-            }
-            Debug.Log("AttackAnimationCompleted");
-            _masterStateMachine.GlobalData.IsAttacking = false;
-        }
-
-        public void DodgeAnimationCompleted()
-        {
-            _masterStateMachine.GlobalData.IsDodging = false;
-        }
-
-        public void ChaseAnimationCycleEnding()
-        {
-            chaseAnimationCycleEndingEvent?.Invoke();
-        }
-
-
-        [SerializeField] private Transform RightHandDamageBone;
-        [SerializeField] private Transform LeftHandDamageBone;
-        [SerializeField] private Transform LeftFootDamageBone;
-        [SerializeField] private Transform RightFootDamageBone;
-        
-        private bool LeftHandDamageActive = false;
-        private bool RightHandDamageActive = false;
-        private bool LeftFootDamageActive = false;
-        private bool RightFootDamageActive = false;
-
-        void DoDamageCheck()
-        {
-            if (LeftHandDamageActive)
-            {
-                DoDamageOverlap(LeftHandDamageBone);
-            }
-            if (RightHandDamageActive)
-            {
-                DoDamageOverlap(RightHandDamageBone);
-            }
-            if (LeftFootDamageActive)
-            {
-                DoDamageOverlap(LeftFootDamageBone);
-            }
-            if (RightHandDamageActive)
-            {
-                DoDamageOverlap(RightFootDamageBone);
-            }
-        }
-        public void DoDamageOverlapActivate(string _damagePointId)
-        {
-            switch (_damagePointId)
-            {
-                case "LeftHand":
-                    LeftHandDamageActive = true;
-                    break;
-                case "RightHand":
-                    RightHandDamageActive = true;
-                    break;
-                case "LeftFoot":
-                    LeftFootDamageActive = true;
-                    break;
-                case "RightFoot":
-                    RightFootDamageActive = true;
-                    break;
-                default:
-                    RightHandDamageActive = true;
-                    break;
-            }
-        }
-        public void DoDamageOverlapDeactivate(string _damagePointId)
-        {
-            switch (_damagePointId)
-            {
-                case "LeftHand":
-                    LeftHandDamageActive = false;
-                    break;
-                case "RightHand":
-                    RightHandDamageActive = false;
-                    break;
-                case "LeftFoot":
-                    LeftFootDamageActive = false;
-                    break;
-                case "RightFoot":
-                    RightFootDamageActive = false;
-                    break;
-                default:
-                    RightHandDamageActive = false;
-                    break;
-            }
-        }
-
-        public void DoDamageOverlap(Transform _originTransform)
-        {
-            
-            Collider[] hitColliders = Physics.OverlapSphere(_originTransform.position, damageOverlapRadius, damageOverlapLayers);
-            foreach (Collider hitCollider in hitColliders)
-            {
-                if (hitCollider.transform == transform)
-                {
-                    continue;
-                }
-
-                ITakeDamage takeDamage = hitCollider.GetComponentInParent<ITakeDamage>();
-                if (takeDamage == null)
-                {
-                    continue;
-                }
-
-                takeDamage.TakeDamage(_masterStateMachine.GlobalData.Anim.GetFloat("CurrentDamage"), transform.forward * _masterStateMachine.GlobalData.Anim.GetFloat("CurrentDamageForce"), Vector3.zero);
-            }
-        }
-
-        private Vector3 GetDamageOverlapCenter(Vector3 localOffset)
-        {
-            return transform.TransformPoint(localOffset);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (!showDamageOverlapDebugSphere)
-            {
-                return;
-            }
-            if (LeftHandDamageActive)
-            {
-                Gizmos.color = damageOverlapDebugColor;
-                Gizmos.DrawWireSphere(LeftHandDamageBone.position, damageOverlapRadius);
-            }
-            if (RightHandDamageActive)
-            {
-                Gizmos.color = damageOverlapDebugColor;
-                Gizmos.DrawWireSphere(RightHandDamageBone.position, damageOverlapRadius);
-            }
-            if (LeftFootDamageActive)
-            {
-                Gizmos.color = damageOverlapDebugColor;
-                Gizmos.DrawWireSphere(LeftFootDamageBone.position, damageOverlapRadius);
-            }
-            if (RightHandDamageActive)
-            {
-                Gizmos.color = damageOverlapDebugColor;
-                Gizmos.DrawWireSphere(RightFootDamageBone.position, damageOverlapRadius);
-            }
-
             
         }
 
@@ -296,10 +142,7 @@ namespace AICharacterModule.NPC
 
             return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
         }
-
-
-
-
+        
         private bool ShouldApproachTargetAfterCirclingForDuration(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
@@ -428,64 +271,13 @@ namespace AICharacterModule.NPC
 
         public void IncomingAttack(Vector3 _offset)
         {
-            Animator anim = _masterStateMachine.GlobalData.Anim;
             if (_masterStateMachine.GlobalData.IsAttacking || _masterStateMachine.GlobalData.IsDodging)
             {
                 return;
             }
 
             _masterStateMachine.GlobalData.IsDodging = true;
-            
-            if (_offset.y == 1)
-            {
-                // duck
-                anim.SetTrigger("DodgePunchDown");
-                return;
-            }
-            if (_offset.y == -1)
-            {
-                // back
-                anim.SetTrigger("DodgePunchBack");
-                return;
-            }
-            if (_offset.z == -1)
-            {
-                // back
-                anim.SetTrigger("DodgePunchBack");
-                return;
-            }
-            if (_offset.x == 1)
-            {
-                // left
-                anim.SetTrigger("DodgePunchLeft");
-                return;
-            }
-            if (_offset.x == -1)
-            {
-                // right
-                anim.SetTrigger("DodgePunchRight");
-                return;
-            }
-        }
-
-        [SerializeField] private float HorizontalCenterWidth = 0.4f;
-        public Vector3 GetRelativePositionAxes(Transform referenceTransform, Vector3 worldPosition)
-        {
-            
-            float x = 0, y = 0, z = 0;
-            Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
-            
-            if (localPosition.x > HorizontalCenterWidth / 2)
-            {
-                x = 1;
-            }
-            else if (localPosition.x < -HorizontalCenterWidth / 2)
-            {
-                x = -1;
-            }
-            y = localPosition.y > 1.3f ? 1 : -1;
-            z = localPosition.z < 0 ? -1 : 1;
-            return new Vector3(x, y, z);
+            _masterStateMachine.GlobalData.AnimationController.PlayDodgeAnimation(_offset);
         }
 
         public void TakeDamage(float _amount)
@@ -496,164 +288,12 @@ namespace AICharacterModule.NPC
         [SerializeField] private Transform TorsoeBone;
         public void TakeDamage(float _amount, Vector3 _direction, Vector3 _damagerPos)
         {
-            Vector3 offset = GetRelativePositionAxes(TorsoeBone, _damagerPos);
-            Animator anim = _masterStateMachine.GlobalData.Anim;
-            //Debug.LogError($"TakeDamage: {offset}");
-
-            // Expected axis mapping:
-            // X: +1 left, -1 right
-            // Y: +1 above, -1 below
-            // Z: +1 front, -1 back
-
-            if (offset.z == -1f)
-            {
-                if (offset.y == 1f)
-                {
-                    anim.SetTrigger("TorsoeDamageHigh_Back");
-                    return;
-                }
-
-                if (offset.y == -1f)
-                {
-                    anim.SetTrigger("TorsoeDamageLow_Back");
-                    return;
-                }
-            }
-
-            if (offset == new Vector3(0, 1, 1))
-            {
-                // high front
-                anim.SetTrigger("TorsoeDamageHigh_Front");
-                return;
-            }
-            if (offset == new Vector3(1, 1, 1))
-            {
-                // High left
-                anim.SetTrigger("TorsoeDamageHigh_Left");
-                return;
-            }
-            if (offset == new Vector3(-1, 1, 1))
-            {
-                // High right
-                anim.SetTrigger("TorsoeDamageHigh_Right");
-                return;
-            }
-            if (offset == new Vector3(1, -1, 1))
-            {
-                // Low left
-                anim.SetTrigger("TorsoeDamageLow_Left");
-                return;
-            }
-            if (offset == new Vector3(-1, -1, 1))
-            {
-                // Low right
-                anim.SetTrigger("TorsoeDamageLow_Right");
-                return;
-            }
-            if (offset == new Vector3(0, -1, 1))
-            {
-                // Low front
-                anim.SetTrigger("TorsoeDamageLow_Front");
-                return;
-            }
+            throw new NotImplementedException();
         }
-
-        [SerializeField] private AudioClip[] HighBodyHitSounds;
-        [SerializeField] private AudioClip[] LowBodyHitSounds;
-        [SerializeField] private AudioClip[] FaceHitSounds;
 
         public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
         {
-            Vector3 offset = _hitZoneInfo.LocalOffset;
-            Animator anim = _masterStateMachine.GlobalData.Anim;
-            Debug.LogError($"TakeDamage: {offset}");
-
-            // Expected axis mapping:
-            // X: +1 left, -1 right
-            // Y: +1 above, -1 below
-            // Z: +1 front, -1 back
-
-            if (offset.z == -1f)
-            {
-                if (offset.y == 1f)
-                {
-                    anim.SetTrigger("TorsoeDamageHigh_Back");
-                    PlayHighBodyHit(_hitZoneInfo);
-                    return;
-                }
-
-                if (offset.y == -1f)
-                {
-                    anim.SetTrigger("TorsoeDamageLow_Back");
-                    PlayLowBodyHit(_hitZoneInfo);
-                    return;
-                }
-            }
-
-            if (offset == new Vector3(0, 1, 1))
-            {
-                // high front
-                anim.SetTrigger("TorsoeDamageHigh_Front");
-                PlayHighBodyHit(_hitZoneInfo);
-                return;
-            }
-            if (offset == new Vector3(1, 1, 1))
-            {
-                // High left
-                anim.SetTrigger("TorsoeDamageHigh_Left");
-                PlayHighBodyHit(_hitZoneInfo);
-                return;
-            }
-            if (offset == new Vector3(-1, 1, 1))
-            {
-                // High right
-                anim.SetTrigger("TorsoeDamageHigh_Right");
-                PlayHighBodyHit(_hitZoneInfo);
-                return;
-            }
-            if (offset == new Vector3(1, -1, 1))
-            {
-                // Low left
-                anim.SetTrigger("TorsoeDamageLow_Left");
-                PlayLowBodyHit(_hitZoneInfo);
-                return;
-            }
-            if (offset == new Vector3(-1, -1, 1))
-            {
-                // Low right
-                anim.SetTrigger("TorsoeDamageLow_Right");
-                PlayLowBodyHit(_hitZoneInfo);
-                return;
-            }
-            if (offset == new Vector3(0, -1, 1))
-            {
-                // Low front
-                anim.SetTrigger("TorsoeDamageLow_Front");
-                PlayLowBodyHit(_hitZoneInfo);
-                return;
-            }
-        }
-
-        void PlayLowBodyHit(HitZoneInfo _hitZone)
-        {
-            if (!_hitZone.SelfTransform.TryGetComponent(out AudioSource source))
-            {
-                return;
-            }
-            int rand = Random.Range(0, LowBodyHitSounds.Length);
-            source.clip = LowBodyHitSounds[rand];
-            source.Play();
-
-        }
-        void PlayHighBodyHit(HitZoneInfo _hitZone)
-        {
-            if (!_hitZone.SelfTransform.TryGetComponent(out AudioSource source))
-            {
-                return;
-            }
-            int rand = Random.Range(0, HighBodyHitSounds.Length);
-            source.clip = HighBodyHitSounds[rand];
-            source.Play();
+            _masterStateMachine.GlobalData.AnimationController.PlayDamageAnimation(_amount, _direction, _hitZoneInfo);
         }
         
         [SerializeField] private HitZoneInfo[] HitZonesCache;
@@ -675,78 +315,7 @@ namespace AICharacterModule.NPC
             return closestHitZone;
         }
 
-        [SerializeField] private AudioClip[] HeavyPunchWooshSounds;
-        [SerializeField] private AudioClip[] LightPunchWooshSounds;
-        [SerializeField] private AudioClip[] HeavyKickWooshSounds;
-        [SerializeField] private AudioClip[] LightKickWooshSounds;
-
-        public void PlayHeavyPunchWoosh(string _isLeftHand)
-        {
-            int maxEx = HeavyPunchWooshSounds.Length;
-            AudioClip[] clips = HeavyPunchWooshSounds;
-            int rand = Random.Range(0, maxEx);
-            AudioSource source = _isLeftHand == "true"
-                ? LeftHandDamageBone.GetComponent<AudioSource>()
-                : RightHandDamageBone.GetComponent<AudioSource>();
-            if (source == null)
-            {
-                return;
-            }
-
-            source.clip = clips[rand];
-            source.Play();
-
-        }
-        public void PlayLightPunchWoosh(string _isLeftHand)
-        {
-            int maxEx = LightPunchWooshSounds.Length;
-            AudioClip[] clips = LightPunchWooshSounds;
-            int rand = Random.Range(0, maxEx);
-            AudioSource source = _isLeftHand == "true"
-                ? LeftHandDamageBone.GetComponent<AudioSource>()
-                : RightHandDamageBone.GetComponent<AudioSource>();
-            if (source == null)
-            {
-                return;
-            }
-
-            source.clip = clips[rand];
-            source.Play();
-
-        }
-
-        public void PlayHeavyKickWoosh(string _isLeftHand)
-        {
-            int maxEx = HeavyKickWooshSounds.Length;
-            AudioClip[] clips = HeavyKickWooshSounds;
-            int rand = Random.Range(0, maxEx);
-            AudioSource source = _isLeftHand == "true"
-                ? LeftFootDamageBone.GetComponent<AudioSource>()
-                : RightFootDamageBone.GetComponent<AudioSource>();
-            if (source == null)
-            {
-                return;
-            }
-
-            source.clip = clips[rand];
-            source.Play();
-        }
-        public void PlayLightKickWoosh(string _isLeftHand)
-        {
-            int maxEx = HeavyKickWooshSounds.Length;
-            AudioClip[] clips = HeavyKickWooshSounds;
-            int rand = Random.Range(0, maxEx);
-            AudioSource source = _isLeftHand == "true"
-                ? LeftFootDamageBone.GetComponent<AudioSource>()
-                : RightFootDamageBone.GetComponent<AudioSource>();
-            if (source == null)
-            {
-                return;
-            }
-
-            source.clip = clips[rand];
-            source.Play();
-        }
+        
     }
     
 }

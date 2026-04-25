@@ -874,32 +874,10 @@ MonoBehaviour:
   approachToHandCombatDistance: 4.5
   handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
-  damageOverlapRadius: 0.2
-  damageAmount: 20
-  damageOverlapLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  defaultDamageOverlapOffset: {x: 0, y: 1, z: 1}
-  showDamageOverlapDebugSphere: 1
-  damageOverlapDebugColor: {r: 1, g: 0.2, b: 0.2, a: 0.75}
-  RightHandDamageBone: {fileID: 1641631271}
-  LeftHandDamageBone: {fileID: 1641631270}
-  LeftFootDamageBone: {fileID: 1641631269}
-  RightFootDamageBone: {fileID: 1641631268}
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
   HorizontalCenterWidth: 0.3
   TorsoeBone: {fileID: 1641631264}
-  HighBodyHitSounds:
-  - {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
-  - {fileID: 8300000, guid: e82879725b40ce444bca27d19a75f42c, type: 3}
-  - {fileID: 8300000, guid: 2b019c6187fca1e48b47e28c891dc66c, type: 3}
-  - {fileID: 8300000, guid: b883c27c88428884fb3a10dcc42b8b47, type: 3}
-  LowBodyHitSounds:
-  - {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
-  - {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
-  - {fileID: 8300000, guid: 58a5d36d6b134014ea5623d9802082e2, type: 3}
-  FaceHitSounds: []
   HitZonesCache:
   - SelfTransform: {fileID: 1589834636}
     LocalOffset: {x: 1, y: 1, z: 1}
@@ -915,17 +893,6 @@ MonoBehaviour:
     LocalOffset: {x: -1, y: -1, z: 1}
   - SelfTransform: {fileID: 1444257817}
     LocalOffset: {x: 0, y: 1, z: 1}
-  HeavyPunchWooshSounds:
-  - {fileID: 8300000, guid: 0e9bca6dd55d7e541a865752da6415f5, type: 3}
-  - {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
-  LightPunchWooshSounds:
-  - {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
-  - {fileID: 8300000, guid: 90fb91c5d9f18df4183363d36d921429, type: 3}
-  HeavyKickWooshSounds:
-  - {fileID: 8300000, guid: a65d792d6907f744490c9b15bb70edfe, type: 3}
-  LightKickWooshSounds:
-  - {fileID: 8300000, guid: 482611fe6bc559142a00be6e726b4862, type: 3}
-  - {fileID: 8300000, guid: 4d4ef7516a431934681038a3dc391e55, type: 3}
 --- !u!195 &405209233
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -948,24 +915,58 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &405209234
+--- !u!95 &405209236 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+  m_PrefabInstance: {fileID: 1641631263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &405209237
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 405209229}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f962e8aa68f5c8c4dbfdf2ef442bd308, type: 3}
+  m_Script: {fileID: 11500000, guid: 6c69543895ac34d4cae20372c122e5cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 189356296}
-  walk01: 1
-  run02: 0
-  Walk01GoIdleDistance: 3
-  run01GoIdleDistance: 8.5
-  goWalkDistance: 20
+  anim: {fileID: 405209236}
+  npcController: {fileID: 405209232}
+  damageOverlapRadius: 0.2
+  damageAmount: 20
+  damageOverlapLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  defaultDamageOverlapOffset: {x: 0, y: 1, z: 1}
+  showDamageOverlapDebugSphere: 1
+  damageOverlapDebugColor: {r: 1, g: 0.2, b: 0.2, a: 0.75}
+  HeavyPunchWooshSounds:
+  - {fileID: 8300000, guid: 0e9bca6dd55d7e541a865752da6415f5, type: 3}
+  - {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
+  LightPunchWooshSounds:
+  - {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
+  - {fileID: 8300000, guid: 90fb91c5d9f18df4183363d36d921429, type: 3}
+  HeavyKickWooshSounds:
+  - {fileID: 8300000, guid: a65d792d6907f744490c9b15bb70edfe, type: 3}
+  LightKickWooshSounds:
+  - {fileID: 8300000, guid: 482611fe6bc559142a00be6e726b4862, type: 3}
+  - {fileID: 8300000, guid: 4d4ef7516a431934681038a3dc391e55, type: 3}
+  RightHandDamageBone: {fileID: 1641631271}
+  LeftHandDamageBone: {fileID: 1641631270}
+  LeftFootDamageBone: {fileID: 1641631269}
+  RightFootDamageBone: {fileID: 1641631268}
+  HighBodyHitSounds:
+  - {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
+  - {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
+  - {fileID: 8300000, guid: 58a5d36d6b134014ea5623d9802082e2, type: 3}
+  LowBodyHitSounds:
+  - {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
+  - {fileID: 8300000, guid: e82879725b40ce444bca27d19a75f42c, type: 3}
+  - {fileID: 8300000, guid: 2b019c6187fca1e48b47e28c891dc66c, type: 3}
+  - {fileID: 8300000, guid: b883c27c88428884fb3a10dcc42b8b47, type: 3}
+  FaceHitSounds: []
 --- !u!1 &555414548 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3730080606814098470, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
@@ -3652,7 +3653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1193340829816115258, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_Layer
@@ -3939,7 +3940,7 @@ PrefabInstance:
       addedObject: {fileID: 405209232}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 405209234}
+      addedObject: {fileID: 405209237}
     - targetCorrespondingSourceObject: {fileID: -1752415085017933849, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 555414555}
