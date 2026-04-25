@@ -28,8 +28,10 @@ namespace FirstPersonCharacter
         [SerializeField] private int mouseButton = 0;
 
         [Header("Punch Timing")]
-        [Min(0.01f)] [SerializeField] private float windUpDuration = 0.06f;
-        [Min(0.01f)] [SerializeField] private float strikeDuration = 0.1f;
+        [Min(0.01f)] [SerializeField] private float minWindUpDuration = 0.06f;
+        [Min(0.01f)] [SerializeField] private float maxWindUpDuration = 0.2f;
+        [Min(0.01f)] [SerializeField] private float minStrikeDuration = 0.05f;
+        [Min(0.01f)] [SerializeField] private float maxStrikeDuration = 0.1f;
         [Min(0.01f)] [SerializeField] private float recoverDuration = 0.12f;
         [Min(0f)] [SerializeField] private float punchCooldown = 0.03f;
         [Range(0f, 1f)] [SerializeField] private float punchDamageWindowNormalized = 0.2f;
@@ -72,6 +74,8 @@ namespace FirstPersonCharacter
         private Vector3 rightRestLocalPos;
         private Quaternion spineRestLocalRot;
         private bool punchRunning;
+        private bool punchCharging;
+        private float punchChargeStartTime;
         private bool punchRightNext = true;
         private float lastPunchTime = -10f;
         private bool punchDamageResolved;
@@ -105,18 +109,81 @@ namespace FirstPersonCharacter
         [SerializeField] private HitZoneInfo CurrentHitZone;
         private void Update()
         {
-            
-            if (!Input.GetMouseButtonDown(mouseButton))
+            if (punchRunning)
             {
                 return;
             }
 
-            if (punchRunning || Time.time < lastPunchTime + punchCooldown)
+            if (Input.GetMouseButtonDown(mouseButton))
+            {
+                TryStartPunchCharge();
+            }
+
+            if (!punchCharging)
             {
                 return;
             }
-            
-            CurrentHitZone = new();
+
+            float maxWindUp = GetMaxWindUpDuration();
+            if (maxWindUp > 0f && Time.time - punchChargeStartTime >= maxWindUp)
+            {
+                LaunchPunch(1f);
+                return;
+            }
+
+            if (Input.GetMouseButtonUp(mouseButton))
+            {
+                LaunchPunch(GetCurrentChargeRatio());
+            }
+        }
+
+        private void TryStartPunchCharge()
+        {
+            if (Time.time < lastPunchTime + punchCooldown)
+            {
+                return;
+            }
+
+            punchCharging = true;
+            punchChargeStartTime = Time.time;
+        }
+
+        private float GetCurrentChargeRatio()
+        {
+            float maxWindUp = GetMaxWindUpDuration();
+            if (maxWindUp <= 0f)
+            {
+                return 1f;
+            }
+
+            return Mathf.Clamp01((Time.time - punchChargeStartTime) / maxWindUp);
+        }
+
+        private float GetMaxWindUpDuration()
+        {
+            return Mathf.Max(minWindUpDuration, maxWindUpDuration);
+        }
+
+        private void LaunchPunch(float chargeRatio)
+        {
+            if (!punchCharging || punchRunning)
+            {
+                return;
+            }
+
+            CurrentHitZone = GetCurrentHitZone();
+            punchCharging = false;
+            float clampedChargeRatio = Mathf.Clamp01(chargeRatio);
+            float windUpDuration = Mathf.Lerp(minWindUpDuration, GetMaxWindUpDuration(), clampedChargeRatio);
+            float strikeDuration = Mathf.Lerp(Mathf.Max(maxStrikeDuration, minStrikeDuration), minStrikeDuration, clampedChargeRatio);
+            StartCoroutine(PunchRoutine(punchRightNext, windUpDuration, strikeDuration));
+            punchRightNext = !punchRightNext;
+            lastPunchTime = Time.time;
+        }
+
+        private HitZoneInfo GetCurrentHitZone()
+        {
+            HitZoneInfo selectedHitZone = new HitZoneInfo();
             Vector3 overlapPos = transform.position + Vector3.up + transform.forward * 0.5f;
             Collider[] cols = Physics.OverlapSphere(overlapPos, 1,
                 enemyLayerMask,
@@ -126,66 +193,11 @@ namespace FirstPersonCharacter
                 if (col.transform.root.TryGetComponent(out IHasHitZones hitzones))
                 {
                     Vector3 adjustedCamPosition = cam.transform.position + cam.transform.forward;
-                    CurrentHitZone = hitzones.GetClosestHitzoneTransform(adjustedCamPosition);
+                    selectedHitZone = hitzones.GetClosestHitzoneTransform(adjustedCamPosition);
                 }
             }
-            //if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
-            //        CamRaycastMask))
-            //{
-            //    IHasHitZones hasHitZones = _hitInfo.collider != null
-            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
-            //        : null;
-            //    Debug.LogWarning("Hit target with hitzones");
-            //    if (hasHitZones == null)
-            //    {
-            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
-            //    }
-//
-            //    if (hasHitZones != null)
-            //    {
-            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
-            //        Debug.LogWarning("Got HitZone");
-            //    }
-            //}
-            //else if (Physics.Raycast(cam.transform.position + cam.transform.right * 0.15f, cam.transform.forward, out _hitInfo, PunchRaycastDistance,
-            //             CamRaycastMask))
-            //{
-            //    IHasHitZones hasHitZones = _hitInfo.collider != null
-            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
-            //        : null;
-            //    Debug.LogWarning("Hit target with hitzones");
-            //    if (hasHitZones == null)
-            //    {
-            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
-            //    }
-//
-            //    if (hasHitZones != null)
-            //    {
-            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
-            //        Debug.LogWarning("Got HitZone");
-            //    }
-            //}
-            //else if (Physics.Raycast(cam.transform.position + -cam.transform.right * 0.15f, cam.transform.forward, out _hitInfo, PunchRaycastDistance,
-            //             CamRaycastMask))
-            //{
-            //    IHasHitZones hasHitZones = _hitInfo.collider != null
-            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
-            //        : null;
-            //    Debug.LogWarning("Hit target with hitzones");
-            //    if (hasHitZones == null)
-            //    {
-            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
-            //    }
-//
-            //    if (hasHitZones != null)
-            //    {
-            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
-            //        Debug.LogWarning("Got HitZone");
-            //    }
-            //}
-            StartCoroutine(PunchRoutine(punchRightNext));
-            punchRightNext = !punchRightNext;
-            lastPunchTime = Time.time;
+
+            return selectedHitZone;
         }
 
         [ContextMenu("Cache Rest Pose")]
@@ -214,7 +226,7 @@ namespace FirstPersonCharacter
             playerController.AddImpulse(transform.forward * punchMobileForce);
         }
 
-        private IEnumerator PunchRoutine(bool useRightArm)
+        private IEnumerator PunchRoutine(bool useRightArm, float windUpDuration, float strikeDuration)
         {
             punchRunning = true;
 
@@ -450,6 +462,7 @@ namespace FirstPersonCharacter
             }
 
             punchRunning = false;
+            punchCharging = false;
             punchDamageResolved = false;
         }
 
