@@ -90,13 +90,34 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         throw new System.NotImplementedException();
     }
 
+    private bool damageSoundCooldown = false;
+    [SerializeField] private AudioClip[] LightFaceHits;
+    [SerializeField] private AudioClip[] HeavyFaceHits;
     public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
-        AddImpulse(_direction * 0.25f);
+        AddImpulse(_direction);
+        if (!damageSoundCooldown)
+        {
+            damageSoundCooldown = true;
+            StartCoroutine(DamageSoundCooldown());
+            int maxRand = _direction.magnitude < 2 ? LightFaceHits.Length : HeavyFaceHits.Length;
+            AudioClip clip = _direction.magnitude < 2
+                ? LightFaceHits[Random.Range(0, maxRand)]
+                : HeavyFaceHits[Random.Range(0, maxRand)];
+            AudioSource.PlayClipAtPoint(clip, transform.position + transform.up + transform.forward, 0.7f);
+        }
+        
+        
     }
 
     public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
     {
         throw new System.NotImplementedException();
+    }
+
+    IEnumerator DamageSoundCooldown()
+    {
+        yield return new WaitForSeconds(0.5f);
+        damageSoundCooldown = false;
     }
 }

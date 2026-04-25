@@ -117,25 +117,72 @@ namespace FirstPersonCharacter
             }
             
             CurrentHitZone = new();
-            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
-                    CamRaycastMask))
+            Vector3 overlapPos = transform.position + Vector3.up + transform.forward * 0.5f;
+            Collider[] cols = Physics.OverlapSphere(overlapPos, 1,
+                enemyLayerMask,
+                QueryTriggerInteraction.Collide);
+            foreach (Collider col in cols)
             {
-                IHasHitZones hasHitZones = _hitInfo.collider != null
-                    ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
-                    : null;
-
-                if (hasHitZones == null)
+                if (col.transform.root.TryGetComponent(out IHasHitZones hitzones))
                 {
-                    _hitInfo.transform.TryGetComponent(out hasHitZones);
-                }
-
-                if (hasHitZones != null)
-                {
-                    CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
-                    Debug.LogWarning("Got HitZone");
+                    Vector3 adjustedCamPosition = cam.transform.position + cam.transform.forward;
+                    CurrentHitZone = hitzones.GetClosestHitzoneTransform(adjustedCamPosition);
                 }
             }
-
+            //if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit _hitInfo, PunchRaycastDistance,
+            //        CamRaycastMask))
+            //{
+            //    IHasHitZones hasHitZones = _hitInfo.collider != null
+            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
+            //        : null;
+            //    Debug.LogWarning("Hit target with hitzones");
+            //    if (hasHitZones == null)
+            //    {
+            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
+            //    }
+//
+            //    if (hasHitZones != null)
+            //    {
+            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
+            //        Debug.LogWarning("Got HitZone");
+            //    }
+            //}
+            //else if (Physics.Raycast(cam.transform.position + cam.transform.right * 0.15f, cam.transform.forward, out _hitInfo, PunchRaycastDistance,
+            //             CamRaycastMask))
+            //{
+            //    IHasHitZones hasHitZones = _hitInfo.collider != null
+            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
+            //        : null;
+            //    Debug.LogWarning("Hit target with hitzones");
+            //    if (hasHitZones == null)
+            //    {
+            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
+            //    }
+//
+            //    if (hasHitZones != null)
+            //    {
+            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
+            //        Debug.LogWarning("Got HitZone");
+            //    }
+            //}
+            //else if (Physics.Raycast(cam.transform.position + -cam.transform.right * 0.15f, cam.transform.forward, out _hitInfo, PunchRaycastDistance,
+            //             CamRaycastMask))
+            //{
+            //    IHasHitZones hasHitZones = _hitInfo.collider != null
+            //        ? _hitInfo.collider.GetComponentInParent<IHasHitZones>()
+            //        : null;
+            //    Debug.LogWarning("Hit target with hitzones");
+            //    if (hasHitZones == null)
+            //    {
+            //        _hitInfo.transform.TryGetComponent(out hasHitZones);
+            //    }
+//
+            //    if (hasHitZones != null)
+            //    {
+            //        CurrentHitZone = hasHitZones.GetClosestHitzoneTransform(_hitInfo.point);
+            //        Debug.LogWarning("Got HitZone");
+            //    }
+            //}
             StartCoroutine(PunchRoutine(punchRightNext));
             punchRightNext = !punchRightNext;
             lastPunchTime = Time.time;
@@ -358,17 +405,22 @@ namespace FirstPersonCharacter
 
         private void DoPunchOverlapDamage(Transform handBone, HashSet<ITakeDamage> damagedTargets)
         {
-            Collider[] hitColliders = Physics.OverlapSphere(handBone.position + transform.forward * 0.2f, punchOverlapSphereRadius, enemyLayerMask, QueryTriggerInteraction.Ignore);
+            
+            Collider[] hitColliders = Physics.OverlapSphere(handBone.position + transform.forward * 0.2f, punchOverlapSphereRadius, enemyLayerMask, QueryTriggerInteraction.Collide);
+            Debug.LogWarning($"DoPunchOverlapDamage {hitColliders.Length}");
             foreach (Collider hitCollider in hitColliders)
             {
-                ITakeDamage damageReceiver = hitCollider.GetComponentInParent<ITakeDamage>();
+                //ITakeDamage damageReceiver = hitCollider.GetComponentInParent<ITakeDamage>();
+                ITakeDamage damageReceiver = hitCollider.transform.root.GetComponent<ITakeDamage>();
                 if (damageReceiver == null)
                 {
+                    Debug.LogWarning("DamageReciever null");
                     continue;
                 }
 
                 if (damagedTargets != null && !damagedTargets.Add(damageReceiver))
                 {
+                    Debug.LogWarning("other continue");
                     continue;
                 }
 

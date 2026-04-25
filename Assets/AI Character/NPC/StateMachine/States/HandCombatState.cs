@@ -149,7 +149,6 @@ namespace AICharacterModule.NPC.StateMachine.States
                 }
                 if(distanceToTarget < 1)
                 {
-                    Debug.LogWarning("Trying reverse");
                     Vector3 sourcePos = globalData.NpcTransform.position + (globalData.NpcTransform.position -
                                                                             (globalData.CurrentTarget.position -
                                                                              Vector3.up)).normalized * 3;

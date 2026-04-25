@@ -248,7 +248,7 @@ namespace AICharacterModule.NPC
                     continue;
                 }
 
-                takeDamage.TakeDamage(damageAmount, transform.forward, Vector3.zero);
+                takeDamage.TakeDamage(_masterStateMachine.GlobalData.Anim.GetFloat("CurrentDamage"), transform.forward * _masterStateMachine.GlobalData.Anim.GetFloat("CurrentDamageForce"), Vector3.zero);
             }
         }
 
@@ -578,12 +578,14 @@ namespace AICharacterModule.NPC
                 if (offset.y == 1f)
                 {
                     anim.SetTrigger("TorsoeDamageHigh_Back");
+                    PlayHighBodyHit(_hitZoneInfo);
                     return;
                 }
 
                 if (offset.y == -1f)
                 {
                     anim.SetTrigger("TorsoeDamageLow_Back");
+                    PlayLowBodyHit(_hitZoneInfo);
                     return;
                 }
             }
