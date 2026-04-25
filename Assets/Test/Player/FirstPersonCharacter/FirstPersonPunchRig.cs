@@ -124,6 +124,8 @@ namespace FirstPersonCharacter
                 return;
             }
 
+            UpdateChargePose(GetCurrentChargeRatio());
+
             float maxWindUp = GetMaxWindUpDuration();
             if (maxWindUp > 0f && Time.time - punchChargeStartTime >= maxWindUp)
             {
@@ -174,9 +176,8 @@ namespace FirstPersonCharacter
             CurrentHitZone = GetCurrentHitZone();
             punchCharging = false;
             float clampedChargeRatio = Mathf.Clamp01(chargeRatio);
-            float windUpDuration = Mathf.Lerp(minWindUpDuration, GetMaxWindUpDuration(), clampedChargeRatio);
             float strikeDuration = Mathf.Lerp(Mathf.Max(maxStrikeDuration, minStrikeDuration), minStrikeDuration, clampedChargeRatio);
-            StartCoroutine(PunchRoutine(punchRightNext, windUpDuration, strikeDuration));
+            StartCoroutine(PunchRoutine(punchRightNext, strikeDuration));
             punchRightNext = !punchRightNext;
             lastPunchTime = Time.time;
         }
@@ -226,7 +227,7 @@ namespace FirstPersonCharacter
             playerController.AddImpulse(transform.forward * punchMobileForce);
         }
 
-        private IEnumerator PunchRoutine(bool useRightArm, float windUpDuration, float strikeDuration)
+        private IEnumerator PunchRoutine(bool useRightArm, float strikeDuration)
         {
             punchRunning = true;
 
@@ -242,7 +243,6 @@ namespace FirstPersonCharacter
             Vector3 rest = useRightArm ? rightRestLocalPos : leftRestLocalPos;
             float sideSign = useRightArm ? -1f : 1f;
 
-            Vector3 windUpPos = rest + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
             Vector3 defaultStrikePos = rest + Vector3.forward * forwardDistance + Vector3.right * sideSign * inwardDistance + Vector3.up * upwardDistance;
             defaultStrikePos.x = Mathf.Lerp(defaultStrikePos.x, centerlineX, Mathf.Clamp01(centerBias));
             Vector3 strikePos = GetStrikePositionFromCurrentHitZone(rest, defaultStrikePos);
@@ -256,14 +256,14 @@ namespace FirstPersonCharacter
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
-            float totalPunchDuration = windUpDuration + strikeDuration + recoverDuration;
+            float totalPunchDuration = strikeDuration + recoverDuration;
             float impulseDelay = totalPunchDuration * Mathf.Clamp01(impulseForwardTimingNormalized);
             float punchWooshDelay = totalPunchDuration * Mathf.Clamp01(punchWooshTimingNormalized);
             StartCoroutine(ImpulseForwardRoutine(impulseDelay));
             StartCoroutine(PlayPunchWooshRoutine(punchWooshDelay, useRightArm));
 
-            yield return MoveTarget(activeTarget, rest, windUpPos, windUpDuration, windUpCurve, spineStart, Quaternion.identity);
-            yield return MoveTarget(activeTarget, windUpPos, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
+            Vector3 strikeStart = activeTarget.localPosition;
+            yield return MoveTarget(activeTarget, strikeStart, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
             Vector3 recoverStart = activeTarget.localPosition;
             yield return MoveTarget(activeTarget, recoverStart, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
             Debug.DrawLine(transform.TransformPoint(strikePos), transform.TransformPoint(strikePos) + Vector3.up, Color.green, 3);
@@ -275,6 +275,35 @@ namespace FirstPersonCharacter
 
             punchRunning = false;
             punchDamageResolved = false;
+        }
+
+        private void UpdateChargePose(float chargeRatio)
+        {
+            bool useRightArm = punchRightNext;
+            Transform activeTarget = useRightArm ? rightHandTarget : leftHandTarget;
+            if (activeTarget == null)
+            {
+                return;
+            }
+
+            Vector3 rest = useRightArm ? rightRestLocalPos : leftRestLocalPos;
+            float sideSign = useRightArm ? -1f : 1f;
+            Vector3 windUpPos = GetWindUpPosition(rest, sideSign);
+            float clampedCharge = Mathf.Clamp01(chargeRatio);
+            float curvedCharge = windUpCurve != null ? windUpCurve.Evaluate(clampedCharge) : clampedCharge;
+
+            activeTarget.localPosition = Vector3.LerpUnclamped(rest, windUpPos, curvedCharge);
+
+            if (spine != null)
+            {
+                Quaternion punchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
+                spine.localRotation = Quaternion.SlerpUnclamped(spineRestLocalRot, spineRestLocalRot * punchOffset, curvedCharge);
+            }
+        }
+
+        private Vector3 GetWindUpPosition(Vector3 restPosition, float sideSign)
+        {
+            return restPosition + Vector3.back * windUpBackDistance + Vector3.right * sideSign * inwardDistance * 0.5f;
         }
 
         private IEnumerator ImpulseForwardRoutine(float delaySeconds)
