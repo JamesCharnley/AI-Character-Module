@@ -147,6 +147,22 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         standUpRoutine = StartCoroutine(StandUpRoutine());
     }
 
+    private float EvaluateCurveProgress(AnimationCurve curve, float normalizedTime)
+    {
+        float clampedTime = Mathf.Clamp01(normalizedTime);
+        if (curve == null || curve.length == 0)
+            return clampedTime;
+
+        float startValue = curve.Evaluate(0f);
+        float endValue = curve.Evaluate(1f);
+        float valueRange = endValue - startValue;
+        if (Mathf.Abs(valueRange) < 0.0001f)
+            return clampedTime;
+
+        float currentValue = curve.Evaluate(clampedTime);
+        return Mathf.Clamp01((currentValue - startValue) / valueRange);
+    }
+
     private IEnumerator PushToGroundRoutine()
     {
         IsMovementInputLocked = true;
@@ -158,7 +174,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / pushDuration);
-            float pushCurveValue = Mathf.Clamp01(pushSpeedCurve.Evaluate(t));
+            float pushCurveValue = EvaluateCurveProgress(pushSpeedCurve, t);
             float cameraGroundCurveValue = Mathf.Clamp01(cameraGroundMoveCurve.Evaluate(t));
             float targetBack = pushBackDistance * pushCurveValue;
             float targetDown = pushDownDistance * pushCurveValue;
