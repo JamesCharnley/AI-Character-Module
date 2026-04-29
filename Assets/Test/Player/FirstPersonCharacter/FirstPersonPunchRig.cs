@@ -127,7 +127,8 @@ namespace FirstPersonCharacter
         [SerializeField] private HitZoneInfo CurrentHitZone;
         private void Update()
         {
-            bool isBlocking = Input.GetMouseButton(blockMouseButton);
+            bool blockInputHeld = Input.GetMouseButton(blockMouseButton);
+            bool isBlocking = blockInputHeld && !punchRunning;
             UpdateBlockPose(isBlocking);
 
             if (punchRunning || isBlocking)
