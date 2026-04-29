@@ -78,6 +78,15 @@ namespace FirstPersonCharacter
         [SerializeField] private AudioSource rightHandAudioSource;
         [SerializeField] private AudioClip[] punchWooshSounds;
 
+
+        [Header("Camera Punch Effect")]
+        [SerializeField] private Transform cameraEffectTarget;
+        [SerializeField] private float cameraLungeDistance = 0.08f;
+        [Min(0.01f)] [SerializeField] private float cameraLungeDuration = 0.06f;
+        [Min(0.01f)] [SerializeField] private float cameraReturnDuration = 0.1f;
+        [SerializeField] private AnimationCurve cameraLungeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        [SerializeField] private AnimationCurve cameraReturnCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
         [Header("Curves")]
         [SerializeField] private AnimationCurve windUpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         [SerializeField] private AnimationCurve strikeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -97,6 +106,8 @@ namespace FirstPersonCharacter
         private float lastPunchTime = -10f;
         private bool punchDamageResolved;
         private float blockPoseWeight;
+        private Vector3 cameraRestLocalPos;
+        private Coroutine cameraPunchRoutine;
         
         [SerializeField] private LayerMask CamRaycastMask;
         [SerializeField] private float PunchRaycastDistance = 1;
@@ -310,6 +321,11 @@ namespace FirstPersonCharacter
             {
                 rightHintRestLocalPos = rightHandHintTarget.localPosition;
             }
+
+            if (cameraEffectTarget != null)
+            {
+                cameraRestLocalPos = cameraEffectTarget.localPosition;
+            }
         }
 
         [SerializeField] private float punchMobileForce = 0.3f;
@@ -353,6 +369,7 @@ namespace FirstPersonCharacter
             float punchWooshDelay = totalPunchDuration * Mathf.Clamp01(punchWooshTimingNormalized);
             StartCoroutine(ImpulseForwardRoutine(impulseDelay));
             StartCoroutine(PlayPunchWooshRoutine(punchWooshDelay, useRightArm));
+            StartCameraPunchEffect();
 
             Vector3 strikeStart = activeTarget.localPosition;
             yield return MoveTarget(activeTarget, strikeStart, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
@@ -363,6 +380,17 @@ namespace FirstPersonCharacter
             if (spine != null)
             {
                 spine.localRotation = spineRestLocalRot;
+            }
+
+            if (cameraPunchRoutine != null)
+            {
+                StopCoroutine(cameraPunchRoutine);
+                cameraPunchRoutine = null;
+            }
+
+            if (cameraEffectTarget != null)
+            {
+                cameraEffectTarget.localPosition = cameraRestLocalPos;
             }
 
             punchRunning = false;
@@ -444,6 +472,53 @@ namespace FirstPersonCharacter
             }
 
             handAudioSource.PlayOneShot(randomWooshClip);
+        }
+
+
+        private void StartCameraPunchEffect()
+        {
+            if (cameraEffectTarget == null)
+            {
+                return;
+            }
+
+            if (cameraPunchRoutine != null)
+            {
+                StopCoroutine(cameraPunchRoutine);
+            }
+
+            cameraPunchRoutine = StartCoroutine(CameraPunchEffectRoutine());
+        }
+
+        private IEnumerator CameraPunchEffectRoutine()
+        {
+            Vector3 startLocalPos = cameraEffectTarget.localPosition;
+            Vector3 lungeTargetPos = cameraRestLocalPos + Vector3.forward * cameraLungeDistance;
+
+            float lungeElapsed = 0f;
+            while (lungeElapsed < cameraLungeDuration)
+            {
+                lungeElapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(lungeElapsed / cameraLungeDuration);
+                float curvedT = cameraLungeCurve != null ? cameraLungeCurve.Evaluate(t) : t;
+                cameraEffectTarget.localPosition = Vector3.LerpUnclamped(startLocalPos, lungeTargetPos, curvedT);
+                yield return null;
+            }
+
+            cameraEffectTarget.localPosition = lungeTargetPos;
+
+            float returnElapsed = 0f;
+            while (returnElapsed < cameraReturnDuration)
+            {
+                returnElapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(returnElapsed / cameraReturnDuration);
+                float curvedT = cameraReturnCurve != null ? cameraReturnCurve.Evaluate(t) : t;
+                cameraEffectTarget.localPosition = Vector3.LerpUnclamped(lungeTargetPos, cameraRestLocalPos, curvedT);
+                yield return null;
+            }
+
+            cameraEffectTarget.localPosition = cameraRestLocalPos;
+            cameraPunchRoutine = null;
         }
 
         private IEnumerator MoveTarget(
@@ -592,6 +667,17 @@ namespace FirstPersonCharacter
             if (spine != null)
             {
                 spine.localRotation = spineRestLocalRot;
+            }
+
+            if (cameraPunchRoutine != null)
+            {
+                StopCoroutine(cameraPunchRoutine);
+                cameraPunchRoutine = null;
+            }
+
+            if (cameraEffectTarget != null)
+            {
+                cameraEffectTarget.localPosition = cameraRestLocalPos;
             }
 
             punchRunning = false;
