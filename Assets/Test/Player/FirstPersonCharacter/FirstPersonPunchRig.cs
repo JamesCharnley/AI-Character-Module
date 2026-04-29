@@ -21,6 +21,8 @@ namespace FirstPersonCharacter
         [Header("IK Targets")]
         [SerializeField] private Transform leftHandTarget;
         [SerializeField] private Transform rightHandTarget;
+        [SerializeField] private Transform leftHandHintTarget;
+        [SerializeField] private Transform rightHandHintTarget;
         [SerializeField] private Transform leftHandBone;
         [SerializeField] private Transform rightHandBone;
 
@@ -32,7 +34,11 @@ namespace FirstPersonCharacter
         [SerializeField] private float blockRaiseDistance = 0.14f;
         [SerializeField] private float blockForwardDistance = 0.03f;
         [SerializeField] private float blockInwardDistance = 0.03f;
-        [SerializeField] private float blockHintLocalX = 0.1f;
+        [SerializeField] private float blockTargetLocalX = 0.1f;
+        [SerializeField] private float blockHintRaiseDistance = 0.12f;
+        [SerializeField] private float blockHintForwardDistance = 0.02f;
+        [SerializeField] private float blockHintInwardDistance = 0.05f;
+        [SerializeField] private float blockHintLocalX = 0.16f;
         [SerializeField] private Vector3 blockTargetRotationEuler = Vector3.zero;
         [Min(0.01f)] [SerializeField] private float blockBlendSpeed = 14f;
 
@@ -83,6 +89,8 @@ namespace FirstPersonCharacter
         private Vector3 rightRestLocalPos;
         private Quaternion leftRestLocalRot;
         private Quaternion rightRestLocalRot;
+        private Vector3 leftHintRestLocalPos;
+        private Vector3 rightHintRestLocalPos;
         private Quaternion spineRestLocalRot;
         private bool punchRunning;
         private bool punchCharging;
@@ -171,6 +179,8 @@ namespace FirstPersonCharacter
 
             ApplyBlockPoseToHand(leftHandTarget, leftRestLocalPos, leftRestLocalRot, 1f, blockPoseWeight);
             ApplyBlockPoseToHand(rightHandTarget, rightRestLocalPos, rightRestLocalRot, -1f, blockPoseWeight);
+            ApplyBlockPoseToHint(leftHandHintTarget, leftHintRestLocalPos, 1f, blockPoseWeight);
+            ApplyBlockPoseToHint(rightHandHintTarget, rightHintRestLocalPos, -1f, blockPoseWeight);
 
             if (spine != null)
             {
@@ -190,11 +200,26 @@ namespace FirstPersonCharacter
                                   + Vector3.forward * blockForwardDistance
                                   + Vector3.right * sideSign * blockInwardDistance;
             Vector3 blockPose = restLocalPos + blockOffset;
-            blockPose.x = sideSign * blockHintLocalX;
+            blockPose.x = sideSign * blockTargetLocalX;
             handTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockPose, poseWeight);
 
             Quaternion blockRotation = restLocalRot * Quaternion.Euler(blockTargetRotationEuler);
             handTarget.localRotation = Quaternion.SlerpUnclamped(restLocalRot, blockRotation, poseWeight);
+        }
+
+        private void ApplyBlockPoseToHint(Transform hintTarget, Vector3 restLocalPos, float sideSign, float poseWeight)
+        {
+            if (hintTarget == null)
+            {
+                return;
+            }
+
+            Vector3 hintOffset = Vector3.up * blockHintRaiseDistance
+                                 + Vector3.forward * blockHintForwardDistance
+                                 + Vector3.right * sideSign * blockHintInwardDistance;
+            Vector3 blockHintPose = restLocalPos + hintOffset;
+            blockHintPose.x = sideSign * blockHintLocalX;
+            hintTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockHintPose, poseWeight);
         }
 
         private void TryStartPunchCharge()
@@ -277,6 +302,16 @@ namespace FirstPersonCharacter
             if (spine != null)
             {
                 spineRestLocalRot = spine.localRotation;
+            }
+
+            if (leftHandHintTarget != null)
+            {
+                leftHintRestLocalPos = leftHandHintTarget.localPosition;
+            }
+
+            if (rightHandHintTarget != null)
+            {
+                rightHintRestLocalPos = rightHandHintTarget.localPosition;
             }
         }
 
@@ -545,6 +580,16 @@ namespace FirstPersonCharacter
             {
                 rightHandTarget.localPosition = rightRestLocalPos;
                 rightHandTarget.localRotation = rightRestLocalRot;
+            }
+
+            if (leftHandHintTarget != null)
+            {
+                leftHandHintTarget.localPosition = leftHintRestLocalPos;
+            }
+
+            if (rightHandHintTarget != null)
+            {
+                rightHandHintTarget.localPosition = rightHintRestLocalPos;
             }
 
             if (spine != null)
