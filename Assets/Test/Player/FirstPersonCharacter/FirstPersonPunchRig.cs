@@ -107,7 +107,8 @@ namespace FirstPersonCharacter
         private bool punchDamageResolved;
         private float blockPoseWeight;
         private Vector3 cameraRestLocalPos;
-        private Coroutine cameraPunchRoutine;
+        private Quaternion cameraRestLocalRot;
+        private Coroutine cameraEffectRoutine;
         
         [SerializeField] private LayerMask CamRaycastMask;
         [SerializeField] private float PunchRaycastDistance = 1;
@@ -325,6 +326,7 @@ namespace FirstPersonCharacter
             if (cameraEffectTarget != null)
             {
                 cameraRestLocalPos = cameraEffectTarget.localPosition;
+                cameraRestLocalRot = cameraEffectTarget.localRotation;
             }
         }
 
@@ -382,15 +384,12 @@ namespace FirstPersonCharacter
                 spine.localRotation = spineRestLocalRot;
             }
 
-            if (cameraPunchRoutine != null)
-            {
-                StopCoroutine(cameraPunchRoutine);
-                cameraPunchRoutine = null;
-            }
+            StopCameraEffectRoutine();
 
             if (cameraEffectTarget != null)
             {
                 cameraEffectTarget.localPosition = cameraRestLocalPos;
+                cameraEffectTarget.localRotation = cameraRestLocalRot;
             }
 
             punchRunning = false;
@@ -482,12 +481,9 @@ namespace FirstPersonCharacter
                 return;
             }
 
-            if (cameraPunchRoutine != null)
-            {
-                StopCoroutine(cameraPunchRoutine);
-            }
+            StopCameraEffectRoutine();
 
-            cameraPunchRoutine = StartCoroutine(CameraPunchEffectRoutine());
+            cameraEffectRoutine = StartCoroutine(CameraPunchEffectRoutine());
         }
 
         private IEnumerator CameraPunchEffectRoutine()
@@ -518,7 +514,65 @@ namespace FirstPersonCharacter
             }
 
             cameraEffectTarget.localPosition = cameraRestLocalPos;
-            cameraPunchRoutine = null;
+            cameraEffectRoutine = null;
+        }
+
+
+        public void TriggerCameraPunchReaction(float lungeBackDistance, float rotateUpDegrees)
+        {
+            if (cameraEffectTarget == null)
+            {
+                return;
+            }
+
+            StopCameraEffectRoutine();
+            cameraEffectRoutine = StartCoroutine(CameraPunchReactionRoutine(lungeBackDistance, rotateUpDegrees));
+        }
+
+        private IEnumerator CameraPunchReactionRoutine(float lungeBackDistance, float rotateUpDegrees)
+        {
+            Vector3 startLocalPos = cameraEffectTarget.localPosition;
+            Quaternion startLocalRot = cameraEffectTarget.localRotation;
+            Vector3 lungeTargetPos = cameraRestLocalPos + Vector3.back * lungeBackDistance;
+            Quaternion reactionTargetRot = cameraRestLocalRot * Quaternion.Euler(-rotateUpDegrees, 0f, 0f);
+
+            float lungeElapsed = 0f;
+            while (lungeElapsed < cameraLungeDuration)
+            {
+                lungeElapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(lungeElapsed / cameraLungeDuration);
+                float curvedT = cameraLungeCurve != null ? cameraLungeCurve.Evaluate(t) : t;
+                cameraEffectTarget.localPosition = Vector3.LerpUnclamped(startLocalPos, lungeTargetPos, curvedT);
+                cameraEffectTarget.localRotation = Quaternion.SlerpUnclamped(startLocalRot, reactionTargetRot, curvedT);
+                yield return null;
+            }
+
+            cameraEffectTarget.localPosition = lungeTargetPos;
+            cameraEffectTarget.localRotation = reactionTargetRot;
+
+            float returnElapsed = 0f;
+            while (returnElapsed < cameraReturnDuration)
+            {
+                returnElapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(returnElapsed / cameraReturnDuration);
+                float curvedT = cameraReturnCurve != null ? cameraReturnCurve.Evaluate(t) : t;
+                cameraEffectTarget.localPosition = Vector3.LerpUnclamped(lungeTargetPos, cameraRestLocalPos, curvedT);
+                cameraEffectTarget.localRotation = Quaternion.SlerpUnclamped(reactionTargetRot, cameraRestLocalRot, curvedT);
+                yield return null;
+            }
+
+            cameraEffectTarget.localPosition = cameraRestLocalPos;
+            cameraEffectTarget.localRotation = cameraRestLocalRot;
+            cameraEffectRoutine = null;
+        }
+
+        private void StopCameraEffectRoutine()
+        {
+            if (cameraEffectRoutine != null)
+            {
+                StopCoroutine(cameraEffectRoutine);
+                cameraEffectRoutine = null;
+            }
         }
 
         private IEnumerator MoveTarget(
@@ -669,15 +723,12 @@ namespace FirstPersonCharacter
                 spine.localRotation = spineRestLocalRot;
             }
 
-            if (cameraPunchRoutine != null)
-            {
-                StopCoroutine(cameraPunchRoutine);
-                cameraPunchRoutine = null;
-            }
+            StopCameraEffectRoutine();
 
             if (cameraEffectTarget != null)
             {
                 cameraEffectTarget.localPosition = cameraRestLocalPos;
+                cameraEffectTarget.localRotation = cameraRestLocalRot;
             }
 
             punchRunning = false;
