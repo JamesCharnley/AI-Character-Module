@@ -102,6 +102,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         Debug.LogError("Player take damage");
         AddImpulse(_direction);
         PunchRig.TriggerCameraPunchReaction(lungeBackDistance, upDegrees);
+        PunchRig.TriggerBlockHitReaction();
         if (!damageSoundCooldown)
         {
             damageSoundCooldown = true;
