@@ -42,6 +42,9 @@ namespace AICharacterModule.NPC
         public bool IsNavigationStateLocked => _navigationStateManager?.IsCurrentStateLocked ?? false;
         public bool IsCombatStateLocked => _combatStateManager?.IsCurrentStateLocked ?? false;
 
+        [SerializeField] private float MaxHealth = 100;
+        private float CurrentHealth = 100;
+
         private void Awake()
         {
             var navAgent = GetComponent<NavMeshAgent>();
@@ -293,6 +296,13 @@ namespace AICharacterModule.NPC
 
         public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
         {
+            CurrentHealth -= _amount;
+            if (CurrentHealth <= 0)
+            {
+                Debug.Log("NPC DEAD");
+                CurrentHealth = MaxHealth;
+                return;
+            }
             _masterStateMachine.GlobalData.AnimationController.PlayDamageAnimation(_amount, _direction, _hitZoneInfo);
         }
         

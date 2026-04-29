@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     public LayerMask groundMask;
     // external velocity (impulses, knockbacks, etc.)
     private Vector3 externalVelocity;
+    [SerializeField] private float MaxHealth = 100;
+    private float CurrentHealth = 100;
     
 
     public float drag = 5f;        // how fast impulse dies off
@@ -100,6 +102,14 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
         Debug.LogError("Player take damage");
+        
+        CurrentHealth -= _amount;
+        if (CurrentHealth <= 0)
+        {
+            Debug.Log("PLAYER DEAD");
+            CurrentHealth = MaxHealth;
+            return;
+        }
         AddImpulse(_direction);
         PunchRig.TriggerCameraPunchReaction(lungeBackDistance, upDegrees);
         PunchRig.TriggerBlockHitReaction();
