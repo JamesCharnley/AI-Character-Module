@@ -23,20 +23,34 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     private Vector3 externalVelocity;
     [SerializeField] private float MaxHealth = 100;
     private float CurrentHealth = 100;
+    public bool IsMovementInputLocked { get; private set; }
     
 
     public float drag = 5f;        // how fast impulse dies off
+    [Header("Push To Ground")]
+    [SerializeField] private Transform cameraRoot;
+    [SerializeField] private float pushBackDistance = 2.2f;
+    [SerializeField] private float pushDownDistance = 0.9f;
+    [SerializeField] private float pushDuration = 0.28f;
+    [SerializeField] private float standUpDuration = 0.45f;
+    private Vector3 initialCameraLocalPosition;
+    private Coroutine pushRoutine;
+    private Coroutine standUpRoutine;
     
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        if (cameraRoot == null && Camera.main != null)
+            cameraRoot = Camera.main.transform;
+        if (cameraRoot != null)
+            initialCameraLocalPosition = cameraRoot.localPosition;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void Update()
     {
-        isSprinting = Input.GetKey(KeyCode.LeftShift);
+        isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
         HandleMovement();
         float dt = Time.deltaTime;
 
@@ -70,21 +84,98 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         }
 
         // Input
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        float x = IsMovementInputLocked ? 0f : Input.GetAxis("Horizontal");
+        float z = IsMovementInputLocked ? 0f : Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * x + transform.forward * z;
         float speedBuff = isSprinting ? sprintMulti : 1;
         controller.Move(move * (moveSpeed * speedBuff * Time.deltaTime));
 
         // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (!IsMovementInputLocked && Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
         }
 
         
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    public void TriggerPushToGround()
+    {
+        if (pushRoutine != null)
+            StopCoroutine(pushRoutine);
+        if (standUpRoutine != null)
+            StopCoroutine(standUpRoutine);
+        pushRoutine = StartCoroutine(PushToGroundRoutine());
+    }
+
+    public void TriggerStandUp()
+    {
+        if (cameraRoot == null)
+        {
+            IsMovementInputLocked = false;
+            return;
+        }
+
+        if (standUpRoutine != null)
+            StopCoroutine(standUpRoutine);
+        standUpRoutine = StartCoroutine(StandUpRoutine());
+    }
+
+    private IEnumerator PushToGroundRoutine()
+    {
+        IsMovementInputLocked = true;
+        float elapsed = 0f;
+        float movedBack = 0f;
+        float movedDown = 0f;
+
+        while (elapsed < pushDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / pushDuration);
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+            float targetBack = pushBackDistance * eased;
+            float targetDown = pushDownDistance * eased;
+
+            float deltaBack = targetBack - movedBack;
+            float deltaDown = targetDown - movedDown;
+            movedBack = targetBack;
+            movedDown = targetDown;
+
+            Vector3 move = (-transform.forward * deltaBack) + (Vector3.down * deltaDown);
+            controller.Move(move);
+
+            if (cameraRoot != null)
+            {
+                Vector3 cameraPos = cameraRoot.localPosition;
+                cameraPos.y = Mathf.Lerp(initialCameraLocalPosition.y, initialCameraLocalPosition.y - pushDownDistance, eased);
+                cameraRoot.localPosition = cameraPos;
+            }
+
+            yield return null;
+        }
+
+        pushRoutine = null;
+    }
+
+    private IEnumerator StandUpRoutine()
+    {
+        float elapsed = 0f;
+        Vector3 startCamPos = cameraRoot.localPosition;
+
+        while (elapsed < standUpDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / standUpDuration);
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+            cameraRoot.localPosition = Vector3.Lerp(startCamPos, initialCameraLocalPosition, eased);
+            yield return null;
+        }
+
+        cameraRoot.localPosition = initialCameraLocalPosition;
+        IsMovementInputLocked = false;
+        standUpRoutine = null;
     }
 
 
