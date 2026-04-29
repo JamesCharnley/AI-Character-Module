@@ -41,7 +41,8 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     private Quaternion initialCameraLocalRotation;
     private Coroutine pushRoutine;
     private Coroutine standUpRoutine;
-    
+    private bool IsOnGround = false;
+    private bool IsGettingUp = false;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -58,14 +59,24 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.P))
+        if (IsOnGround)
         {
-            TriggerPushToGround();
+            if (pushRoutine == null)
+            {
+                TriggerStandUp();
+                IsOnGround = false;
+                IsGettingUp = true;
+            }
         }
-        if (Input.GetKeyUp(KeyCode.U))
+
+        if (IsGettingUp)
         {
-            TriggerStandUp();
+            if (standUpRoutine == null)
+            {
+                IsGettingUp = false;
+            }
         }
+        
         isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
         HandleMovement();
         float dt = Time.deltaTime;
@@ -215,14 +226,20 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     [SerializeField] private float upDegrees;
     public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
-        Debug.LogError("Player take damage");
+        Debug.LogError($"Player take damage Mag = {_direction.magnitude}");
         
         CurrentHealth -= _amount;
         if (CurrentHealth <= 0)
         {
             Debug.Log("PLAYER DEAD");
             CurrentHealth = MaxHealth;
+            TriggerPushToGround();
             return;
+        }
+
+        if (_direction.magnitude > 3)
+        {
+            TriggerPushToGround();
         }
         AddImpulse(_direction);
         PunchRig.TriggerCameraPunchReaction(lungeBackDistance, upDegrees);
