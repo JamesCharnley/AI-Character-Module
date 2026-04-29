@@ -4,6 +4,7 @@ using AICharacterModule.NPC.StateMachine.Core;
 using FirstPersonCharacter;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour, ITakeDamage
@@ -43,6 +44,9 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     private Coroutine standUpRoutine;
     private bool IsOnGround = false;
     private bool IsGettingUp = false;
+    [Header("Push To Ground Events")]
+    [SerializeField] private UnityEvent onPushToGroundComplete;
+    [SerializeField] private UnityEvent onStandUpComplete;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -113,6 +117,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     public void TriggerPushToGround()
     {
+        IsGettingUp = false;
         if (pushRoutine != null)
             StopCoroutine(pushRoutine);
         if (standUpRoutine != null)
@@ -128,6 +133,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
             return;
         }
 
+        IsGettingUp = true;
         if (standUpRoutine != null)
             StopCoroutine(standUpRoutine);
         standUpRoutine = StartCoroutine(StandUpRoutine());
@@ -172,6 +178,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         }
 
         pushRoutine = null;
+        PushToGroundComplete();
     }
 
     private IEnumerator StandUpRoutine()
@@ -193,6 +200,21 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         cameraRoot.localRotation = initialCameraLocalRotation;
         IsMovementInputLocked = false;
         standUpRoutine = null;
+        StandUpComplete();
+    }
+
+    public void PushToGroundComplete()
+    {
+        IsOnGround = true;
+        IsGettingUp = false;
+        onPushToGroundComplete?.Invoke();
+    }
+
+    public void StandUpComplete()
+    {
+        IsOnGround = false;
+        IsGettingUp = false;
+        onStandUpComplete?.Invoke();
     }
 
 
