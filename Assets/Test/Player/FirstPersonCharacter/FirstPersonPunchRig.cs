@@ -379,6 +379,7 @@ namespace FirstPersonCharacter
 
             Quaternion spineStart = spine != null ? spine.localRotation : Quaternion.identity;
             Quaternion spinePunchOffset = Quaternion.Euler(-spinePitch, -sideSign * spineYaw, 0f);
+            Quaternion spinePunchTarget = spineRestLocalRot * spinePunchOffset;
             float totalPunchDuration = strikeDuration + recoverDuration;
             float impulseDelay = totalPunchDuration * Mathf.Clamp01(impulseForwardTimingNormalized);
             float punchWooshDelay = totalPunchDuration * Mathf.Clamp01(punchWooshTimingNormalized);
@@ -387,9 +388,10 @@ namespace FirstPersonCharacter
             StartCameraPunchEffect();
 
             Vector3 strikeStart = activeTarget.localPosition;
-            yield return MoveTarget(activeTarget, strikeStart, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchOffset, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
+            yield return MoveTarget(activeTarget, strikeStart, strikePos, strikeDuration, strikeCurve, spineStart, spinePunchTarget, strikeArcHeight, activeHandBone, damagedTargets, trackHitZoneDuringStrike, rest, defaultStrikePos);
             Vector3 recoverStart = activeTarget.localPosition;
-            yield return MoveTarget(activeTarget, recoverStart, rest, recoverDuration, recoverCurve, spineStart, Quaternion.identity);
+            Quaternion recoverSpineStart = spine != null ? spine.localRotation : Quaternion.identity;
+            yield return MoveTarget(activeTarget, recoverStart, rest, recoverDuration, recoverCurve, recoverSpineStart, spineRestLocalRot);
             Debug.DrawLine(transform.TransformPoint(strikePos), transform.TransformPoint(strikePos) + Vector3.up, Color.green, 3);
             activeTarget.localPosition = rest;
             if (spine != null)
@@ -647,7 +649,7 @@ namespace FirstPersonCharacter
             float duration,
             AnimationCurve curve,
             Quaternion spineStart,
-            Quaternion spineOffset,
+            Quaternion spineTarget,
             float arcHeight = 0f,
             Transform activeHandBone = null,
             HashSet<ITakeDamage> damagedTargets = null,
@@ -677,7 +679,7 @@ namespace FirstPersonCharacter
 
                 if (spine != null)
                 {
-                    spine.localRotation = Quaternion.SlerpUnclamped(spineStart, spineStart * spineOffset, curvedT);
+                    spine.localRotation = Quaternion.SlerpUnclamped(spineStart, spineTarget, curvedT);
                 }
 
                 if (activeHandBone != null && !punchDamageResolved && ShouldApplyPunchDamageWindow(t))
@@ -691,7 +693,7 @@ namespace FirstPersonCharacter
             target.localPosition = finalEnd;
             if (spine != null)
             {
-                spine.localRotation = spineStart * spineOffset;
+                spine.localRotation = spineTarget;
             }
 
             if (activeHandBone != null && !punchDamageResolved && ShouldApplyPunchDamageWindow(1f))
