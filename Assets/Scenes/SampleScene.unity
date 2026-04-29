@@ -584,6 +584,8 @@ MonoBehaviour:
   blockRaiseDistance: 0.2
   blockForwardDistance: 0.07
   blockInwardDistance: 0.03
+  blockHintLocalX: 0.1
+  blockTargetRotationEuler: {x: 0, y: 0, z: 0}
   blockBlendSpeed: 5.5
   minWindUpDuration: 0.2
   maxWindUpDuration: 0.7
@@ -3657,7 +3659,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1193340829816115258, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_Layer
