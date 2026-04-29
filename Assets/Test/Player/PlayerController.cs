@@ -33,7 +33,12 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     [SerializeField] private float pushDownDistance = 0.9f;
     [SerializeField] private float pushDuration = 0.28f;
     [SerializeField] private float standUpDuration = 0.45f;
+    [SerializeField] private AnimationCurve pushSpeedCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private AnimationCurve cameraGroundMoveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private AnimationCurve cameraLookUpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private float cameraLookUpDegrees = 14f;
     private Vector3 initialCameraLocalPosition;
+    private Quaternion initialCameraLocalRotation;
     private Coroutine pushRoutine;
     private Coroutine standUpRoutine;
     
@@ -43,7 +48,10 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         if (cameraRoot == null && Camera.main != null)
             cameraRoot = Camera.main.transform;
         if (cameraRoot != null)
+        {
             initialCameraLocalPosition = cameraRoot.localPosition;
+            initialCameraLocalRotation = cameraRoot.localRotation;
+        }
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -142,9 +150,10 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / pushDuration);
-            float eased = Mathf.SmoothStep(0f, 1f, t);
-            float targetBack = pushBackDistance * eased;
-            float targetDown = pushDownDistance * eased;
+            float pushCurveValue = Mathf.Clamp01(pushSpeedCurve.Evaluate(t));
+            float cameraGroundCurveValue = Mathf.Clamp01(cameraGroundMoveCurve.Evaluate(t));
+            float targetBack = pushBackDistance * pushCurveValue;
+            float targetDown = pushDownDistance * pushCurveValue;
 
             float deltaBack = targetBack - movedBack;
             float deltaDown = targetDown - movedDown;
@@ -157,8 +166,12 @@ public class PlayerController : MonoBehaviour, ITakeDamage
             if (cameraRoot != null)
             {
                 Vector3 cameraPos = cameraRoot.localPosition;
-                cameraPos.y = Mathf.Lerp(initialCameraLocalPosition.y, initialCameraLocalPosition.y - pushDownDistance, eased);
+                cameraPos.y = Mathf.Lerp(initialCameraLocalPosition.y, initialCameraLocalPosition.y - pushDownDistance, cameraGroundCurveValue);
                 cameraRoot.localPosition = cameraPos;
+
+                float lookUpCurveValue = Mathf.Clamp01(cameraLookUpCurve.Evaluate(t));
+                Quaternion lookUpRotation = Quaternion.Euler(-cameraLookUpDegrees * lookUpCurveValue, 0f, 0f);
+                cameraRoot.localRotation = initialCameraLocalRotation * lookUpRotation;
             }
 
             yield return null;
@@ -178,10 +191,12 @@ public class PlayerController : MonoBehaviour, ITakeDamage
             float t = Mathf.Clamp01(elapsed / standUpDuration);
             float eased = Mathf.SmoothStep(0f, 1f, t);
             cameraRoot.localPosition = Vector3.Lerp(startCamPos, initialCameraLocalPosition, eased);
+            cameraRoot.localRotation = Quaternion.Slerp(cameraRoot.localRotation, initialCameraLocalRotation, eased);
             yield return null;
         }
 
         cameraRoot.localPosition = initialCameraLocalPosition;
+        cameraRoot.localRotation = initialCameraLocalRotation;
         IsMovementInputLocked = false;
         standUpRoutine = null;
     }
