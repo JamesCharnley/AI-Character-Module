@@ -20,17 +20,6 @@ public class CameraLook : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            Camera cam = GetComponent<Camera>();
-            Vector2 punchZone = GetLookDirection(cam, DodgeTarget);
-            //PunchOffsetResult = punchZone;
-            //DamageOffsetResult = GetLookDirection(cam, DamageTarget);
-            //npcBehaviourController.IncomingAttack(new Vector3(punchZone.x, punchZone.y, 0f));
-            //npcBehaviourController.TakeDamage(20, transform.forward, DamageOffsetResult);
-
-            
-        }
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);

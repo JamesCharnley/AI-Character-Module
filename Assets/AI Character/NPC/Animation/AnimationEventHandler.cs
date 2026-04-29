@@ -135,23 +135,27 @@ namespace AICharacterModule.NPC.Animation
 		{
 			if (LeftHandDamageActive)
 			{
-				DoDamageOverlap(LeftHandDamageBone);
+				bool didDamage = DoDamageOverlap(LeftHandDamageBone);
+				if (didDamage) LeftHandDamageActive = false;
 			}
 			if (RightHandDamageActive)
 			{
-				DoDamageOverlap(RightHandDamageBone);
+				bool didDamage = DoDamageOverlap(RightHandDamageBone);
+				if (didDamage) RightHandDamageActive = false;
 			}
 			if (LeftFootDamageActive)
 			{
-				DoDamageOverlap(LeftFootDamageBone);
+				bool didDamage = DoDamageOverlap(LeftFootDamageBone);
+				if (didDamage) LeftFootDamageActive = false;
 			}
 			if (RightHandDamageActive)
 			{
-				DoDamageOverlap(RightFootDamageBone);
+				bool didDamage = DoDamageOverlap(RightFootDamageBone);
+				if (didDamage) RightHandDamageActive = false;
 			}
 		}
 		
-		public void DoDamageOverlap(Transform _originTransform)
+		public bool DoDamageOverlap(Transform _originTransform)
 		{
             
 			Collider[] hitColliders = Physics.OverlapSphere(_originTransform.position, damageOverlapRadius, damageOverlapLayers);
@@ -167,9 +171,11 @@ namespace AICharacterModule.NPC.Animation
 				{
 					continue;
 				}
-
 				takeDamage.TakeDamage(npcController.GetMasterStateMachine.GlobalData.Anim.GetFloat("CurrentDamage"), transform.forward * npcController.GetMasterStateMachine.GlobalData.Anim.GetFloat("CurrentDamageForce"), Vector3.zero);
+				return true;
 			}
+
+			return false;
 		}
 		
 		public void DoDamageOverlapActivate(string _damagePointId)

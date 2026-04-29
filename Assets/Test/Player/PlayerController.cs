@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using AICharacterModule.NPC.StateMachine.Core;
+using FirstPersonCharacter;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -93,9 +94,14 @@ public class PlayerController : MonoBehaviour, ITakeDamage
     private bool damageSoundCooldown = false;
     [SerializeField] private AudioClip[] LightFaceHits;
     [SerializeField] private AudioClip[] HeavyFaceHits;
+    [SerializeField] private FirstPersonPunchRig PunchRig;
+    [SerializeField] private float lungeBackDistance;
+    [SerializeField] private float upDegrees;
     public void TakeDamage(float _amount, Vector3 _direction, Vector3 _offset)
     {
+        Debug.LogError("Player take damage");
         AddImpulse(_direction);
+        PunchRig.TriggerCameraPunchReaction(lungeBackDistance, upDegrees);
         if (!damageSoundCooldown)
         {
             damageSoundCooldown = true;
