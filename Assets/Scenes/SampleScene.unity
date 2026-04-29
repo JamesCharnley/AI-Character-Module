@@ -580,6 +580,11 @@ MonoBehaviour:
   leftHandBone: {fileID: 2112423593}
   rightHandBone: {fileID: 2112423589}
   mouseButton: 0
+  blockMouseButton: 1
+  blockRaiseDistance: 0.2
+  blockForwardDistance: 0.07
+  blockInwardDistance: 0.03
+  blockBlendSpeed: 5.5
   minWindUpDuration: 0.2
   maxWindUpDuration: 0.7
   minStrikeDuration: 0.1
@@ -876,7 +881,6 @@ MonoBehaviour:
   combatToChaseDistanceIncrease: 2.5
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
-  HorizontalCenterWidth: 0.3
   TorsoeBone: {fileID: 1641631264}
   HitZonesCache:
   - SelfTransform: {fileID: 1589834636}
