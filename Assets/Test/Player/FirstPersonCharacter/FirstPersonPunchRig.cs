@@ -39,6 +39,14 @@ namespace FirstPersonCharacter
         [SerializeField] private float blockHintInwardDistance = 0.05f;
         [SerializeField] private Vector3 blockTargetRotationEuler = Vector3.zero;
         [Min(0.01f)] [SerializeField] private float blockBlendSpeed = 14f;
+        
+        [Header("Block Hit Reaction")]
+        [SerializeField] private float blockHitRaiseOffset = 0.035f;
+        [SerializeField] private float blockHitForwardOffset = -0.02f;
+        [SerializeField] private float blockHitInwardOffset = -0.02f;
+        [Min(0.01f)] [SerializeField] private float blockHitReactionInDuration = 0.05f;
+        [Min(0.01f)] [SerializeField] private float blockHitReactionOutDuration = 0.1f;
+        [SerializeField] private AnimationCurve blockHitReactionCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
         [Header("Punch Timing")]
         [Min(0.01f)] [SerializeField] private float minWindUpDuration = 0.06f;
@@ -109,6 +117,8 @@ namespace FirstPersonCharacter
         private Vector3 cameraRestLocalPos;
         private Quaternion cameraRestLocalRot;
         private Coroutine cameraEffectRoutine;
+        private Coroutine blockHitReactionRoutine;
+        private float blockHitReactionWeight;
         
         [SerializeField] private LayerMask CamRaycastMask;
         [SerializeField] private float PunchRaycastDistance = 1;
@@ -207,9 +217,12 @@ namespace FirstPersonCharacter
                 return;
             }
 
-            Vector3 blockOffset = Vector3.up * blockRaiseDistance
-                                  + Vector3.forward * blockForwardDistance
-                                  + Vector3.right * sideSign * blockInwardDistance;
+            float adjustedRaiseDistance = blockRaiseDistance + (blockHitRaiseOffset * blockHitReactionWeight);
+            float adjustedForwardDistance = blockForwardDistance + (blockHitForwardOffset * blockHitReactionWeight);
+            float adjustedInwardDistance = blockInwardDistance + (blockHitInwardOffset * blockHitReactionWeight);
+            Vector3 blockOffset = Vector3.up * adjustedRaiseDistance
+                                  + Vector3.forward * adjustedForwardDistance
+                                  + Vector3.right * sideSign * adjustedInwardDistance;
             Vector3 blockPose = restLocalPos + blockOffset;
             handTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockPose, poseWeight);
 
@@ -527,6 +540,52 @@ namespace FirstPersonCharacter
 
             StopCameraEffectRoutine();
             cameraEffectRoutine = StartCoroutine(CameraPunchReactionRoutine(lungeBackDistance, rotateUpDegrees));
+        }
+
+        public bool IsBlocking()
+        {
+            return blockPoseWeight > 0.99f && !punchRunning;
+        }
+
+        public void TriggerBlockHitReaction()
+        {
+            if (!IsBlocking())
+            {
+                return;
+            }
+
+            if (blockHitReactionRoutine != null)
+            {
+                StopCoroutine(blockHitReactionRoutine);
+            }
+
+            blockHitReactionRoutine = StartCoroutine(BlockHitReactionRoutine());
+        }
+
+        private IEnumerator BlockHitReactionRoutine()
+        {
+            float elapsed = 0f;
+            while (elapsed < blockHitReactionInDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / blockHitReactionInDuration);
+                blockHitReactionWeight = blockHitReactionCurve != null ? blockHitReactionCurve.Evaluate(t) : t;
+                yield return null;
+            }
+
+            blockHitReactionWeight = 1f;
+            elapsed = 0f;
+            while (elapsed < blockHitReactionOutDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / blockHitReactionOutDuration);
+                float curvedT = blockHitReactionCurve != null ? blockHitReactionCurve.Evaluate(t) : t;
+                blockHitReactionWeight = 1f - curvedT;
+                yield return null;
+            }
+
+            blockHitReactionWeight = 0f;
+            blockHitReactionRoutine = null;
         }
 
         private IEnumerator CameraPunchReactionRoutine(float lungeBackDistance, float rotateUpDegrees)
