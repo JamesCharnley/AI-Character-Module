@@ -26,6 +26,13 @@ namespace FirstPersonCharacter
 
         [Header("Input")]
         [SerializeField] private int mouseButton = 0;
+        [SerializeField] private int blockMouseButton = 1;
+
+        [Header("Block Pose (Local Space)")]
+        [SerializeField] private float blockRaiseDistance = 0.14f;
+        [SerializeField] private float blockForwardDistance = 0.03f;
+        [SerializeField] private float blockInwardDistance = 0.03f;
+        [Min(0.01f)] [SerializeField] private float blockBlendSpeed = 14f;
 
         [Header("Punch Timing")]
         [Min(0.01f)] [SerializeField] private float minWindUpDuration = 0.06f;
@@ -79,6 +86,7 @@ namespace FirstPersonCharacter
         private bool punchRightNext = true;
         private float lastPunchTime = -10f;
         private bool punchDamageResolved;
+        private float blockPoseWeight;
         
         [SerializeField] private LayerMask CamRaycastMask;
         [SerializeField] private float PunchRaycastDistance = 1;
@@ -109,7 +117,10 @@ namespace FirstPersonCharacter
         [SerializeField] private HitZoneInfo CurrentHitZone;
         private void Update()
         {
-            if (punchRunning)
+            bool isBlocking = Input.GetMouseButton(blockMouseButton);
+            UpdateBlockPose(isBlocking);
+
+            if (punchRunning || isBlocking)
             {
                 return;
             }
@@ -137,6 +148,45 @@ namespace FirstPersonCharacter
             {
                 LaunchPunch(GetCurrentChargeRatio());
             }
+        }
+
+        private void UpdateBlockPose(bool isBlocking)
+        {
+            float targetWeight = isBlocking ? 1f : 0f;
+            blockPoseWeight = Mathf.MoveTowards(blockPoseWeight, targetWeight, blockBlendSpeed * Time.deltaTime);
+
+            if (punchCharging && blockPoseWeight > 0f)
+            {
+                punchCharging = false;
+            }
+
+            if (punchCharging)
+            {
+                return;
+            }
+
+            ApplyBlockPoseToHand(leftHandTarget, leftRestLocalPos, 1f, blockPoseWeight);
+            ApplyBlockPoseToHand(rightHandTarget, rightRestLocalPos, -1f, blockPoseWeight);
+
+            if (spine != null)
+            {
+                Quaternion blockSpineOffset = Quaternion.Euler(-spinePitch * 0.5f, 0f, 0f);
+                spine.localRotation = Quaternion.SlerpUnclamped(spineRestLocalRot, spineRestLocalRot * blockSpineOffset, blockPoseWeight);
+            }
+        }
+
+        private void ApplyBlockPoseToHand(Transform handTarget, Vector3 restLocalPos, float sideSign, float poseWeight)
+        {
+            if (handTarget == null)
+            {
+                return;
+            }
+
+            Vector3 blockOffset = Vector3.up * blockRaiseDistance
+                                  + Vector3.forward * blockForwardDistance
+                                  + Vector3.right * sideSign * blockInwardDistance;
+            Vector3 blockPose = restLocalPos + blockOffset;
+            handTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockPose, poseWeight);
         }
 
         private void TryStartPunchCharge()
