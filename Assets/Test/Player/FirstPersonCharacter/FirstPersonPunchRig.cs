@@ -34,11 +34,9 @@ namespace FirstPersonCharacter
         [SerializeField] private float blockRaiseDistance = 0.14f;
         [SerializeField] private float blockForwardDistance = 0.03f;
         [SerializeField] private float blockInwardDistance = 0.03f;
-        [SerializeField] private float blockTargetLocalX = 0.1f;
         [SerializeField] private float blockHintRaiseDistance = 0.12f;
         [SerializeField] private float blockHintForwardDistance = 0.02f;
         [SerializeField] private float blockHintInwardDistance = 0.05f;
-        [SerializeField] private float blockHintLocalX = 0.16f;
         [SerializeField] private Vector3 blockTargetRotationEuler = Vector3.zero;
         [Min(0.01f)] [SerializeField] private float blockBlendSpeed = 14f;
 
@@ -200,7 +198,6 @@ namespace FirstPersonCharacter
                                   + Vector3.forward * blockForwardDistance
                                   + Vector3.right * sideSign * blockInwardDistance;
             Vector3 blockPose = restLocalPos + blockOffset;
-            blockPose.x = sideSign * blockTargetLocalX;
             handTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockPose, poseWeight);
 
             Quaternion blockRotation = restLocalRot * Quaternion.Euler(blockTargetRotationEuler);
@@ -218,7 +215,6 @@ namespace FirstPersonCharacter
                                  + Vector3.forward * blockHintForwardDistance
                                  + Vector3.right * sideSign * blockHintInwardDistance;
             Vector3 blockHintPose = restLocalPos + hintOffset;
-            blockHintPose.x = sideSign * blockHintLocalX;
             hintTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockHintPose, poseWeight);
         }
 

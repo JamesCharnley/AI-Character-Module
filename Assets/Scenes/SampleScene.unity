@@ -577,15 +577,19 @@ MonoBehaviour:
   rightArmIK: {fileID: 2112423594}
   leftHandTarget: {fileID: 1149067460}
   rightHandTarget: {fileID: 868118242}
+  leftHandHintTarget: {fileID: 1905566790}
+  rightHandHintTarget: {fileID: 973090930}
   leftHandBone: {fileID: 2112423593}
   rightHandBone: {fileID: 2112423589}
   mouseButton: 0
   blockMouseButton: 1
-  blockRaiseDistance: 0.2
-  blockForwardDistance: 0.07
-  blockInwardDistance: 0.03
-  blockHintLocalX: 0.1
-  blockTargetRotationEuler: {x: 0, y: 0, z: 0}
+  blockRaiseDistance: 0.18
+  blockForwardDistance: 0.06
+  blockInwardDistance: 0.15
+  blockHintRaiseDistance: 0.12
+  blockHintForwardDistance: 0.02
+  blockHintInwardDistance: 0.4
+  blockTargetRotationEuler: {x: 1.38, y: 42.2, z: -37.1}
   blockBlendSpeed: 5.5
   minWindUpDuration: 0.2
   maxWindUpDuration: 0.7
