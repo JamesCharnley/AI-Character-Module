@@ -59,23 +59,6 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     void Update()
     {
-        if (IsOnGround)
-        {
-            if (pushRoutine == null)
-            {
-                TriggerStandUp();
-                IsOnGround = false;
-                IsGettingUp = true;
-            }
-        }
-
-        if (IsGettingUp)
-        {
-            if (standUpRoutine == null)
-            {
-                IsGettingUp = false;
-            }
-        }
         
         isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
         HandleMovement();
