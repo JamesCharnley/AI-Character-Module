@@ -63,23 +63,31 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     void Update()
     {
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            TriggerPushToGround();
+        }
+
+        if (!IsMovementInputLocked)
+        {
+            isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
+            HandleMovement();
+            float dt = Time.deltaTime;
+
+            // Apply gravity
+            externalVelocity.y += gravity * dt;
+
+            // Move character using external velocity
+            controller.Move(externalVelocity * dt);
+
+            // Apply drag (decay impulse)
+            externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, drag * dt);
+
+            // Optional: stop tiny values to prevent micro sliding
+            if (externalVelocity.magnitude < 0.01f)
+                externalVelocity = Vector3.zero;
+        }
         
-        isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
-        HandleMovement();
-        float dt = Time.deltaTime;
-
-        // Apply gravity
-        externalVelocity.y += gravity * dt;
-
-        // Move character using external velocity
-        controller.Move(externalVelocity * dt);
-
-        // Apply drag (decay impulse)
-        externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, drag * dt);
-
-        // Optional: stop tiny values to prevent micro sliding
-        if (externalVelocity.magnitude < 0.01f)
-            externalVelocity = Vector3.zero;
     }
     
     public void AddImpulse(Vector3 impulse)
@@ -144,7 +152,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         IsMovementInputLocked = true;
         float elapsed = 0f;
         float movedBack = 0f;
-        float movedDown = 0f;
+        //float movedDown = 0f;
 
         while (elapsed < pushDuration)
         {
@@ -156,11 +164,11 @@ public class PlayerController : MonoBehaviour, ITakeDamage
             float targetDown = pushDownDistance * pushCurveValue;
 
             float deltaBack = targetBack - movedBack;
-            float deltaDown = targetDown - movedDown;
+           // float deltaDown = targetDown - movedDown;
             movedBack = targetBack;
-            movedDown = targetDown;
+            //movedDown = targetDown;
 
-            Vector3 move = (-transform.forward * deltaBack) + (Vector3.down * deltaDown);
+            Vector3 move = (-transform.forward * deltaBack);// + (Vector3.down * deltaDown);
             controller.Move(move);
 
             if (cameraRoot != null)
@@ -208,6 +216,8 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         IsOnGround = true;
         IsGettingUp = false;
         onPushToGroundComplete?.Invoke();
+        StartCoroutine(StandUpDelay());
+        Debug.LogError("PushToGroundComplete");
     }
 
     public void StandUpComplete()
@@ -215,8 +225,14 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         IsOnGround = false;
         IsGettingUp = false;
         onStandUpComplete?.Invoke();
+        Debug.LogError("Stand Up Complete");
     }
 
+    IEnumerator StandUpDelay()
+    {
+        yield return new WaitForSeconds(1);
+        TriggerStandUp();
+    }
 
     public void TakeDamage(float _amount)
     {
@@ -246,7 +262,7 @@ public class PlayerController : MonoBehaviour, ITakeDamage
         {
             TriggerPushToGround();
         }
-        AddImpulse(_direction);
+        //AddImpulse(_direction);
         PunchRig.TriggerCameraPunchReaction(lungeBackDistance, upDegrees);
         PunchRig.TriggerBlockHitReaction();
         if (!damageSoundCooldown)
