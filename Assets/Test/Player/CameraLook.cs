@@ -14,10 +14,12 @@ public class CameraLook : MonoBehaviour
     [SerializeField] private Vector2 PunchOffsetResult;
     [SerializeField] private Vector2 DamageOffsetResult;
     [SerializeField] private NPCBehaviourController npcBehaviourController;
+    [SerializeField] private PlayerController playerController;
 
     
     void Update()
     {
+        if (playerController.IsMovementInputLocked) return;
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 

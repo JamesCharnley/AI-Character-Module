@@ -50,6 +50,14 @@ public class PlayerController : MonoBehaviour, ITakeDamage
 
     void Update()
     {
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            TriggerPushToGround();
+        }
+        if (Input.GetKeyUp(KeyCode.U))
+        {
+            TriggerStandUp();
+        }
         isSprinting = !IsMovementInputLocked && Input.GetKey(KeyCode.LeftShift);
         HandleMovement();
         float dt = Time.deltaTime;

@@ -506,7 +506,13 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
+  MaxHealth: 100
   drag: 20
+  cameraRoot: {fileID: 1716434799}
+  pushBackDistance: 4
+  pushDownDistance: 0.9
+  pushDuration: 0.75
+  standUpDuration: 0.45
   LightFaceHits:
   - {fileID: 8300000, guid: 1cd9fbc4bb2c19749aa2e61afd72aaaa, type: 3}
   - {fileID: 8300000, guid: faf53b5b59d41a14e97c8858f4664122, type: 3}
@@ -594,6 +600,35 @@ MonoBehaviour:
   blockHintInwardDistance: 0.4
   blockTargetRotationEuler: {x: 1.38, y: 42.2, z: -37.1}
   blockBlendSpeed: 5.5
+  blockHitRaiseOffset: 0.035
+  blockHitForwardOffset: -0.02
+  blockHitInwardOffset: -0.02
+  blockHitReactionInDuration: 0.05
+  blockHitReactionOutDuration: 0.1
+  blockHitReactionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   minWindUpDuration: 0.2
   maxWindUpDuration: 0.7
   minStrikeDuration: 0.1
@@ -940,6 +975,7 @@ MonoBehaviour:
   approachToHandCombatDistance: 4.5
   handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
+  MaxHealth: 100
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
   TorsoeBone: {fileID: 1641631264}
@@ -3696,7 +3732,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1193340829816115258, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       propertyPath: m_Layer
@@ -4491,6 +4527,7 @@ MonoBehaviour:
   PunchOffsetResult: {x: 0, y: 0}
   DamageOffsetResult: {x: 0, y: 0}
   npcBehaviourController: {fileID: 405209232}
+  playerController: {fileID: 189356294}
   horizontalThreshold: 0.1
   verticalThreshold: 0.1
 --- !u!4 &1722874544 stripped
