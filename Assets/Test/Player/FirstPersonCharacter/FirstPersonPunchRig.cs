@@ -538,6 +538,12 @@ namespace FirstPersonCharacter
                 return;
             }
 
+            if (IsBlocking())
+            {
+                lungeBackDistance *= 0.65f;
+                rotateUpDegrees *= 0.65f;
+            }
+
             StopCameraEffectRoutine();
             cameraEffectRoutine = StartCoroutine(CameraPunchReactionRoutine(lungeBackDistance, rotateUpDegrees));
         }
