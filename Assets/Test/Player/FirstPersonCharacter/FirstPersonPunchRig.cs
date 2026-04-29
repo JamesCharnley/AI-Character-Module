@@ -435,7 +435,7 @@ namespace FirstPersonCharacter
 
             if (punchRunning)
             {
-                ImpulseForward();
+                //ImpulseForward();
             }
         }
 
