@@ -32,6 +32,8 @@ namespace FirstPersonCharacter
         [SerializeField] private float blockRaiseDistance = 0.14f;
         [SerializeField] private float blockForwardDistance = 0.03f;
         [SerializeField] private float blockInwardDistance = 0.03f;
+        [SerializeField] private float blockHintLocalX = 0.1f;
+        [SerializeField] private Vector3 blockTargetRotationEuler = Vector3.zero;
         [Min(0.01f)] [SerializeField] private float blockBlendSpeed = 14f;
 
         [Header("Punch Timing")]
@@ -79,6 +81,8 @@ namespace FirstPersonCharacter
 
         private Vector3 leftRestLocalPos;
         private Vector3 rightRestLocalPos;
+        private Quaternion leftRestLocalRot;
+        private Quaternion rightRestLocalRot;
         private Quaternion spineRestLocalRot;
         private bool punchRunning;
         private bool punchCharging;
@@ -165,8 +169,8 @@ namespace FirstPersonCharacter
                 return;
             }
 
-            ApplyBlockPoseToHand(leftHandTarget, leftRestLocalPos, 1f, blockPoseWeight);
-            ApplyBlockPoseToHand(rightHandTarget, rightRestLocalPos, -1f, blockPoseWeight);
+            ApplyBlockPoseToHand(leftHandTarget, leftRestLocalPos, leftRestLocalRot, 1f, blockPoseWeight);
+            ApplyBlockPoseToHand(rightHandTarget, rightRestLocalPos, rightRestLocalRot, -1f, blockPoseWeight);
 
             if (spine != null)
             {
@@ -175,7 +179,7 @@ namespace FirstPersonCharacter
             }
         }
 
-        private void ApplyBlockPoseToHand(Transform handTarget, Vector3 restLocalPos, float sideSign, float poseWeight)
+        private void ApplyBlockPoseToHand(Transform handTarget, Vector3 restLocalPos, Quaternion restLocalRot, float sideSign, float poseWeight)
         {
             if (handTarget == null)
             {
@@ -186,7 +190,11 @@ namespace FirstPersonCharacter
                                   + Vector3.forward * blockForwardDistance
                                   + Vector3.right * sideSign * blockInwardDistance;
             Vector3 blockPose = restLocalPos + blockOffset;
+            blockPose.x = sideSign * blockHintLocalX;
             handTarget.localPosition = Vector3.LerpUnclamped(restLocalPos, blockPose, poseWeight);
+
+            Quaternion blockRotation = restLocalRot * Quaternion.Euler(blockTargetRotationEuler);
+            handTarget.localRotation = Quaternion.SlerpUnclamped(restLocalRot, blockRotation, poseWeight);
         }
 
         private void TryStartPunchCharge()
@@ -257,11 +265,13 @@ namespace FirstPersonCharacter
             if (leftHandTarget != null)
             {
                 leftRestLocalPos = leftHandTarget.localPosition;
+                leftRestLocalRot = leftHandTarget.localRotation;
             }
 
             if (rightHandTarget != null)
             {
                 rightRestLocalPos = rightHandTarget.localPosition;
+                rightRestLocalRot = rightHandTarget.localRotation;
             }
 
             if (spine != null)
@@ -528,11 +538,13 @@ namespace FirstPersonCharacter
             if (leftHandTarget != null)
             {
                 leftHandTarget.localPosition = leftRestLocalPos;
+                leftHandTarget.localRotation = leftRestLocalRot;
             }
 
             if (rightHandTarget != null)
             {
                 rightHandTarget.localPosition = rightRestLocalPos;
+                rightHandTarget.localRotation = rightRestLocalRot;
             }
 
             if (spine != null)
