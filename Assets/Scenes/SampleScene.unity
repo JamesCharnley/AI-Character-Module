@@ -513,6 +513,106 @@ MonoBehaviour:
   pushDownDistance: 0.9
   pushDuration: 0.75
   standUpDuration: 0.45
+  pushSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.23439482
+      value: 0.99397516
+      inSlope: 0.21009797
+      outSlope: 0.21009797
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.08144293
+    - serializedVersion: 3
+      time: 0.53114265
+      value: 0.9072441
+      inSlope: -1.9130503
+      outSlope: -1.9130503
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.16658716
+      outWeight: 0.06820965
+    - serializedVersion: 3
+      time: 1
+      value: 0.662735
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  cameraGroundMoveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  cameraLookUpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.42391795
+      value: 0.62450415
+      inSlope: 1.493307
+      outSlope: 1.493307
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  cameraLookUpDegrees: 14
   LightFaceHits:
   - {fileID: 8300000, guid: 1cd9fbc4bb2c19749aa2e61afd72aaaa, type: 3}
   - {fileID: 8300000, guid: faf53b5b59d41a14e97c8858f4664122, type: 3}
