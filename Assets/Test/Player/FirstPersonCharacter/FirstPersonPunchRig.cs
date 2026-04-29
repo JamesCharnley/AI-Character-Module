@@ -601,7 +601,7 @@ namespace FirstPersonCharacter
             Vector3 startLocalPos = cameraEffectTarget.localPosition;
             Quaternion startLocalRot = cameraEffectTarget.localRotation;
             Vector3 lungeTargetPos = cameraRestLocalPos + Vector3.back * lungeBackDistance;
-            Quaternion reactionTargetRot = cameraRestLocalRot * Quaternion.Euler(-rotateUpDegrees, 0f, 0f);
+            Quaternion reactionTargetRot = startLocalRot * Quaternion.Euler(-rotateUpDegrees, 0f, 0f);
 
             float lungeElapsed = 0f;
             while (lungeElapsed < cameraLungeDuration)
@@ -624,12 +624,12 @@ namespace FirstPersonCharacter
                 float t = Mathf.Clamp01(returnElapsed / cameraReturnDuration);
                 float curvedT = cameraReturnCurve != null ? cameraReturnCurve.Evaluate(t) : t;
                 cameraEffectTarget.localPosition = Vector3.LerpUnclamped(lungeTargetPos, cameraRestLocalPos, curvedT);
-                cameraEffectTarget.localRotation = Quaternion.SlerpUnclamped(reactionTargetRot, cameraRestLocalRot, curvedT);
+                cameraEffectTarget.localRotation = Quaternion.SlerpUnclamped(reactionTargetRot, startLocalRot, curvedT);
                 yield return null;
             }
 
             cameraEffectTarget.localPosition = cameraRestLocalPos;
-            cameraEffectTarget.localRotation = cameraRestLocalRot;
+            cameraEffectTarget.localRotation = startLocalRot;
             cameraEffectRoutine = null;
         }
 
