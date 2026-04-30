@@ -1072,25 +1072,9 @@ MonoBehaviour:
   approachToHandCombatDistance: 4.5
   handCombatExitDistance: 5
   combatToChaseDistanceIncrease: 2.5
-  MaxHealth: 100
+  CharacterController: {fileID: 405209238}
   rightHandTarget: {fileID: 963194228}
   leftHandTarget: {fileID: 963194228}
-  TorsoeBone: {fileID: 1641631264}
-  HitZonesCache:
-  - SelfTransform: {fileID: 1589834636}
-    LocalOffset: {x: 1, y: 1, z: 1}
-  - SelfTransform: {fileID: 646239613}
-    LocalOffset: {x: 0, y: 1, z: 1}
-  - SelfTransform: {fileID: 1408741031}
-    LocalOffset: {x: -1, y: 1, z: 1}
-  - SelfTransform: {fileID: 102745148}
-    LocalOffset: {x: 1, y: -1, z: 1}
-  - SelfTransform: {fileID: 846786516}
-    LocalOffset: {x: 0, y: -1, z: 1}
-  - SelfTransform: {fileID: 1564154784}
-    LocalOffset: {x: -1, y: -1, z: 1}
-  - SelfTransform: {fileID: 1444257817}
-    LocalOffset: {x: 0, y: 2, z: 1}
 --- !u!195 &405209233
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1165,6 +1149,35 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2b019c6187fca1e48b47e28c891dc66c, type: 3}
   - {fileID: 8300000, guid: b883c27c88428884fb3a10dcc42b8b47, type: 3}
   FaceHitSounds: []
+--- !u!114 &405209238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405209229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9f2c98a2c152e047a42f3bb410b9a4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHealth: 100
+  HitZonesCache:
+  - SelfTransform: {fileID: 1589834636}
+    LocalOffset: {x: 1, y: 1, z: 1}
+  - SelfTransform: {fileID: 646239613}
+    LocalOffset: {x: 0, y: 1, z: 1}
+  - SelfTransform: {fileID: 1408741031}
+    LocalOffset: {x: -1, y: 1, z: 1}
+  - SelfTransform: {fileID: 102745148}
+    LocalOffset: {x: 1, y: -1, z: 1}
+  - SelfTransform: {fileID: 846786516}
+    LocalOffset: {x: 0, y: -1, z: 1}
+  - SelfTransform: {fileID: 1564154784}
+    LocalOffset: {x: -1, y: -1, z: 1}
+  - SelfTransform: {fileID: 1444257817}
+    LocalOffset: {x: 0, y: 2, z: 1}
+  animationController: {fileID: 405209237}
 --- !u!1 &555414548 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3730080606814098470, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
@@ -4117,6 +4130,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 405209237}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 405209238}
     - targetCorrespondingSourceObject: {fileID: -1752415085017933849, guid: b50a736fe304da54da76c9f55b6a543e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 555414555}

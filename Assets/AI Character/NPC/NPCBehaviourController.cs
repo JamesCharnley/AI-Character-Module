@@ -18,12 +18,13 @@ namespace AICharacterModule.NPC
     /// Master machine chooses between navigation and combat sub-machines.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NPCBehaviourController : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat
+    public class NPCBehaviourController : MonoBehaviour
     {
         [SerializeField] private Transform target;
 
-        [Header("Combat Transition Thresholds")]
-        [SerializeField] private float combatCircleApproachDelaySeconds = 5f;
+        [Header("Combat Transition Thresholds")] [SerializeField]
+        private float combatCircleApproachDelaySeconds = 5f;
+
         [SerializeField] private float combatCircleMaxDistanceChange = 2f;
         [SerializeField] private float combatCircleMovedCloserDistance = 5f;
         [SerializeField] private float combatCircleMinDistanceAfterMoveCloser = 8f;
@@ -33,8 +34,8 @@ namespace AICharacterModule.NPC
         [SerializeField] private float approachToHandCombatDistance = 6f;
         [SerializeField] private float handCombatExitDistance = 8f;
         [SerializeField] private float combatToChaseDistanceIncrease = 2.5f;
-        
-        
+
+
         private StateMachineManager<NPCGlobalData> _masterStateMachine;
         public StateMachineManager<NPCGlobalData> GetMasterStateMachine => _masterStateMachine;
         private StateManager<NavigationData, NPCGlobalData> _navigationStateManager;
@@ -43,8 +44,8 @@ namespace AICharacterModule.NPC
         public bool IsNavigationStateLocked => _navigationStateManager?.IsCurrentStateLocked ?? false;
         public bool IsCombatStateLocked => _combatStateManager?.IsCurrentStateLocked ?? false;
 
-        [SerializeField] private float MaxHealth = 100;
-        private float CurrentHealth = 100;
+        [SerializeField] private NpcCharacter CharacterController;
+        public NpcCharacter GetCharacterController => CharacterController;
 
         private void Awake()
         {
@@ -60,24 +61,26 @@ namespace AICharacterModule.NPC
                 DetectionRange = navAgent.stoppingDistance + 60f,
                 AttackRange = navAgent.stoppingDistance,
                 AnimationController = GetComponent<AnimationEventHandler>()
-                
+
             };
 
             _masterStateMachine = new StateMachineManager<NPCGlobalData>(globalData);
 
             // Navigation State machine
-            _navigationStateManager = new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
+            _navigationStateManager =
+                new StateManager<NavigationData, NPCGlobalData>(new NavigationData(globalData), _masterStateMachine);
             _navigationStateManager.RegisterState("Patrol", new PatrolState(this));
             _navigationStateManager.RegisterState("Chase", new ChaseState(this));
             _navigationStateManager.RegisterTransition(
                 "Patrol",
                 "Chase",
                 (_, data) => HasTargetWithinRange(data, data.DetectionRange));
-            
-            
-            var navigationSubMachine = new SubStateMachine<NavigationData, NPCGlobalData>("Navigation", "Chase", _navigationStateManager);
-            
-            
+
+
+            var navigationSubMachine =
+                new SubStateMachine<NavigationData, NPCGlobalData>("Navigation", "Chase", _navigationStateManager);
+
+
             // Combat state machine
             _combatStateManager = new StateManager<CombatData, NPCGlobalData>(new CombatData(), _masterStateMachine);
             _combatStateManager.RegisterState("CombatCircle", new CombatCircleState(this));
@@ -100,8 +103,9 @@ namespace AICharacterModule.NPC
                 "ApproachCombatTarget",
                 ShouldReturnToApproachFromHandCombat);
 
-            var combatSubMachine = new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", _combatStateManager);
-            
+            var combatSubMachine =
+                new SubStateMachine<CombatData, NPCGlobalData>("Combat", "CombatCircle", _combatStateManager);
+
             // Master state machine
             _masterStateMachine.RegisterSubMachine(navigationSubMachine);
             _masterStateMachine.RegisterSubMachine(combatSubMachine);
@@ -116,17 +120,10 @@ namespace AICharacterModule.NPC
                 ShouldReturnToChaseWhenTargetMovesAwayFromCombatCircle);
 
             _masterStateMachine.SwitchTo("Navigation");
-            
+
         }
 
-        private void Start()
-        {
-            HitZones = new();
-            foreach (HitZoneInfo zoneInfo in HitZonesCache)
-            {
-                HitZones.Add(zoneInfo);
-            }
-        }
+
 
         private void Update()
         {
@@ -134,7 +131,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.CurrentTarget = target;
             _masterStateMachine.Tick(Time.deltaTime);
             _masterStateMachine.GlobalData.Tick(Time.deltaTime);
-            
+
         }
 
         private static bool HasTargetWithinRange(NPCGlobalData data, float range)
@@ -146,7 +143,7 @@ namespace AICharacterModule.NPC
 
             return Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position) <= range;
         }
-        
+
         private bool ShouldApproachTargetAfterCirclingForDuration(CombatData localData, NPCGlobalData globalData)
         {
             if (globalData.CurrentTarget == null)
@@ -159,9 +156,11 @@ namespace AICharacterModule.NPC
                 return false;
             }
 
-            float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
+            float currentDistance =
+                Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position);
             float distanceChange = Mathf.Abs(currentDistance - localData.CombatCircleEntryDistanceToTarget);
-            if (distanceChange <= combatCircleMaxDistanceChange) Debug.Log("ShouldApproachTargetAfterCirclingForDuration");
+            if (distanceChange <= combatCircleMaxDistanceChange)
+                Debug.Log("ShouldApproachTargetAfterCirclingForDuration");
             return distanceChange <= combatCircleMaxDistanceChange;
         }
 
@@ -172,11 +171,15 @@ namespace AICharacterModule.NPC
                 return false;
             }
 
-            float currentDistance = Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position - Vector3.up);
+            float currentDistance = Vector3.Distance(globalData.NpcTransform.position,
+                globalData.CurrentTarget.position - Vector3.up);
             float movedCloserDistance = localData.CombatCircleEntryDistanceToTarget - currentDistance;
-            if (movedCloserDistance >= combatCircleMovedCloserDistance && currentDistance > combatCircleMinDistanceAfterMoveCloser) Debug.Log("ShouldApproachTargetWhenItMovesCloser");
-            return movedCloserDistance >= combatCircleMovedCloserDistance && currentDistance > combatCircleMinDistanceAfterMoveCloser;
-            
+            if (movedCloserDistance >= combatCircleMovedCloserDistance &&
+                currentDistance > combatCircleMinDistanceAfterMoveCloser)
+                Debug.Log("ShouldApproachTargetWhenItMovesCloser");
+            return movedCloserDistance >= combatCircleMovedCloserDistance &&
+                   currentDistance > combatCircleMinDistanceAfterMoveCloser;
+
         }
 
         private bool ShouldEnterCombatCircleFromChase(NPCGlobalData data)
@@ -189,7 +192,8 @@ namespace AICharacterModule.NPC
             float distance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position - Vector3.up);
             float targetSpeed = data.GetTargetVelocity().magnitude;
 
-            return distance >= chaseToCombatMinDistance && distance <= chaseToCombatMaxDistance && targetSpeed < chaseToCombatMaxTargetSpeed;
+            return distance >= chaseToCombatMinDistance && distance <= chaseToCombatMaxDistance &&
+                   targetSpeed < chaseToCombatMaxTargetSpeed;
         }
 
         private bool ShouldEnterHandCombatFromApproach(CombatData localData, NPCGlobalData globalData)
@@ -221,21 +225,23 @@ namespace AICharacterModule.NPC
                 return false;
             }
 
-            float currentDistance = Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position - Vector3.up);
+            float currentDistance =
+                Vector3.Distance(data.NpcTransform.position, data.CurrentTarget.position - Vector3.up);
             float distanceIncreaseSinceCombatCircleEnter =
                 currentDistance - data.CombatCircleEntryDistanceToTarget;
 
             return distanceIncreaseSinceCombatCircleEnter >= combatToChaseDistanceIncrease;
-            
+
         }
-        
+
         // ANIMATOR CODE
-        
-        [Header("IK Targets")]
-        [SerializeField] private Transform rightHandTarget;
+
+        [Header("IK Targets")] [SerializeField]
+        private Transform rightHandTarget;
+
         [SerializeField] private Transform leftHandTarget;
 
-        
+
 
         private static readonly int RightHandIKWeightHash = Animator.StringToHash("RightHandIKWeight");
         private static readonly int LeftHandIKWeightHash = Animator.StringToHash("LeftHandIKWeight");
@@ -246,6 +252,7 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.Anim.SetFloat("Speed", Mathf.Abs(localVelocity.z));
             _masterStateMachine.GlobalData.NpcLastVelocity = _masterStateMachine.GlobalData.Anim.velocity;
         }
+
         private void OnAnimatorIK(int layerIndex)
         {
             Animator animator = _masterStateMachine.GlobalData.Anim;
@@ -262,7 +269,7 @@ namespace AICharacterModule.NPC
         private void ApplyHandIK(AvatarIKGoal handGoal, Transform target, float weight)
         {
             Animator animator = _masterStateMachine.GlobalData.Anim;
-            
+
             animator.SetIKPositionWeight(handGoal, weight);
             //animator.SetIKRotationWeight(handGoal, weight);
 
@@ -284,64 +291,8 @@ namespace AICharacterModule.NPC
             _masterStateMachine.GlobalData.AnimationController.PlayDodgeAnimation(_offset);
         }
 
-        public void TakeDamage(float _amount)
-        {
-            throw new NotImplementedException();
-        }
 
-        [SerializeField] private Transform TorsoeBone;
-        public void TakeDamage(float _amount, Vector3 _direction, Vector3 _damagerPos)
-        {
-            throw new NotImplementedException();
-        }
 
-        public void TakeDamage(float _amount, Vector3 _direction, HitZoneInfo _hitZoneInfo)
-        {
-            CurrentHealth -= _amount;
-            if (CurrentHealth <= 0)
-            {
-                Debug.Log("NPC DEAD");
-                CurrentHealth = MaxHealth;
-                return;
-            }
-            _masterStateMachine.GlobalData.AnimationController.PlayDamageAnimation(_amount, _direction, _hitZoneInfo);
-        }
-        
-        [SerializeField] private HitZoneInfo[] HitZonesCache;
-        public List<HitZoneInfo> HitZones { get; set; }
-        public HitZoneInfo GetClosestHitzoneTransform(Vector3 _RelativeTo)
-        {
-            HitZoneInfo closestHitZone = new();
-            float shortestDist = 999;
-            foreach (HitZoneInfo hitZone in HitZones)
-            {
-                float dist = Vector3.Distance(hitZone.SelfTransform.position, _RelativeTo);
-                if (dist < shortestDist)
-                {
-                    shortestDist = dist;
-                    closestHitZone = hitZone;
-                }
-            }
-
-            return closestHitZone;
-        }
-
-        private IncomingAttackData CurrentIncomingAttack;
-        public IncomingAttackData GetCurrentIncomingAttack => CurrentIncomingAttack;
-        public void NotifyIncomingAttack(IncomingAttackData _data)
-        {
-            CurrentIncomingAttack = _data;
-            StartCoroutine(IncomingAttackExpire(_data));
-        }
-
-        IEnumerator IncomingAttackExpire(IncomingAttackData _data)
-        {
-            yield return new WaitForSeconds(0.5f);
-            if (Math.Abs(_data.TimeStamp - CurrentIncomingAttack.TimeStamp) < 0.05f)
-            {
-                CurrentIncomingAttack = new();
-            }
-        }
     }
-    
+
 }

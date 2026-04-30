@@ -108,7 +108,7 @@ namespace AICharacterModule.NPC.StateMachine.States
                     if (ShouldDodge(localData, globalData, Time.deltaTime))
                     {
                         globalData.IsDodging = true;
-                        globalData.AnimationController.PlayDodgeAnimation(globalData.BehaviourController.GetCurrentIncomingAttack.HitZoneData.LocalOffset);
+                        globalData.AnimationController.PlayDodgeAnimation(globalData.BehaviourController.GetCharacterController.GetCurrentIncomingAttack.HitZoneData.LocalOffset);
                     }
                     else if (!WasAttacking && !AttackCoolingDown)
                     {
@@ -177,7 +177,7 @@ namespace AICharacterModule.NPC.StateMachine.States
 
         bool ShouldDodge(CombatData localData, NPCGlobalData globalData, float deltaTime)
         {
-            IncomingAttackData data = globalData.BehaviourController.GetCurrentIncomingAttack;
+            IncomingAttackData data = globalData.BehaviourController.GetCharacterController.GetCurrentIncomingAttack;
             if (data.Type == EAttackType.None)
             {
                 return false;
