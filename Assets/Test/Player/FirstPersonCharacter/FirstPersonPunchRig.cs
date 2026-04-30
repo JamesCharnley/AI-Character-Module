@@ -277,8 +277,21 @@ namespace FirstPersonCharacter
             {
                 return;
             }
-
             CurrentHitZone = GetCurrentHitZone();
+            if (CurrentHitZone.SelfTransform)
+            {
+                if (CurrentHitZone.SelfTransform.root.TryGetComponent(out ICombat combat))
+                {
+                    IncomingAttackData data = new()
+                    {
+                        Type = EAttackType.Melee,
+                        HitZoneData = CurrentHitZone,
+                        TimeStamp = Time.time
+                    };
+
+                    combat.NotifyIncomingAttack(data);
+                }
+            }
             punchCharging = false;
             float clampedChargeRatio = Mathf.Clamp01(chargeRatio);
             float strikeDuration = Mathf.Lerp(Mathf.Max(maxStrikeDuration, minStrikeDuration), minStrikeDuration, clampedChargeRatio);

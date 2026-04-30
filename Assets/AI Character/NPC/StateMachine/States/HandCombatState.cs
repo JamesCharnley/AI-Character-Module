@@ -105,7 +105,12 @@ namespace AICharacterModule.NPC.StateMachine.States
 
                 if (!globalData.IsAttacking && !globalData.IsDodging && globalData.NavAgent.speed < 0.1f)
                 {
-                    if (!WasAttacking && !AttackCoolingDown)
+                    if (ShouldDodge(localData, globalData, Time.deltaTime))
+                    {
+                        globalData.IsDodging = true;
+                        globalData.AnimationController.PlayDodgeAnimation(globalData.BehaviourController.GetCurrentIncomingAttack.HitZoneData.LocalOffset);
+                    }
+                    else if (!WasAttacking && !AttackCoolingDown)
                     {
                         EvaluateAttacks(localData, globalData);
                     }
@@ -168,6 +173,26 @@ namespace AICharacterModule.NPC.StateMachine.States
 
             WasAttacking = globalData.IsAttacking;
 
+        }
+
+        bool ShouldDodge(CombatData localData, NPCGlobalData globalData, float deltaTime)
+        {
+            IncomingAttackData data = globalData.BehaviourController.GetCurrentIncomingAttack;
+            if (data.Type == EAttackType.None)
+            {
+                return false;
+            }
+
+            float timePassed = Mathf.Abs(Time.time - data.TimeStamp);
+            if (data.Type == EAttackType.Melee)
+            {
+                if (timePassed < 0.2f)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         IEnumerator AttackCooldown()

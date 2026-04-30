@@ -3,6 +3,7 @@ using AICharacterModule.NPC.StateMachine.Managers;
 using AICharacterModule.NPC.StateMachine.States;
 using AICharacterModule.NPC.StateMachine.SubMachines;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using AICharacterModule.NPC.Animation;
 using AICharacterModule.NPC.StateMachine.Core;
@@ -17,7 +18,7 @@ namespace AICharacterModule.NPC
     /// Master machine chooses between navigation and combat sub-machines.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NPCBehaviourController : MonoBehaviour, ITakeDamage, IHasHitZones
+    public class NPCBehaviourController : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat
     {
         [SerializeField] private Transform target;
 
@@ -325,7 +326,22 @@ namespace AICharacterModule.NPC
             return closestHitZone;
         }
 
-        
+        private IncomingAttackData CurrentIncomingAttack;
+        public IncomingAttackData GetCurrentIncomingAttack => CurrentIncomingAttack;
+        public void NotifyIncomingAttack(IncomingAttackData _data)
+        {
+            CurrentIncomingAttack = _data;
+            StartCoroutine(IncomingAttackExpire(_data));
+        }
+
+        IEnumerator IncomingAttackExpire(IncomingAttackData _data)
+        {
+            yield return new WaitForSeconds(0.5f);
+            if (Math.Abs(_data.TimeStamp - CurrentIncomingAttack.TimeStamp) < 0.05f)
+            {
+                CurrentIncomingAttack = new();
+            }
+        }
     }
     
 }
