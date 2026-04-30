@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AICharacterModule.NPC;
 using AICharacterModule.NPC.Animation;
 using AICharacterModule.NPC.StateMachine.Core;
 using UnityEngine;
 
-public class NpcCharacter : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat
+public class NpcCharacter : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat, IBehaviours
 {
     [SerializeField] private float MaxHealth = 100;
     private float CurrentHealth = 100;
@@ -13,8 +14,11 @@ public class NpcCharacter : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat
     [SerializeField] private HitZoneInfo[] HitZonesCache;
 
     [SerializeField] private AnimationEventHandler animationController;
+    
+    public NPCBehaviourController BehaviourController { get; set; }
     private void Start()
     {
+        BehaviourController = GetComponent<NPCBehaviourController>();
         HitZones = new();
         foreach (HitZoneInfo zoneInfo in HitZonesCache)
         {
@@ -80,5 +84,7 @@ public class NpcCharacter : MonoBehaviour, ITakeDamage, IHasHitZones, ICombat
             CurrentIncomingAttack = new();
         }
     }
+
+    
 }
 

@@ -735,7 +735,7 @@ MonoBehaviour:
   punchDamageWindowNormalized: 0.2
   impulseForwardTimingNormalized: 0.626
   punchWooshTimingNormalized: 0.25
-  forwardDistance: 1.2
+  forwardDistance: 1.35
   inwardDistance: 0
   upwardDistance: 0
   windUpBackDistance: 0.2
