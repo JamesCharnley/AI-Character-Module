@@ -117,6 +117,7 @@ namespace FirstPersonCharacter
         private Vector3 cameraRestLocalPos;
         private Quaternion cameraRestLocalRot;
         private Coroutine cameraEffectRoutine;
+        private bool cameraPunchReactionActive;
         private Coroutine blockHitReactionRoutine;
         private float blockHitReactionWeight;
         
@@ -509,6 +510,11 @@ namespace FirstPersonCharacter
                 return;
             }
 
+            if (cameraPunchReactionActive)
+            {
+                return;
+            }
+
             StopCameraEffectRoutine();
 
             cameraEffectRoutine = StartCoroutine(CameraPunchEffectRoutine());
@@ -560,6 +566,7 @@ namespace FirstPersonCharacter
             }
 
             StopCameraEffectRoutine();
+            cameraPunchReactionActive = true;
             cameraEffectRoutine = StartCoroutine(CameraPunchReactionRoutine(lungeBackDistance, rotateUpDegrees));
         }
 
@@ -643,6 +650,7 @@ namespace FirstPersonCharacter
 
             cameraEffectTarget.localPosition = cameraRestLocalPos;
             cameraEffectTarget.localRotation = startLocalRot;
+            cameraPunchReactionActive = false;
             cameraEffectRoutine = null;
         }
 
@@ -653,6 +661,8 @@ namespace FirstPersonCharacter
                 StopCoroutine(cameraEffectRoutine);
                 cameraEffectRoutine = null;
             }
+
+            cameraPunchReactionActive = false;
         }
 
         private IEnumerator MoveTarget(
