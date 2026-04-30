@@ -253,13 +253,13 @@ namespace AICharacterModule.NPC.Animation
 		
 		public void PlayDodgeAnimation(Vector3 _offset)
 		{
-			if (_offset.y == 1)
+			if (_offset.y == 2 && _offset.x == 0)
 			{
 				// duck
 				anim.SetTrigger("DodgePunchDown");
 				return;
 			}
-			if (_offset.y == -1)
+			if ((_offset.y == -1 && _offset.x == 0) || (_offset.y == 1 && _offset.x == 0))
 			{
 				// back
 				anim.SetTrigger("DodgePunchBack");
@@ -271,13 +271,13 @@ namespace AICharacterModule.NPC.Animation
 				anim.SetTrigger("DodgePunchBack");
 				return;
 			}
-			if (_offset.x == 1)
+			if (_offset.x == -1)
 			{
 				// left
 				anim.SetTrigger("DodgePunchLeft");
 				return;
 			}
-			if (_offset.x == -1)
+			if (_offset.x == 1)
 			{
 				// right
 				anim.SetTrigger("DodgePunchRight");

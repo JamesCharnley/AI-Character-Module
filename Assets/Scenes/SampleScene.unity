@@ -1090,7 +1090,7 @@ MonoBehaviour:
   - SelfTransform: {fileID: 1564154784}
     LocalOffset: {x: -1, y: -1, z: 1}
   - SelfTransform: {fileID: 1444257817}
-    LocalOffset: {x: 0, y: 1, z: 1}
+    LocalOffset: {x: 0, y: 2, z: 1}
 --- !u!195 &405209233
 NavMeshAgent:
   m_ObjectHideFlags: 0
