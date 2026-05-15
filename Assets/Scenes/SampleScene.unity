@@ -734,7 +734,7 @@ MonoBehaviour:
   punchCooldown: 0.1
   punchDamageWindowNormalized: 0.2
   impulseForwardTimingNormalized: 0.626
-  punchWooshTimingNormalized: 0.25
+  punchWooshTimingNormalized: 0
   forwardDistance: 1.35
   inwardDistance: 0
   upwardDistance: 0
@@ -1716,12 +1716,24 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6
+      value: -1.922
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1754,6 +1766,10 @@ PrefabInstance:
     - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400010, guid: 744b9f4a43d835d41b06367fee405e99, type: 3}
       propertyPath: m_LocalRotation.w

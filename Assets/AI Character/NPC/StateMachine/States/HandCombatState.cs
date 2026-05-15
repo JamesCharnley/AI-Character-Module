@@ -78,12 +78,12 @@ namespace AICharacterModule.NPC.StateMachine.States
             float distanceToTarget =
                 Vector3.Distance(globalData.NpcTransform.position, globalData.CurrentTarget.position - Vector3.up);
 
-            if (!IsIdle && distanceToTarget < 1.5f && distanceToTarget > 0.6f)
+            if (!IsIdle && distanceToTarget < 1.35f && distanceToTarget > 0.6f)
             {
                 IsIdle = true;
                 IsMoving = false;
             }
-            else if (IsIdle && distanceToTarget > 2 || distanceToTarget <= 0.6f)
+            else if (IsIdle && distanceToTarget > 1.35f || distanceToTarget <= 0.6f)
             {
                 IsMoving = true;
                 IsIdle = false;
